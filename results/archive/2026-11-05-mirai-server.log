@@ -1,0 +1,48 @@
+🚀 OpenAI-compatible server v0.6.17 for model: alibaba:qwen3.8:27b:mirai:mirai-m:4
+🌐 Available at: http://127.0.0.1:8000
+🗄️  Prefix cache: enabled
+📝 Endpoints:
+   POST /v1/chat/completions (or /chat/completions)
+   GET  /v1/models           (or /models)
+
+[3f29ca4c] received: 1 messages, stream, 0 tools, reasoning_effort=disabled
+[3f29ca4c] completed in 1.42s, finish=length, prompt 47 tok (0 cached, 47 prefilled @ 43.3 tok/s), ttft 1.08s, decode 8 tok @ 64.9 tok/s, spec 8.50 tok/pass (2 passes)
+[d465f26a] received: 1 messages, stream, 0 tools, reasoning_effort=disabled
+[d465f26a] completed in 4.55s, finish=length, prompt 47 tok (0 cached, 47 prefilled @ 292.1 tok/s), ttft 0.16s, decode 256 tok @ 58.6 tok/s, spec 7.63 tok/pass (35 passes)
+[e9517f5a] received: 1 messages, stream, 0 tools, reasoning_effort=disabled
+[e9517f5a] completed in 4.77s, finish=length, prompt 47 tok (0 cached, 47 prefilled @ 291.0 tok/s), ttft 0.16s, decode 256 tok @ 57.1 tok/s, spec 6.74 tok/pass (38 passes)
+[9b0974c5] received: 1 messages, stream, 0 tools, reasoning_effort=disabled
+[9b0974c5] completed in 4.68s, finish=length, prompt 47 tok (0 cached, 47 prefilled @ 286.1 tok/s), ttft 0.16s, decode 256 tok @ 58.2 tok/s, spec 6.92 tok/pass (37 passes)
+[50f7365d] received: 1 messages, stream, 0 tools, reasoning_effort=disabled
+[50f7365d] completed in 35.92s, finish=length, prompt 18129 tok (0 cached, 18129 prefilled @ 508.8 tok/s), ttft 35.63s, decode 8 tok @ 30.0 tok/s, spec 3.33 tok/pass (3 passes)
+[a6fbc7a4] received: 1 messages, stream, 0 tools, reasoning_effort=disabled
+[a6fbc7a4] completed in 34.58s, finish=length, prompt 18129 tok (0 cached, 18129 prefilled @ 528.5 tok/s), ttft 34.30s, decode 8 tok @ 30.0 tok/s, spec 3.33 tok/pass (3 passes)
+[47cfe022] received: 1 messages, stream, 0 tools, reasoning_effort=disabled
+[47cfe022] completed in 38.29s, finish=length, prompt 18129 tok (0 cached, 18129 prefilled @ 513.2 tok/s), ttft 35.32s, decode 128 tok @ 43.5 tok/s, spec 5.67 tok/pass (24 passes)
+[9f04cac3] received: 1 messages, stream, 0 tools, reasoning_effort=disabled
+[9f04cac3] completed in 34.22s, finish=stop, prompt 18133 tok (0 cached, 18133 prefilled @ 533.9 tok/s), ttft 33.96s, decode 2 tok @ 9.3 tok/s, spec 2.00 tok/pass (2 passes)
+[8d9a6172] received: 1 messages, stream, 0 tools, reasoning_effort=disabled
+[8d9a6172] completed in 34.53s, finish=length, prompt 18133 tok (0 cached, 18133 prefilled @ 527.5 tok/s), ttft 34.38s, decode 4 tok @ 28.9 tok/s, spec 3.00 tok/pass (2 passes)
+[b2705af9] received: 1 messages, stream, 0 tools, reasoning_effort=disabled
+[b2705af9] completed in 35.36s, finish=length, prompt 18139 tok (0 cached, 18139 prefilled @ 517.0 tok/s), ttft 35.08s, decode 4 tok @ 13.0 tok/s, spec 2.67 tok/pass (3 passes)
+[1b31fefc] received: 1 messages, stream, 0 tools, reasoning_effort=disabled
+[1b31fefc] completed in 34.89s, finish=length, prompt 18144 tok (0 cached, 18144 prefilled @ 524.3 tok/s), ttft 34.61s, decode 4 tok @ 13.0 tok/s, spec 2.67 tok/pass (3 passes)
+[c3c9e5cb] received: 1 messages, stream, 0 tools, reasoning_effort=disabled
+[c3c9e5cb] completed in 34.20s, finish=stop, prompt 18133 tok (0 cached, 18133 prefilled @ 534.5 tok/s), ttft 33.92s, decode 2 tok @ 9.3 tok/s, spec 2.00 tok/pass (2 passes)
+[c265b7ca] received: 3 messages, stream, 0 tools, reasoning_effort=disabled
+[c265b7ca] completed in 0.28s, finish=stop, prompt 18152 tok (18135 cached, 17 prefilled @ 129.9 tok/s), ttft 0.13s, decode 2 tok @ 9.3 tok/s, spec 1.50 tok/pass (2 passes)
+[9441a16c] received: 3 messages, stream, 0 tools, reasoning_effort=disabled
+[9441a16c] completed in 34.53s, finish=stop, prompt 18152 tok (0 cached, 18152 prefilled @ 528.0 tok/s), ttft 34.38s, decode 2 tok @ 9.2 tok/s, spec 1.50 tok/pass (2 passes)
+[daeb20cb] received: 1 messages, stream, 0 tools, reasoning_effort=disabled
+[daeb20cb] completed in 0.40s, finish=length, prompt 47 tok (0 cached, 47 prefilled @ 283.2 tok/s), ttft 0.17s, decode 8 tok @ 72.6 tok/s, spec 8.50 tok/pass (2 passes)
+[c1b5c9d5] received: 1 messages, stream, 0 tools, reasoning_effort=disabled
+[c1b5c9d5] completed in 4.24s, finish=length, prompt 47 tok (0 cached, 47 prefilled @ 297.0 tok/s), ttft 0.16s, decode 256 tok @ 63.0 tok/s, spec 7.63 tok/pass (35 passes)
+[dc9a603f] received: 1 messages, stream, 0 tools, reasoning_effort=disabled
+[dc9a603f] completed in 4.23s, finish=length, prompt 47 tok (0 cached, 47 prefilled @ 295.8 tok/s), ttft 0.16s, decode 256 tok @ 63.1 tok/s, spec 7.63 tok/pass (35 passes)
+[6cb918e0] received: 1 messages, stream, 0 tools, reasoning_effort=disabled
+[6cb918e0] completed in 4.46s, finish=length, prompt 47 tok (0 cached, 47 prefilled @ 296.6 tok/s), ttft 0.16s, decode 256 tok @ 59.6 tok/s, spec 7.03 tok/pass (37 passes)
+[98c71a5a] received: 1 messages, stream, 0 tools, reasoning_effort=disabled
+[98c71a5a] completed in 36.99s, finish=length, prompt 18129 tok (0 cached, 18129 prefilled @ 532.8 tok/s), ttft 34.03s, decode 128 tok @ 43.5 tok/s, spec 5.83 tok/pass (24 passes)
+[8a102ce7] received: 3 messages, stream, 0 tools, reasoning_effort=disabled
+[8a102ce7] Reprefill: rendered text changed; discarding 18257 cached tokens, prefilling 18277 tokens; first_text_difference_byte=32849 (0-based), cached_bytes=32855, rendered_bytes=32965; first_token_difference=18255 (0-based), cached=198 ("\n"), rendered=248046 ("<|im_end|>"); cached_tokens[18252..18257]=[(198, "\n"), (262, "   "), (4071, " \"\"\""), (198, "\n"), (1031, "    \n")]; rendered_tokens[18252..18259]=[(198, "\n"), (262, "   "), (4071, " \"\"\""), (248046, "<|im_end|>"), (198, "\n"), (248045, "<|im_start|>"), (846, "user")]
+[8a102ce7] completed in 35.08s, finish=stop, prompt 18277 tok (0 cached, 18277 prefilled @ 523.3 tok/s), ttft 34.93s, decode 2 tok @ 9.3 tok/s, spec 1.50 tok/pass (2 passes)

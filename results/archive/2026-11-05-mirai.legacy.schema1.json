@@ -1,0 +1,184 @@
+{
+  "schema_version": 1,
+  "label": "mirai",
+  "timestamp": "2026-11-05T20:47:51.556775+00:00",
+  "source": "legacy-import",
+  "legacy_schema_version": 0,
+  "imported_at": "2026-11-05T21:32:18.615888+00:00",
+  "imported_from": "jarvis/bench-llm/results/mirai.json",
+  "engine": {
+    "label": "mirai",
+    "name": "Mirai / uzu",
+    "version": "cli 0.6.17",
+    "version_source": "captured-at-import",
+    "base_url": "http://127.0.0.1:8000/v1",
+    "port": 8000,
+    "reasoning_effort": "disabled",
+    "proc_pattern": "(^|/)mirai (--model|server)|cli server",
+    "persistent": false
+  },
+  "model": {
+    "id": "alibaba:qwen3.8:27b:mirai:mirai-m:4",
+    "configured_id": "alibaba:qwen3.8:27b:mirai:mirai-m:4",
+    "quantization": "4-bit (Mirai M)",
+    "context": null,
+    "context_source": "legacy"
+  },
+  "suite": {
+    "revision": 0,
+    "note": "Imported from the original jarvis/bench-llm harness. Cases and max_tokens differ from the current suite.",
+    "cases": [
+      {
+        "name": "decode_short",
+        "prompt": "short",
+        "max_tokens": 256,
+        "reps": 3,
+        "validate": null
+      },
+      {
+        "name": "prefill_cold_long",
+        "prompt": "long",
+        "max_tokens": 128,
+        "reps": 1,
+        "validate": null
+      },
+      {
+        "name": "cached_ttft_long",
+        "prompt": "long",
+        "max_tokens": 2,
+        "reps": 1,
+        "validate": "cache_hit"
+      }
+    ]
+  },
+  "machine": {
+    "host": "mac-mini-m6",
+    "os": "Darwin 27.2.0",
+    "macos": "27.2",
+    "model": "Mac18,5",
+    "chip": "Apple M6",
+    "memory_gb": 34.4,
+    "python": "3.15.2"
+  },
+  "summary": {
+    "model": "alibaba:qwen3.8:27b:mirai:mirai-m:4",
+    "context": null,
+    "decode_short_tps": 62.96,
+    "prefill_long_tps": 532.08,
+    "cached_ttft_long_ms": null,
+    "cold_ttft_long_ms": 34071.8,
+    "decode_at_long_tps": 45.53,
+    "prompt_tokens_long": 18129,
+    "peak_engine_rss_mb": 15455.5,
+    "wired_before_gb": 2.31,
+    "wired_peak_gb": 19.71,
+    "wired_after_gb": 19.55,
+    "rss_samples": 162,
+    "reported_cached_ttft_long_ms": 34975.2,
+    "valid_cases": [
+      "decode_short",
+      "prefill_cold_long"
+    ],
+    "invalid_cases": [
+      "cached_ttft_long"
+    ]
+  },
+  "validation": {
+    "decode_short": {
+      "valid": true,
+      "reasons": []
+    },
+    "prefill_cold_long": {
+      "valid": true,
+      "reasons": []
+    },
+    "cached_ttft_long": {
+      "valid": false,
+      "reasons": [
+        "cached TTFT (34975 ms) is not meaningfully lower than cold TTFT (34072 ms)"
+      ]
+    }
+  },
+  "runs": [
+    {
+      "ttft_ms": 185.4,
+      "ttft_any_ms": 185.4,
+      "total_ms": 4239.3,
+      "prompt_tokens": 47,
+      "completion_tokens": 256,
+      "completion_tokens_source": "usage",
+      "content_chunks": 197,
+      "reasoning_chunks": 0,
+      "decode_tps": 62.96,
+      "prefill_tps": 253.44,
+      "answer_preview": "```python def merge_intervals(intervals):     \"\"\"     Merge overlapping closed intervals and return them sorted.        ",
+      "text": "```python\ndef merge_intervals(intervals):\n    \"\"\"\n    Merge overlapping closed intervals and return them sorted.\n    \n    >>> merge_intervals([(1, 3), (2, 6), (8, 10), (15, 18)])\n    [(1, 6), (8, 10), (15, 18)]\n    >>> merge_intervals([(1, 4), (4, 5)])\n    [(1, 5)]\n    >>> merge_intervals([])\n    []\n    \"\"\"\n    if not intervals:\n        return []\n    \n    # Sort intervals by start time\n    sorted_intervals = sorted(intervals, key=lambda x: x[0])\n    \n    merged = [sorted_intervals[0]]\n    \n    for current in sorted_intervals[1:]:\n        last = merged[-1]\n        # Check if current interval overlaps with the last merged interval\n        if current[0] <= last[1]:\n            # Merge by updating the end of the last interval\n            merged[-1] = (last[0], max(last[1], current[1]))\n        else:\n            # No overlap, add the current interval",
+      "case": "decode_short",
+      "rep": 1
+    },
+    {
+      "ttft_ms": 186.7,
+      "ttft_any_ms": 186.7,
+      "total_ms": 4228.5,
+      "prompt_tokens": 47,
+      "completion_tokens": 256,
+      "completion_tokens_source": "usage",
+      "content_chunks": 197,
+      "reasoning_chunks": 0,
+      "decode_tps": 63.14,
+      "prefill_tps": 251.78,
+      "answer_preview": "```python def merge_intervals(intervals):     \"\"\"     Merge overlapping closed intervals and return them sorted.        ",
+      "text": "```python\ndef merge_intervals(intervals):\n    \"\"\"\n    Merge overlapping closed intervals and return them sorted.\n    \n    >>> merge_intervals([(1, 3), (2, 6), (8, 10), (15, 18)])\n    [(1, 6), (8, 10), (15, 18)]\n    >>> merge_intervals([(1, 4), (4, 5)])\n    [(1, 5)]\n    >>> merge_intervals([])\n    []\n    \"\"\"\n    if not intervals:\n        return []\n    \n    # Sort intervals by start time\n    sorted_intervals = sorted(intervals, key=lambda x: x[0])\n    \n    merged = [sorted_intervals[0]]\n    \n    for current in sorted_intervals[1:]:\n        last = merged[-1]\n        # Check if current interval overlaps with the last merged interval\n        if current[0] <= last[1]:\n            # Merge by updating the end of the last interval\n            merged[-1] = (last[0], max(last[1], current[1]))\n        else:\n            # No overlap, add the current interval",
+      "case": "decode_short",
+      "rep": 2
+    },
+    {
+      "ttft_ms": 187.1,
+      "ttft_any_ms": 187.1,
+      "total_ms": 4465.3,
+      "prompt_tokens": 47,
+      "completion_tokens": 256,
+      "completion_tokens_source": "usage",
+      "content_chunks": 196,
+      "reasoning_chunks": 0,
+      "decode_tps": 59.66,
+      "prefill_tps": 251.18,
+      "answer_preview": "```python def merge_intervals(intervals):     \"\"\"     Merge overlapping closed intervals and return them sorted.        ",
+      "text": "```python\ndef merge_intervals(intervals):\n    \"\"\"\n    Merge overlapping closed intervals and return them sorted.\n    \n    >>> merge_intervals([(1, 3), (2, 6), (8, 10), (15, 18)])\n    [(1, 6), (8, 10), (15, 18)]\n    >>> merge_intervals([(1, 4), (4, 5)])\n    [(1, 5)]\n    >>> merge_intervals([])\n    []\n    \"\"\"\n    if not intervals:\n        return []\n    \n    # Sort intervals by start time\n    sorted_intervals = sorted(intervals, key=lambda x: x[0])\n    \n    merged = [sorted_intervals[0]]\n    \n    for current in sorted_intervals[1:]:\n        last = merged[-1]\n        # Check if current interval overlaps with the last merged interval\n        if current[0] <= last[1]:\n            # Merge: update the end of the last interval\n            merged[-1] = (last[0], max(last[1], current[1]))\n        else:\n            # No overlap, add current interval",
+      "case": "decode_short",
+      "rep": 3
+    },
+    {
+      "ttft_ms": 34071.8,
+      "ttft_any_ms": 34071.8,
+      "total_ms": 36992.5,
+      "prompt_tokens": 18129,
+      "completion_tokens": 128,
+      "completion_tokens_source": "usage",
+      "content_chunks": 102,
+      "reasoning_chunks": 0,
+      "decode_tps": 45.53,
+      "prefill_tps": 532.08,
+      "answer_preview": "```python \"\"\" LRU Cache Implementation using a Doubly Linked List and Hash Map.  This module provides an LRU (Least Rece",
+      "text": "```python\n\"\"\"\nLRU Cache Implementation using a Doubly Linked List and Hash Map.\n\nThis module provides an LRU (Least Recently Used) cache with O(1) time complexity\nfor both get and put operations.\n\"\"\"\n\nfrom typing import Optional, Hashable, Any\n\n\nclass Node:\n    \"\"\"\n    A node in the doubly linked list.\n    \n    Attributes:\n        key: The key associated with the node.\n        value: The value stored in the node.\n        prev: Reference to the previous node.\n        next: Reference to the next node.\n    \"\"\"",
+      "case": "prefill_cold_long",
+      "rep": 1
+    },
+    {
+      "ttft_ms": 34975.2,
+      "ttft_any_ms": 34975.2,
+      "total_ms": 35082.5,
+      "prompt_tokens": 18277,
+      "completion_tokens": 2,
+      "completion_tokens_source": "usage",
+      "content_chunks": 1,
+      "reasoning_chunks": 0,
+      "decode_tps": null,
+      "prefill_tps": 522.57,
+      "answer_preview": "DONE",
+      "text": "DONE",
+      "case": "cached_ttft_long",
+      "rep": 1
+    }
+  ]
+}

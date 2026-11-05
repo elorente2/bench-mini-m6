@@ -1,0 +1,73 @@
+# Engine definitions for the benchmark.
+#
+# Only one model-loaded engine may run during a measurement. Splash and Mirai
+# share port 8000; Ollama uses its normal port 11434 and is treated as a
+# persistent service. The harness refuses to start a pass while a conflicting
+# engine is alive. See docs/fairness-rules.md.
+
+[engines.splash]
+name = "Splash"
+base_url = "http://127.0.0.1:8000/v1"
+port = 8000
+model = "unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL"
+api_model = "unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL"
+quantization = "Q3_K_XL (~3-bit)"
+context_tokens = 217081
+reasoning_effort = "none"
+proc_pattern = 'splash serve-native|server\.server'
+conflicts = ['(^|/)mirai (--model|server)']
+start = [
+  "splash",
+  "serve",
+  "--model",
+  "unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL",
+  "--port",
+  "8000",
+]
+version_cmd = ["splash", "--version"]
+persistent = false
+notes = "Text, vision and PDF. Reports a 217,081-token context window."
+
+[engines.mirai]
+name = "Mirai / uzu"
+base_url = "http://127.0.0.1:8000/v1"
+port = 8000
+model = "qwen3.8:27b"
+api_model = "alibaba:qwen3.8:27b:mirai:mirai-m:4"
+quantization = "4-bit (Mirai M)"
+reasoning_effort = "disabled"
+proc_pattern = '(^|/)mirai (--model|server)|cli server'
+conflicts = ['splash serve-native|server\.server']
+start = ["mirai", "server", "--model", "qwen3.8:27b", "--port", "8000"]
+version_cmd = ["mirai", "--version"]
+persistent = false
+notes = "Text only. Ships its own speculator; context window is not reported by the API."
+
+[engines.ollama-q3kxl]
+name = "Ollama (imported Q3_K_XL)"
+base_url = "http://127.0.0.1:11434/v1"
+port = 11434
+model = "qwen3.8-27b-q3kxl"
+api_model = "qwen3.8-27b-q3kxl"
+quantization = "Q3_K_XL (~3-bit, imported GGUF)"
+context_tokens = 32768
+proc_pattern = '(^|/)ollama serve'
+conflicts = ['splash serve-native|server\.server', '(^|/)mirai (--model|server)']
+start = ["ollama", "serve"]
+version_cmd = ["ollama", "--version"]
+persistent = true
+notes = "Same GGUF quant as Splash, imported with scripts/import-ollama.sh."
+
+[engines.ollama-default]
+name = "Ollama (native tag)"
+base_url = "http://127.0.0.1:11434/v1"
+port = 11434
+model = "qwen3.8:27b"
+api_model = "qwen3.8:27b"
+quantization = "Ollama default (native tag)"
+proc_pattern = '(^|/)ollama serve'
+conflicts = ['splash serve-native|server\.server', '(^|/)mirai (--model|server)']
+start = ["ollama", "serve"]
+version_cmd = ["ollama", "--version"]
+persistent = true
+notes = "Out-of-the-box Ollama tag. Context depends on the tag and num_ctx."

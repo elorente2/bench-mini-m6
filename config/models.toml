@@ -1,0 +1,39 @@
+# Model metadata shared by the documentation and the reports.
+#
+# Paths and tags are deliberately not hard-coded in scripts: the exact model
+# identifier is configurable per engine in config/engines.toml.
+
+[models.qwen3.8-27b]
+name = "Qwen3.8-27B"
+family = "qwen3.8"
+parameters = "27B"
+notes = "Text model used by every contender. Splash and Mirai run different weight formats."
+
+[models.qwen3.8-27b.variants.splash]
+engine = "splash"
+id = "unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL"
+format = "GGUF"
+quantization = "Q3_K_XL (~3-bit)"
+weights_gb = 13.1
+draft = "DFlash2 draft (~3.8 GB)"
+
+[models.qwen3.8-27b.variants.mirai]
+engine = "mirai"
+id = "alibaba:qwen3.8:27b:mirai:mirai-m:4"
+format = "Mirai M"
+quantization = "4-bit"
+weights_gb = 14.5
+draft = "Mirai speculator (~1.1 GB)"
+
+[models.qwen3.8-27b.variants.ollama-q3kxl]
+engine = "ollama-q3kxl"
+id = "qwen3.8-27b-q3kxl"
+format = "GGUF imported into Ollama"
+quantization = "Q3_K_XL (~3-bit)"
+weights_gb = 13.1
+
+[models.qwen3.8-27b.variants.ollama-default]
+engine = "ollama-default"
+id = "qwen3.8:27b"
+format = "Ollama native"
+quantization = "depends on the native tag"

@@ -1,0 +1,9 @@
+# Example Modelfile for the Ollama "same weights" contender.
+# Copy it, replace the FROM path with the GGUF on your machine, then run:
+#   ollama create qwen3.8-27b-q3kxl -f Modelfile
+# The helper script does this for you:
+#   ./scripts/import-ollama.sh /path/to/Qwen3.8-27B-UD-Q3_K_XL.gguf
+
+FROM /absolute/path/to/Qwen3.8-27B-UD-Q3_K_XL.gguf
+PARAMETER num_ctx 32768
+PARAMETER temperature 0

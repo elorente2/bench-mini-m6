@@ -1,0 +1,226 @@
+{
+  "schema_version": 1,
+  "label": "mirai",
+  "timestamp": "2026-11-05T21:50:43.586323+00:00",
+  "finished_at": "2026-11-05T21:52:43.998094+00:00",
+  "source": "bench",
+  "engine": {
+    "label": "mirai",
+    "name": "Mirai / uzu",
+    "version": "cli 0.6.17",
+    "base_url": "http://127.0.0.1:8000/v1",
+    "port": 8000,
+    "reasoning_effort": "disabled",
+    "proc_pattern": "(^|/)mirai (--model|server)|cli server",
+    "persistent": false
+  },
+  "model": {
+    "id": "alibaba:qwen3.8:27b:mirai:mirai-m:4",
+    "configured_id": "alibaba:qwen3.8:27b:mirai:mirai-m:4",
+    "quantization": "4-bit (Mirai M)",
+    "context": null,
+    "context_source": "unknown"
+  },
+  "suite": {
+    "revision": 1,
+    "prefill_target_chars": 32000,
+    "warmup_max_tokens": 8,
+    "cases": [
+      {
+        "name": "decode_short",
+        "prompt": "short",
+        "max_tokens": 256,
+        "reps": 3,
+        "validate": null,
+        "compare_to": null
+      },
+      {
+        "name": "prefill_cold_long",
+        "prompt": "long",
+        "max_tokens": 8,
+        "reps": 1,
+        "validate": null,
+        "compare_to": null
+      },
+      {
+        "name": "cached_ttft_long",
+        "prompt": "long_cached",
+        "max_tokens": 32,
+        "reps": 1,
+        "validate": "cache_hit",
+        "compare_to": "prefill_cold_long"
+      },
+      {
+        "name": "decode_at_long",
+        "prompt": "long",
+        "max_tokens": 128,
+        "reps": 1,
+        "validate": null,
+        "compare_to": null
+      }
+    ]
+  },
+  "machine": {
+    "host": "mac-mini-m6",
+    "os": "Darwin 27.2.0",
+    "macos": "27.2",
+    "model": "Mac18,5",
+    "chip": "Apple M6",
+    "memory_gb": 34.4,
+    "python": "3.15.2"
+  },
+  "summary": {
+    "decode_short_tps": 61.19,
+    "decode_at_long_tps": 45.52,
+    "prefill_long_tps": 532.09,
+    "cold_ttft_long_ms": 34079.0,
+    "cached_ttft_long_ms": null,
+    "reported_cached_ttft_long_ms": 34209.0,
+    "peak_engine_rss_mb": 15462.9,
+    "wired_before_gb": 17.37,
+    "wired_peak_gb": 19.68,
+    "wired_after_gb": 19.51,
+    "rss_samples": 227,
+    "invalid_cases": [
+      "cached_ttft_long"
+    ],
+    "valid_cases": [
+      "decode_at_long",
+      "decode_short",
+      "prefill_cold_long"
+    ],
+    "model": "alibaba:qwen3.8:27b:mirai:mirai-m:4",
+    "context": null,
+    "context_source": "unknown"
+  },
+  "validation": {
+    "decode_short": {
+      "valid": true,
+      "reasons": []
+    },
+    "prefill_cold_long": {
+      "valid": true,
+      "reasons": []
+    },
+    "cached_ttft_long": {
+      "valid": false,
+      "reasons": [
+        "cached TTFT (34209 ms) is not meaningfully lower than cold TTFT (34079 ms)"
+      ]
+    },
+    "decode_at_long": {
+      "valid": true,
+      "reasons": []
+    }
+  },
+  "runs": [
+    {
+      "ttft_ms": 184.1,
+      "ttft_content_ms": 184.1,
+      "total_ms": 4481.5,
+      "prompt_tokens": 47,
+      "completion_tokens": 256,
+      "completion_tokens_source": "usage",
+      "content_chunks": 197,
+      "reasoning_chunks": 0,
+      "decode_tps": 60.76,
+      "prefill_tps": 255.28,
+      "finish_reason": "length",
+      "answer_preview": "```python def merge_intervals(intervals):     \"\"\"     Merge overlapping closed intervals and return them sorted.          >>> merge_intervals([(1, 3), (2, 6), (",
+      "answer_chars": 855,
+      "answer_sha256": "4527fe5280f80b965d7cdf315b808a18a81c0c79069c53e9bb16877b3f9939d1",
+      "case": "decode_short",
+      "rep": 1
+    },
+    {
+      "ttft_ms": 184.7,
+      "ttft_content_ms": 184.7,
+      "total_ms": 4355.4,
+      "prompt_tokens": 47,
+      "completion_tokens": 256,
+      "completion_tokens_source": "usage",
+      "content_chunks": 197,
+      "reasoning_chunks": 0,
+      "decode_tps": 61.19,
+      "prefill_tps": 254.43,
+      "finish_reason": "length",
+      "answer_preview": "```python def merge_intervals(intervals):     \"\"\"     Merge overlapping closed intervals and return them sorted.          >>> merge_intervals([(1, 3), (2, 6), (",
+      "answer_chars": 857,
+      "answer_sha256": "484c805a1c1e0f4d932b10d11ce5b1ee284f277c9838956aa583eeb38823ece4",
+      "case": "decode_short",
+      "rep": 2
+    },
+    {
+      "ttft_ms": 188.3,
+      "ttft_content_ms": 188.3,
+      "total_ms": 4241.5,
+      "prompt_tokens": 47,
+      "completion_tokens": 256,
+      "completion_tokens_source": "usage",
+      "content_chunks": 197,
+      "reasoning_chunks": 0,
+      "decode_tps": 62.96,
+      "prefill_tps": 249.63,
+      "finish_reason": "length",
+      "answer_preview": "```python def merge_intervals(intervals):     \"\"\"     Merge overlapping closed intervals and return them sorted.          >>> merge_intervals([(1, 3), (2, 6), (",
+      "answer_chars": 857,
+      "answer_sha256": "484c805a1c1e0f4d932b10d11ce5b1ee284f277c9838956aa583eeb38823ece4",
+      "case": "decode_short",
+      "rep": 3
+    },
+    {
+      "ttft_ms": 34079.0,
+      "ttft_content_ms": 34079.0,
+      "total_ms": 34312.5,
+      "prompt_tokens": 18133,
+      "completion_tokens": 8,
+      "completion_tokens_source": "usage",
+      "content_chunks": 6,
+      "reasoning_chunks": 0,
+      "decode_tps": 30.44,
+      "prefill_tps": 532.09,
+      "finish_reason": "length",
+      "answer_preview": "```python \"\"\" LRU Cache",
+      "answer_chars": 23,
+      "answer_sha256": "443989ecb7b50ec1a61f67696289dcf147d4837238615025b9a467d501946767",
+      "case": "prefill_cold_long",
+      "rep": 1
+    },
+    {
+      "ttft_ms": 34209.0,
+      "ttft_content_ms": 34209.0,
+      "total_ms": 35212.1,
+      "prompt_tokens": 18192,
+      "completion_tokens": 32,
+      "completion_tokens_source": "usage",
+      "content_chunks": 30,
+      "reasoning_chunks": 0,
+      "decode_tps": 31.01,
+      "prefill_tps": 531.79,
+      "finish_reason": "length",
+      "answer_preview": "```python \"\"\"A module implementing an LRU (Least Recently Used) cache with O(1) operations.  This module provides an ``LRUCache",
+      "answer_chars": 127,
+      "answer_sha256": "c4254c5bb2d319a3450919748395f8cb1b45de294f2f9cc278450a22a8574328",
+      "case": "cached_ttft_long",
+      "rep": 1
+    },
+    {
+      "ttft_ms": 34539.5,
+      "ttft_content_ms": 34539.5,
+      "total_ms": 37460.1,
+      "prompt_tokens": 18133,
+      "completion_tokens": 128,
+      "completion_tokens_source": "usage",
+      "content_chunks": 101,
+      "reasoning_chunks": 0,
+      "decode_tps": 45.52,
+      "prefill_tps": 524.99,
+      "finish_reason": "length",
+      "answer_preview": "```python \"\"\" LRU Cache Implementation  This module provides an LRU (Least Recently Used) cache implementation using a doubly linked list and a hash map for O(1",
+      "answer_chars": 524,
+      "answer_sha256": "ddeb2660453fc48aad7e12a1d30d21d615997091c9eee478dd472672bc5fb9e7",
+      "case": "decode_at_long",
+      "rep": 1
+    }
+  ]
+}

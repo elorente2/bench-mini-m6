@@ -1,0 +1,29 @@
+# Benchmark suite. Changing these values changes the meaning of new results;
+# bump [suite].revision when you do, and do not edit historical result files.
+
+[suite]
+revision = 5
+prefill_target_chars = 32000
+warmup_max_tokens = 8
+
+[cases.decode_short]
+prompt = "short"
+max_tokens = 256
+reps = 3
+
+[cases.prefill_cold_long]
+# The short READY answer must finish naturally (finish=stop). A cold turn
+# truncated by max_tokens leaves Mirai's prefix cache in a non-extensible
+# state and the cached case reprefills.
+prompt = "long"
+max_tokens = 64
+reps = 1
+
+[cases.cached_ttft_long]
+# Extends the exact long user prefix with a fixed assistant turn and a short
+# follow-up. The same run also measures decode with the 18K prefix loaded.
+prompt = "long_cached"
+max_tokens = 128
+reps = 1
+validate = "cache_hit"
+compare_to = "prefill_cold_long"
