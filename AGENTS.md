@@ -54,9 +54,9 @@ more than a nice-looking table.
 
 ## Known pending work
 
-- Ollama `ollama-q3kxl` and `ollama-default` passes.
 - Optional second repetition of the long-context decode case to check variance.
 - Optional long-context stress test for Splash beyond 18K.
+- Optional image/PDF checks for Splash and Ollama native (not throughput).
 
 Do not claim these are done in the README until a result file exists.
 

@@ -5,43 +5,53 @@ Silicon macOS. One engine loaded at a time, the same prompt suite for every
 contender, raw JSON for every run.
 
 Current test: **Qwen3.8-27B** on a **Mac mini M6, 32 GB**, comparing
-**Splash 1.5.0**, **Mirai/uzu 0.6.17** and **Ollama 0.40.14**.
+**Splash 1.5.0**, **Mirai/uzu 0.6.17** and two **Ollama 0.40.14** labels:
+the same Q3_K_XL GGUF imported into Ollama and the native `qwen3.8:27b` tag.
 
-## Results — 2026-11-05
+## Results — November 2026
 
-| Metric | Splash | Mirai/uzu | Edge |
-|---|---:|---:|---|
-| Short decode | 56.3 tok/s | **60.8 tok/s** | uzu +8% |
-| Decode @ 18K context | **44.8 tok/s** | 39.6 tok/s | Splash +13% |
-| Prefill @ 18K | 440.7 tok/s | **530.7 tok/s** | uzu +20% |
-| Cold TTFT @ 18K | 41.0 s | **34.1 s** | uzu |
-| Cached TTFT (prefix extension) | 463 ms | **250 ms** | uzu |
-| Peak wired memory | 21.64 GB | **19.63 GB** | uzu |
-| Peak engine RSS | **2,596 MB** | 15,474 MB | informational[^rss] |
-| Quantization | Q3_K_XL (~3-bit) | 4-bit | uzu |
-| Context window (reported) | **217,081** | not reported | Splash |
+| Metric | Splash | Mirai/uzu | Ollama Q3_K_XL | Ollama native |
+|---|---:|---:|---:|---:|
+| Short decode | 56.3 tok/s | **60.8 tok/s** | 11.0 tok/s | 30.6 tok/s |
+| Decode @ 18K context | **44.8 tok/s** | 39.6 tok/s | 9.6 tok/s | 20.1 tok/s |
+| Prefill @ 18K | 440.7 tok/s | **530.7 tok/s** | 212.2 tok/s | 271.6 tok/s |
+| Cold TTFT @ 18K | 41.0 s | **34.1 s** | 85.3 s | 66.6 s |
+| Cached TTFT (prefix extension) | 463 ms | **250 ms** | 830 ms | 510 ms |
+| Peak wired memory | 21.64 GB | 19.63 GB | **16.16 GB** | 24.85 GB |
+| Peak engine RSS[^rss] | **2,596 MB** | 15,474 MB | 14,832 MB | 11,526 MB |
+| Quantization | Q3_K_XL (~3-bit) | 4-bit | Q3_K_XL (~3-bit) | nvfp4 |
+| Context window (API/config) | **217,081** | not reported | 32,768 | 32,768 |
 
-Clean suite v5: both cache cases validate. The two engines were measured
-back-to-back on the same machine; the cold turn finishes naturally so Mirai's
-prefix cache can extend it.
+Splash and Mirai are clean suite-v5 runs from 2026-11-05; both Ollama labels
+are clean suite-v5 runs from 2026-11-06 with 32K context and thinking disabled.
+All four cache cases validate.
 
 [^rss]: On macOS, Metal allocations are wired rather than counted in ordinary
     process RSS. Peak wired memory is the meaningful memory figure here.
 
 ### Verdict
 
-- **Text and code agents:** Mirai/uzu is still the better default. It wins 4 of
-  5 comparable speed metrics (short decode, prefill, cold TTFT, cached TTFT),
-  uses less wired memory and runs a 4-bit model instead of Q3_K_XL.
+- **Text and code agents:** Mirai/uzu is the best default. It wins 4 of 5
+  comparable speed metrics (short decode, prefill, cold TTFT, cached TTFT),
+  uses less wired memory than Splash, and runs a 4-bit model instead of Q3_K_XL.
 - **Long-context decode:** Splash was 13% faster in this pass (44.8 vs
   39.6 tok/s). The earlier legacy suite had the opposite result, so treat this
   single-repetition metric as prompt- and thermal-sensitive rather than a
   stable win.
+- **Ollama native (`qwen3.8:27b`, nvfp4):** 30.6 tok/s short decode, 20.1 tok/s
+  at 18K, 66.6 s cold TTFT and 24.85 GB peak wired. It is roughly 2x faster
+  than the imported Q3_K_XL label but still well behind Splash and Mirai, and
+  it is the heaviest contender in wired memory. It advertises vision and tools,
+  but those were not tested here.
+- **Ollama imported Q3_K_XL:** same weights as Splash, but 11.0 tok/s short
+  decode and an 85.3 s cold TTFT. This is the clearest engine-implementation
+  gap in the set: identical Q3_K_XL weights run about 5x faster under Splash.
+  It does have the lowest peak wired memory (16.16 GB), at a large speed cost.
 - **Vision, PDF or verified context beyond 100K:** Splash. It accepts images
   and PDFs and reports a 217,081-token window. Mirai's M model is text-only and
-  does not report a context window.
-- **Ollama:** not measured yet. Two labels are configured: the same Q3_K_XL
-  GGUF imported into Ollama, and Ollama's native tag.
+  does not report a context window; Ollama was tested at 32K.
+- **Ollama integration:** use the native tag if you need Ollama specifically.
+  Do not use the imported Q3_K_XL label for speed on this hardware.
 
 These results compare **engine speed and memory**, not output quality. Splash
 runs a GGUF Q3_K_XL while Mirai runs a 4-bit M model, so the weights are not
@@ -56,8 +66,8 @@ detailed analysis in [`docs/results/2026-11-m6.md`](docs/results/2026-11-m6.md).
 |---|---|---|---:|---|
 | `splash` | Splash 1.5.0 | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` (13.1 GB) + DFlash2 draft (3.8 GB) | 8000 | `reasoning_effort: none` |
 | `mirai` | Mirai/uzu 0.6.17 | `alibaba:qwen3.8:27b:mirai:mirai-m:4` (14.5 GB) + speculator (1.1 GB) | 8000 | `reasoning_effort: disabled` |
-| `ollama-q3kxl` | Ollama 0.40.14 | same Q3_K_XL GGUF imported with a 32K context | 11434 | not sent |
-| `ollama-default` | Ollama 0.40.14 | native `qwen3.8:27b` tag | 11434 | not sent |
+| `ollama-q3kxl` | Ollama 0.40.14 | same Q3_K_XL GGUF imported with a 32K context | 11434 | `reasoning_effort: none` |
+| `ollama-default` | Ollama 0.40.14 | native `qwen3.8:27b` tag (nvfp4), 32K context | 11434 | `reasoning_effort: none` |
 
 ## Quick start
 
@@ -161,15 +171,17 @@ The benchmark only needs an OpenAI-compatible `/v1/models` and
 ## Results and provenance
 
 `results/2026-11-05-splash.json` and `results/2026-11-05-mirai.json` are clean
-suite-v5 runs measured back-to-back on the test machine. Both cache cases
-validate.
+suite-v5 runs measured back-to-back on the test machine. The Ollama results are
+`results/2026-11-06-ollama-q3kxl.json` and
+`results/2026-11-06-ollama-default.json`, also suite v5, with 32K context and
+thinking disabled. All four cache cases validate.
 
 The original `jarvis/bench-llm` results are preserved in `results/archive/`:
 the raw schema-0 files, their normalized schema-1 imports, the exploratory
 suite-v1..v4 runs, and the Mirai server log. The legacy Mirai cache case is
 invalid there because the truncated cold turn made the server reprefill; the
 reported 35.0 s is retained under `reported_cached_ttft_long_ms` for
-transparency but excluded from that legacy summary. The clean v5 run supersedes
+transparency but excluded from that legacy summary. The clean v5 runs supersede
 it.
 
 Historical result files are immutable. Add a new dated file instead of editing

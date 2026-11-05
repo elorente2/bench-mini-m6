@@ -3,7 +3,7 @@
 The harness only needs an OpenAI-compatible `/v1/models` and
 `/v1/chat/completions` endpoint with streaming. Lifecycle commands are defined
 in `config/engines.toml`; the documentation below explains what was used for the
-2026-11-05 result set.
+November 2026 result set.
 
 | Label | Engine | Port | Start command |
 |---|---|---:|---|
@@ -76,7 +76,25 @@ ollama list
 ollama ps
 ```
 
+The two labels are different in practice:
+
+| Label | Tag | Weights | Runner | Context |
+|---|---|---|---|---|
+| `ollama-q3kxl` | `qwen3.8-27b-q3kxl` | Q3_K_XL GGUF; Ollama reports Q3_K_L | llama.cpp (`llama-server`) | 32768 |
+| `ollama-default` | `qwen3.8:27b` | nvfp4, 27.8B | MLX (`ollama runner`) | 32768 |
+
+The native tag advertises vision, tools and thinking. Thinking defaults to
+`medium`; see the reasoning note below.
+
 The OpenAI-compatible endpoint is `http://127.0.0.1:11434/v1`.
+
+Both labels send `reasoning_effort: none`. The native tag defaults to thinking
+level `medium` and the OpenAI endpoint ignores the Ollama-specific
+`think: false` field; `reasoning_effort: none` is what actually disables it.
+
+`ollama ps` reports the context in use. The 2026-11-05 test used 32768 tokens
+for both labels: the imported Modelfile sets it explicitly, and the native tag
+defaulted to 32768.
 
 ### Native tag
 

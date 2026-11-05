@@ -101,6 +101,31 @@ def assert_ollama_idle(engine: Engine) -> None:
         )
 
 
+def ollama_loaded_models() -> list[str]:
+    if not shutil.which("ollama"):
+        return []
+    output = run_cmd(["ollama", "ps"], timeout=10)
+    models: list[str] = []
+    for line in output.splitlines():
+        line = line.strip()
+        if not line or line.upper().startswith("NAME"):
+            continue
+        if "no models" in line.lower():
+            continue
+        models.append(line.split()[0])
+    return models
+
+
+def unload_other_ollama_models(keep: str) -> None:
+    """Free memory before an Ollama pass; keep the target model if resident."""
+
+    for model in ollama_loaded_models():
+        if model == keep or keep.startswith(model) or model.startswith(keep):
+            continue
+        print(f"unloading Ollama model {model}", file=sys.stderr)
+        run_cmd(["ollama", "stop", model], timeout=60)
+
+
 def _ready(base_url: str, timeout: float = 2.0) -> bool:
     try:
         wait_for_models(base_url, timeout=int(timeout))

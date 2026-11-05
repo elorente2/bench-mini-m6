@@ -22,7 +22,7 @@ METRICS = (
     Metric("cached_ttft_long_ms", "Cached TTFT", "ms", False, "speed"),
     Metric("peak_engine_rss_mb", "Peak engine RSS", "mb", False, "memory"),
     Metric("wired_peak_gb", "Peak wired memory", "gb", False, "memory"),
-    Metric("context", "Context window (reported)", "int", True, "context"),
+    Metric("context", "Context window (API/config)", "int", True, "context"),
 )
 
 ENGINE_ORDER = {

@@ -29,11 +29,14 @@ draft = "Mirai speculator (~1.1 GB)"
 engine = "ollama-q3kxl"
 id = "qwen3.8-27b-q3kxl"
 format = "GGUF imported into Ollama"
-quantization = "Q3_K_XL (~3-bit)"
+quantization = "Q3_K_XL (~3-bit; Ollama reports Q3_K_L)"
 weights_gb = 13.1
+context_tokens = 32768
 
 [models.qwen3.8-27b.variants.ollama-default]
 engine = "ollama-default"
 id = "qwen3.8:27b"
 format = "Ollama native"
-quantization = "depends on the native tag"
+quantization = "nvfp4"
+weights_gb = 18.0
+context_tokens = 32768

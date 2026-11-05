@@ -122,9 +122,15 @@ cases excluded rather than averaged.
   hit is single-shot and sensitive to the prompt and thermal state. Do not
   over-rank engines on that row.
 - **Context is reported, not verified.** Splash advertises 217,081 tokens.
-  Mirai does not report a window and was only exercised at 18K.
-- **Ollama is pending.** The native and imported labels are configured but not
-  measured in the 2026-11-05 result set.
+  Mirai does not report a window and was only exercised at 18K. Both Ollama
+  labels ran with a 32K context.
+- **Ollama uses different weights.** The native tag is nvfp4 and the imported
+  label is Q3_K_XL. The imported label isolates the engine (same weights as
+  Splash); the native label measures the out-of-the-box experience. Both are
+  speed measurements, not a quality comparison.
+- **Ollama was measured in one pass per label.** The imported Q3_K_XL label is
+  about 5x slower than Splash on short decode, so its low wired memory is not a
+  free win.
 
 ## Change control
 

@@ -40,12 +40,19 @@ ollama list
 ```
 
 Splash downloads its GGUF and draft on first `serve`. Mirai resolves the
-`qwen3.8:27b` alias. Ollama needs either `ollama pull qwen3.8:27b` or an
-imported GGUF:
+`qwen3.8:27b` alias. Ollama needs both labels:
 
 ```bash
+# native tag, ~18 GB
+ollama pull qwen3.8:27b
+
+# same Q3_K_XL GGUF as Splash, ~12 GB; sets num_ctx 32768
 ./scripts/import-ollama.sh /path/to/Qwen3.8-27B-UD-Q3_K_XL.gguf
 ```
+
+The native tag uses 32768 context by default on this machine; the imported
+Modelfile sets it explicitly. Both send `reasoning_effort: none` to disable the
+native thinking mode.
 
 ## 3. Verify a clean baseline
 
@@ -112,7 +119,19 @@ Keep Ollama running and measure both labels:
 ```
 
 The first `start` launches `ollama serve`; the second label reuses it. Stop
-Splash and Mirai first.
+Splash and Mirai first. Unload the previous Ollama model between labels so only
+one 27B model is resident at a time:
+
+```bash
+./scripts/engine.sh start ollama-q3kxl
+./scripts/run-pass.sh ollama-q3kxl
+ollama stop qwen3.8-27b-q3kxl
+./scripts/run-pass.sh ollama-default
+```
+
+Both Ollama labels use a 32K context and `reasoning_effort: none`. The native
+tag's OpenAI endpoint ignores `think: false`; `reasoning_effort: none` is what
+actually disables thinking.
 
 If a native tag is missing, the pass fails with a clear "model not found"
 message. Pull the tag or change `config/engines.toml`; do not silently compare a
@@ -151,8 +170,8 @@ To measure a subset:
 ## 9. Verifying the cache case
 
 Suite v5 makes the cold turn finish naturally (`finish=stop`) and extends the
-exact prefix with a fixed assistant turn and a follow-up. Both engines in the
-2026-11-05 result set now validate. To verify a new pass:
+exact prefix with a fixed assistant turn and a follow-up. All four engines in
+the November 2026 result set now validate. To verify a new pass:
 
 ```bash
 ./scripts/engine.sh start mirai

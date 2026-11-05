@@ -12,6 +12,7 @@ from .engine import (
     assert_ollama_idle,
     assert_single_listener,
     port_from_url,
+    unload_other_ollama_models,
 )
 from .metrics import (
     MemSampler,
@@ -80,6 +81,9 @@ def run_pass(
     context, context_source = _context_tokens(entry, engine)
     print(f"   model: {model_id}", file=sys.stderr)
     print(f"   context: {context} ({context_source})", file=sys.stderr)
+
+    if engine.label.startswith("ollama"):
+        unload_other_ollama_models(model_id)
 
     version = capture_version(engine.version_cmd)
     client = ChatClient(base_url, model_id, effort, timeout=timeout)
