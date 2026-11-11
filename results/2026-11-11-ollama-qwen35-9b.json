@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "label": "ollama-qwen35-9b",
+  "timestamp": "2026-11-11T15:33:03.543860+00:00",
+  "finished_at": "2026-11-11T15:34:08.463131+00:00",
+  "source": "bench",
+  "engine": {
+    "label": "ollama-default",
+    "name": "Ollama (native tag)",
+    "version": "ollama version is 0.40.14",
+    "base_url": "http://127.0.0.1:11434/v1",
+    "port": 11434,
+    "reasoning_effort": "none",
+    "chat_template_kwargs": null,
+    "proc_pattern": "(^|/)ollama serve|ollama runner|llama-server|ollama_llama_server",
+    "start_command": [
+      "ollama",
+      "serve"
+    ],
+    "persistent": true
+  },
+  "model": {
+    "id": "qwen3.5-9b-q4:latest",
+    "configured_id": "qwen3.8:27b",
+    "quantization": "Ollama native (nvfp4)",
+    "context": 32768,
+    "context_source": "config"
+  },
+  "suite": {
+    "revision": 5,
+    "prefill_target_chars": 32000,
+    "warmup_max_tokens": 8,
+    "cases": [
+      {
+        "name": "decode_short",
+        "prompt": "short",
+        "max_tokens": 256,
+        "reps": 3,
+        "validate": null,
+        "compare_to": null
+      },
+      {
+        "name": "prefill_cold_long",
+        "prompt": "long",
+        "max_tokens": 64,
+        "reps": 1,
+        "validate": null,
+        "compare_to": null
+      },
+      {
+        "name": "cached_ttft_long",
+        "prompt": "long_cached",
+        "max_tokens": 128,
+        "reps": 1,
+        "validate": "cache_hit",
+        "compare_to": "prefill_cold_long"
+      }
+    ]
+  },
+  "machine": {
+    "host": "Macmini-de-Emilio.local",
+    "os": "Darwin 27.2.0",
+    "macos": "27.2",
+    "model": "Mac18,5",
+    "chip": "Apple M6",
+    "memory_gb": 34.4,
+    "python": "3.15.2"
+  },
+  "summary": {
+    "decode_short_tps": 24.94,
+    "decode_at_long_tps": 21.94,
+    "prefill_long_tps": 660.34,
+    "cold_ttft_long_ms": 27396.4,
+    "cached_ttft_long_ms": 310.8,
+    "reported_cached_ttft_long_ms": 310.8,
+    "peak_engine_rss_mb": 9097.8,
+    "wired_before_gb": 8.96,
+    "wired_peak_gb": 9.1,
+    "wired_after_gb": 9.0,
+    "rss_samples": 115,
+    "invalid_cases": [],
+    "valid_cases": [
+      "cached_ttft_long",
+      "decode_short",
+      "prefill_cold_long"
+    ],
+    "model": "qwen3.5-9b-q4:latest",
+    "context": 32768,
+    "context_source": "config"
+  },
+  "validation": {
+    "decode_short": {
+      "valid": true,
+      "reasons": []
+    },
+    "prefill_cold_long": {
+      "valid": true,
+      "reasons": []
+    },
+    "cached_ttft_long": {
+      "valid": true,
+      "reasons": [],
+      "cold_start_confirmed": true
+    }
+  },
+  "runs": [
+    {
+      "ttft_ms": 56.1,
+      "ttft_content_ms": 56.1,
+      "total_ms": 10259.0,
+      "prompt_tokens": 47,
+      "completion_tokens": 256,
+      "completion_tokens_source": "usage",
+      "content_chunks": 256,
+      "reasoning_chunks": 0,
+      "decode_tps": 24.99,
+      "prefill_tps": 837.73,
+      "finish_reason": "length",
+      "answer_preview": "```python def merge_intervals(intervals):     \"\"\"     Merges overlapping closed intervals and returns them sorted.          Args:         intervals (List[Tuple[",
+      "answer_chars": 836,
+      "answer_sha256": "8c71434a66010e46bf947dee0adead04c04773b5714c75aeb09f8e58f312b555",
+      "case": "decode_short",
+      "rep": 1
+    },
+    {
+      "ttft_ms": 81.0,
+      "ttft_content_ms": 81.0,
+      "total_ms": 10304.8,
+      "prompt_tokens": 47,
+      "completion_tokens": 256,
+      "completion_tokens_source": "usage",
+      "content_chunks": 256,
+      "reasoning_chunks": 0,
+      "decode_tps": 24.94,
+      "prefill_tps": 580.18,
+      "finish_reason": "length",
+      "answer_preview": "```python def merge_intervals(intervals):     \"\"\"     Merges overlapping closed intervals and returns them sorted.          Args:         intervals (List[Tuple[",
+      "answer_chars": 836,
+      "answer_sha256": "8c71434a66010e46bf947dee0adead04c04773b5714c75aeb09f8e58f312b555",
+      "case": "decode_short",
+      "rep": 2
+    },
+    {
+      "ttft_ms": 55.3,
+      "ttft_content_ms": 55.3,
+      "total_ms": 10290.7,
+      "prompt_tokens": 47,
+      "completion_tokens": 256,
+      "completion_tokens_source": "usage",
+      "content_chunks": 256,
+      "reasoning_chunks": 0,
+      "decode_tps": 24.91,
+      "prefill_tps": 850.39,
+      "finish_reason": "length",
+      "answer_preview": "```python def merge_intervals(intervals):     \"\"\"     Merges overlapping closed intervals and returns them sorted.          Args:         intervals (List[Tuple[",
+      "answer_chars": 836,
+      "answer_sha256": "8c71434a66010e46bf947dee0adead04c04773b5714c75aeb09f8e58f312b555",
+      "case": "decode_short",
+      "rep": 3
+    },
+    {
+      "ttft_ms": 27396.4,
+      "ttft_content_ms": 27396.4,
+      "total_ms": 27442.3,
+      "prompt_tokens": 18091,
+      "completion_tokens": 2,
+      "completion_tokens_source": "usage",
+      "content_chunks": 1,
+      "reasoning_chunks": 0,
+      "decode_tps": null,
+      "prefill_tps": 660.34,
+      "finish_reason": "stop",
+      "answer_preview": "READY",
+      "answer_chars": 5,
+      "answer_sha256": "c2e3ac47f4a325469c1a2d5f117e463ec943c721986d5d9f09ac4540b7d80526",
+      "case": "prefill_cold_long",
+      "rep": 1
+    },
+    {
+      "ttft_ms": 310.8,
+      "ttft_content_ms": 310.8,
+      "total_ms": 6100.3,
+      "prompt_tokens": 18149,
+      "completion_tokens": 128,
+      "completion_tokens_source": "usage",
+      "content_chunks": 128,
+      "reasoning_chunks": 0,
+      "decode_tps": 21.94,
+      "prefill_tps": 58397.74,
+      "finish_reason": "length",
+      "answer_preview": "```python \"\"\" LRU Cache Implementation using a Doubly Linked List and a Hash Map.  This module provides an LRU (Least Recently Used) cache implementation that m",
+      "answer_chars": 476,
+      "answer_sha256": "c17dc19aa693b707a54e64de0c9bac7078bfe88033f56f06093ada2ec9f5d2cc",
+      "case": "cached_ttft_long",
+      "rep": 1
+    }
+  ]
+}

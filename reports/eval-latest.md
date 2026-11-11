@@ -1,6 +1,6 @@
 # Precisión por modelo
 
-Apple M6 (Mac18,5) · 34.4 GB · revisión de la suite 1, 2, 3, 4, 5 · 13 ejecuciones · temperatura 0
+Apple M6 (Mac18,5) · 34.4 GB · revisión de la suite 1, 2, 3, 4, 5 · 15 ejecuciones · temperatura 0
 
 > Aviso: hay resultados de revisiones distintas. No se comparan entre sí ni entran en la decisión final.
 
@@ -8,6 +8,8 @@ Apple M6 (Mac18,5) · 34.4 GB · revisión de la suite 1, 2, 3, 4, 5 · 13 ejecu
 
 | Modelo / motor | Instrucciones | JSON | Herramientas | Arquitectura | Cálculo | Código | Contexto largo | Abstención | Extracción | Total |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `ollama-coder-7b-r5-off` | 1/2 (50 %) | 1/2 (50 %) | 0/2 (0 %) | 0/3 (0 %) | 1/2 (50 %) | 1/3 (33 %) | — | 2/2 (100 %) | 1/2 (50 %) | 7/18 (39 %) |
+| `ollama-qwen35-9b-r5-off` | 2/2 (100 %) | 2/2 (100 %) | 2/2 (100 %) | 2/3 (67 %) | 1/2 (50 %) | 1/3 (33 %) | — | 2/2 (100 %) | 2/2 (100 %) | 14/18 (78 %) |
 | `qwen3.8-4bit-omlx-r3-thinkoff` | 3/3 (100 %) | 3/3 (100 %) | 2/2 (100 %) | — | 2/3 (67 %) | 3/3 (100 %) | 2/2 (100 %) | 2/2 (100 %) | 3/3 (100 %) | 20/21 (95 %) |
 | `qwen3.8-4bit-omlx-r3-thinkon` | 3/3 (100 %) | 3/3 (100 %) | 2/2 (100 %) | — | 3/3 (100 %) | 3/3 (100 %) | 2/2 (100 %) | 2/2 (100 %) | 3/3 (100 %) | 21/21 (100 %) |
 | `qwen3.8-4bit-omlx-r5-thinkoff` | 2/2 (100 %) | 1/2 (50 %) | 2/2 (100 %) | 2/3 (67 %) | 1/2 (50 %) | 3/3 (100 %) | 2/2 (100 %) | 2/2 (100 %) | 2/2 (100 %) | 17/20 (85 %) |
@@ -28,6 +30,8 @@ Apple M6 (Mac18,5) · 34.4 GB · revisión de la suite 1, 2, 3, 4, 5 · 13 ejecu
 
 | Ejecución | Modelo | Motor | Pensamiento | Cuantización | Contexto máx |
 |---|---|---|---|---|---:|
+| `ollama-coder-7b-r5-off` | `qwen2.5-coder:7b` | Ollama (native tag) ollama version is 0.40.14 | no | Ollama native (nvfp4) | 32,768* |
+| `ollama-qwen35-9b-r5-off` | `qwen3.5-9b-q4:latest` | Ollama (native tag) ollama version is 0.40.14 | no | Ollama native (nvfp4) | 32,768* |
 | `qwen3.8-4bit-omlx-r3-thinkoff` | `Qwen3.8-27B-4bit` | oMLX 0.7.3 | no | 4-bit MLX | 262,144 |
 | `qwen3.8-4bit-omlx-r3-thinkon` | `Qwen3.8-27B-4bit` | oMLX 0.7.3 | sí | 4-bit MLX | 262,144 |
 | `qwen3.8-4bit-omlx-r5-thinkoff` | `Qwen3.8-27B-4bit` | oMLX 0.7.3 | no | 4-bit MLX | 262,144 |
@@ -48,6 +52,8 @@ El contexto máximo es el que declara la API del motor; `*` marca el que sale de
 
 | Ejecución | Ítems | Minutos | Truncados | Prompt máx (tokens) | Cobertura del contexto | Ítem más lento |
 |---|---:|---:|---:|---:|---:|---:|
+| `ollama-coder-7b-r5-off` | 18 | 0.7 | 0 | — | — | 7.0 s |
+| `ollama-qwen35-9b-r5-off` | 18 | 0.9 | 0 | — | — | 14.9 s |
 | `qwen3.8-4bit-omlx-r3-thinkoff` | 21 | 4.1 | 0 | 24574 | 9 % | 119.1 s |
 | `qwen3.8-4bit-omlx-r3-thinkon` | 21 | 15.2 | 0 | 24614 | 9 % | 216.3 s |
 | `qwen3.8-4bit-omlx-r5-thinkoff` | 20 | 9.2 | 0 | 65124 | 25 % | 348.4 s |
@@ -68,15 +74,15 @@ La cobertura es la parte del contexto máximo que se ejercita de verdad: el prom
 
 | Tarea | Mejor | Acierto | Empatan en el primer puesto |
 |---|---|---:|---|
-| Instrucciones | empate (4) | 100 % | `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkon` |
-| JSON | empate (2) | 100 % | `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkon` |
-| Herramientas | empate (4) | 100 % | `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkon` |
+| Instrucciones | empate (5) | 100 % | `ollama-qwen35-9b-r5-off`, `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkon` |
+| JSON | empate (3) | 100 % | `ollama-qwen35-9b-r5-off`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkon` |
+| Herramientas | empate (5) | 100 % | `ollama-qwen35-9b-r5-off`, `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkon` |
 | Arquitectura | empate (2) | 100 % | `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkon` |
 | Cálculo | empate (2) | 100 % | `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkon` |
 | Código | empate (2) | 100 % | `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkoff` |
 | Contexto largo | empate (4) | 100 % | `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkon` |
-| Abstención | empate (4) | 100 % | `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkon` |
-| Extracción | empate (4) | 100 % | `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkon` |
+| Abstención | empate (6) | 100 % | `ollama-coder-7b-r5-off`, `ollama-qwen35-9b-r5-off`, `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkon` |
+| Extracción | empate (5) | 100 % | `ollama-qwen35-9b-r5-off`, `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkon` |
 
 La decisión solo compara ejecuciones de la revisión más reciente y sin fallos de infraestructura. Si varias empatan en el primer puesto, la fila lo dice y las nombra: el empate no se rompe por velocidad.
 
@@ -86,11 +92,6 @@ La decisión solo compara ejecuciones de la revisión más reciente y sin fallos
 |---|---|---|
 | `abstain-telefono` | todos aciertan | candidato a poda o a subir dificultad |
 | `es-formato-vinetas` | todos aciertan | candidato a poda o a subir dificultad |
-| `extract-factura` | todos aciertan | candidato a poda o a subir dificultad |
-| `json-pedido` | todos aciertan | candidato a poda o a subir dificultad |
-| `needle-24k` | todos aciertan | candidato a poda o a subir dificultad |
-| `tool-orden` | todos aciertan | candidato a poda o a subir dificultad |
-| `tool-tiempo` | todos aciertan | candidato a poda o a subir dificultad |
 
 ## Puertas
 
