@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 from bench.config import ConfigError
-from bench.eval.settings import load_eval_settings
+from bench.eval.settings import EvalSettings, load_eval_settings
 from bench.eval.tasks import CATEGORIES, build_tasks
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -11,9 +11,17 @@ ROOT = Path(__file__).resolve().parent.parent
 
 def test_eval_config_is_loadable() -> None:
     settings = load_eval_settings(ROOT / "config" / "eval.toml")
-    assert settings.revision == 1
+    assert settings.revision == 3
+    assert settings.reasoning_headroom > 0
     assert settings.needle_long_chars > settings.needle_chars
     assert settings.code_timeout_s > 0
+
+
+def test_reasoning_headroom_raises_every_item_budget() -> None:
+    base = build_tasks(EvalSettings())
+    roomy = build_tasks(EvalSettings(reasoning_headroom=100))
+    assert [task.id for task in base] == [task.id for task in roomy]
+    assert all(new.max_tokens == old.max_tokens + 100 for old, new in zip(base, roomy, strict=True))
 
 
 def test_eval_config_rejects_a_short_long_needle(tmp_path: Path) -> None:

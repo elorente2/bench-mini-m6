@@ -141,6 +141,7 @@ def cmd_eval(args: argparse.Namespace) -> int:
         safety=not args.no_safety,
         only=only,
         items=tuple(args.item),
+        thinking_expected=args.thinking_expected,
     )
     print(path)
     return 0
@@ -301,6 +302,14 @@ def build_parser() -> argparse.ArgumentParser:
         action="append",
         default=[],
         help="run only this item id (repeatable)",
+    )
+    eval_parser.add_argument(
+        "--thinking-expected",
+        dest="thinking_expected",
+        action="store_const",
+        const=True,
+        default=None,
+        help="declare that thinking is on, so reasoning is not flagged as a leak",
     )
     eval_parser.add_argument("--out")
     eval_parser.add_argument("--timeout", type=int, default=1800)

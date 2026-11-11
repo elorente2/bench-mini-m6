@@ -7,8 +7,19 @@
   extraction), graded by code with no LLM judge. Code items run in a
   timeout-limited sandbox. Results live in `results/eval/` and the decision
   table in `reports/eval-latest.md`.
-- `config/eval.toml` with its own revision. Changing a prompt, limit, grader or
-  item order requires a revision bump.
+- `config/eval.toml` with its own revision, now 3. Changing a prompt, limit,
+  grader or item order requires a revision bump.
+- `[eval].reasoning_headroom` (4096 tokens) gives a thinking model room to
+  reason and still answer. Without it, thinking-on ended every answer at
+  `finish_reason: length`. A run now records `summary.truncated` and the report
+  shows it, because a truncated answer measures the budget, not the model.
+- `bench eval --thinking-expected` declares thinking on for engines that have
+  no `enable_thinking` template switch, so their reasoning is not flagged as a
+  leak.
+- First results: Qwen3.8-27B UD-Q3_K_XL on Splash, revision 3, 20/21 with
+  thinking off and 21/21 with thinking on. The off run misses `math-iva`
+  (answers 1499.60 € where 1240 × 1.21 = 1500.40 €), so that item separates
+  thinking from not thinking.
 - Eval CLI: `eval`, `eval-report` and `eval-validate --strict` (gates for
   request errors and leaked reasoning).
 - `AGENTS.md` rule 6 rewritten: accuracy is a separate axis from engine speed,

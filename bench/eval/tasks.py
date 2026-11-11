@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Any
 
 CATEGORIES = (
@@ -522,4 +522,8 @@ def build_tasks(settings) -> tuple[Task, ...]:
             max_tokens=24,
         ),
     ]
+
+    headroom = getattr(settings, "reasoning_headroom", 0)
+    if headroom:
+        tasks = [replace(task, max_tokens=task.max_tokens + headroom) for task in tasks]
     return tuple(tasks)

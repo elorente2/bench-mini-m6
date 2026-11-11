@@ -1,0 +1,621 @@
+{
+  "schema_version": 1,
+  "kind": "eval",
+  "label": "qwen3.8-q3kxl-splash-r3-thinkoff",
+  "timestamp": "2026-11-11T10:35:30.195867+00:00",
+  "finished_at": "2026-11-11T10:35:54.535581+00:00",
+  "source": "bench-eval",
+  "engine": {
+    "label": "splash",
+    "name": "Splash",
+    "version": "Splash 1.5.0",
+    "base_url": "http://127.0.0.1:8000/v1",
+    "port": 8000,
+    "reasoning_effort": "none",
+    "chat_template_kwargs": null,
+    "persistent": false
+  },
+  "model": {
+    "id": "unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL",
+    "configured_id": "unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL",
+    "quantization": "Q3_K_XL (~3-bit)",
+    "context": 217081,
+    "context_source": "api"
+  },
+  "eval": {
+    "revision": 3,
+    "max_tokens": 640,
+    "seed": 0,
+    "code_timeout_s": 5,
+    "needle_chars": 24000,
+    "needle_long_chars": 64000,
+    "thinking_expected": false,
+    "categories": [
+      "instrucciones",
+      "json",
+      "herramientas",
+      "calculo",
+      "codigo",
+      "contexto_largo",
+      "abstencion",
+      "extraccion"
+    ],
+    "items": [
+      {
+        "id": "es-formato-vinetas",
+        "category": "instrucciones",
+        "grader": "bullets",
+        "max_tokens": 4256
+      },
+      {
+        "id": "es-limite-palabras",
+        "category": "instrucciones",
+        "grader": "constraints",
+        "max_tokens": 4176
+      },
+      {
+        "id": "es-fecha-larga",
+        "category": "instrucciones",
+        "grader": "regex",
+        "max_tokens": 4136
+      },
+      {
+        "id": "json-pedido",
+        "category": "json",
+        "grader": "json",
+        "max_tokens": 4256
+      },
+      {
+        "id": "json-clasificacion",
+        "category": "json",
+        "grader": "json",
+        "max_tokens": 4256
+      },
+      {
+        "id": "json-articulos",
+        "category": "json",
+        "grader": "json",
+        "max_tokens": 4316
+      },
+      {
+        "id": "tool-tiempo",
+        "category": "herramientas",
+        "grader": "tool",
+        "max_tokens": 4256
+      },
+      {
+        "id": "tool-orden",
+        "category": "herramientas",
+        "grader": "tool",
+        "max_tokens": 4256
+      },
+      {
+        "id": "math-iva",
+        "category": "calculo",
+        "grader": "regex",
+        "max_tokens": 4136
+      },
+      {
+        "id": "math-fecha",
+        "category": "calculo",
+        "grader": "regex",
+        "max_tokens": 4136
+      },
+      {
+        "id": "math-tornillos",
+        "category": "calculo",
+        "grader": "regex",
+        "max_tokens": 4120
+      },
+      {
+        "id": "code-merge-intervals",
+        "category": "codigo",
+        "grader": "code",
+        "max_tokens": 4796
+      },
+      {
+        "id": "code-wordcount",
+        "category": "codigo",
+        "grader": "code",
+        "max_tokens": 4596
+      },
+      {
+        "id": "code-bugfix",
+        "category": "codigo",
+        "grader": "code",
+        "max_tokens": 4496
+      },
+      {
+        "id": "needle-24k",
+        "category": "contexto_largo",
+        "grader": "exact",
+        "max_tokens": 4128
+      },
+      {
+        "id": "needle-64k",
+        "category": "contexto_largo",
+        "grader": "exact",
+        "max_tokens": 4128
+      },
+      {
+        "id": "abstain-telefono",
+        "category": "abstencion",
+        "grader": "regex",
+        "max_tokens": 4120
+      },
+      {
+        "id": "abstain-empleados",
+        "category": "abstencion",
+        "grader": "regex",
+        "max_tokens": 4120
+      },
+      {
+        "id": "extract-factura",
+        "category": "extraccion",
+        "grader": "kv",
+        "max_tokens": 4196
+      },
+      {
+        "id": "extract-agenda",
+        "category": "extraccion",
+        "grader": "parts",
+        "max_tokens": 4196
+      },
+      {
+        "id": "extract-responsable",
+        "category": "extraccion",
+        "grader": "exact",
+        "max_tokens": 4120
+      }
+    ]
+  },
+  "machine": {
+    "host": "Macmini-de-Emilio.local",
+    "os": "Darwin 27.2.0",
+    "macos": "27.2",
+    "model": "Mac18,5",
+    "chip": "Apple M6",
+    "memory_gb": 34.4,
+    "python": "3.15.2"
+  },
+  "summary": {
+    "items": 21,
+    "passed": 20,
+    "accuracy": 0.9524,
+    "errors": 0,
+    "by_category": {
+      "instrucciones": {
+        "items": 3,
+        "passed": 3,
+        "accuracy": 1.0
+      },
+      "json": {
+        "items": 3,
+        "passed": 3,
+        "accuracy": 1.0
+      },
+      "herramientas": {
+        "items": 2,
+        "passed": 2,
+        "accuracy": 1.0
+      },
+      "calculo": {
+        "items": 3,
+        "passed": 2,
+        "accuracy": 0.6667
+      },
+      "codigo": {
+        "items": 3,
+        "passed": 3,
+        "accuracy": 1.0
+      },
+      "contexto_largo": {
+        "items": 2,
+        "passed": 2,
+        "accuracy": 1.0
+      },
+      "abstencion": {
+        "items": 2,
+        "passed": 2,
+        "accuracy": 1.0
+      },
+      "extraccion": {
+        "items": 3,
+        "passed": 3,
+        "accuracy": 1.0
+      }
+    },
+    "truncated": 0,
+    "reasoning_chunks": 0,
+    "thinking_expected": false,
+    "thinking_leaked_items": [],
+    "total_ms": 23894.3,
+    "slowest_ms": 4659.9,
+    "prompt_tokens_max": 24574
+  },
+  "items": [
+    {
+      "id": "es-formato-vinetas",
+      "category": "instrucciones",
+      "passed": true,
+      "detail": "3 lines with the requested format",
+      "extracted": "- Exposición inmediata de credenciales ante cualquier atacante que acceda al sistema o base de datos.\n- Imposibilidad de recuperar la información original una v",
+      "answer_preview": "- Exposición inmediata de credenciales ante cualquier atacante que acceda al sistema o base de datos. - Imposibilidad de recuperar la información original una v",
+      "answer_chars": 337,
+      "prompt_tokens": 54,
+      "completion_tokens": 71,
+      "ttft_ms": 229.5,
+      "total_ms": 4659.9,
+      "decode_tps": 15.8,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "es-limite-palabras",
+      "category": "instrucciones",
+      "passed": true,
+      "detail": "17 words, constraints met",
+      "extracted": "Una VPN cifra tu tráfico y oculta tu dirección IP para navegar de forma privada y segura.",
+      "answer_preview": "Una VPN cifra tu tráfico y oculta tu dirección IP para navegar de forma privada y segura.",
+      "answer_chars": 89,
+      "prompt_tokens": 49,
+      "completion_tokens": 20,
+      "ttft_ms": 191.3,
+      "total_ms": 1297.3,
+      "decode_tps": 17.18,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "es-fecha-larga",
+      "category": "instrucciones",
+      "passed": true,
+      "detail": "matched /^\\s*8 de marzo de 2026\\.?\\s*$/",
+      "extracted": "8 de marzo de 2026",
+      "answer_preview": "8 de marzo de 2026",
+      "answer_chars": 18,
+      "prompt_tokens": 61,
+      "completion_tokens": 10,
+      "ttft_ms": 207.4,
+      "total_ms": 454.5,
+      "decode_tps": 36.45,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "json-pedido",
+      "category": "json",
+      "passed": true,
+      "detail": "schema and values valid",
+      "extracted": "{\n  \"order_id\": 4471,\n  \"customer\": \"Marta Ruiz\",\n  \"total_eur\": 89.50,\n  \"status\": \"enviado\"\n}",
+      "answer_preview": "{   \"order_id\": 4471,   \"customer\": \"Marta Ruiz\",   \"total_eur\": 89.50,   \"status\": \"enviado\" }",
+      "answer_chars": 95,
+      "prompt_tokens": 96,
+      "completion_tokens": 49,
+      "ttft_ms": 175.0,
+      "total_ms": 1046.9,
+      "decode_tps": 55.06,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "json-clasificacion",
+      "category": "json",
+      "passed": true,
+      "detail": "schema and values valid",
+      "extracted": "{\n  \"category\": \"facturacion\",\n  \"urgent\": true,\n  \"summary\": \"Doble cobro de octubre, devolución requerida antes del viernes.\"\n}",
+      "answer_preview": "{   \"category\": \"facturacion\",   \"urgent\": true,   \"summary\": \"Doble cobro de octubre, devolución requerida antes del viernes.\" }",
+      "answer_chars": 129,
+      "prompt_tokens": 95,
+      "completion_tokens": 40,
+      "ttft_ms": 177.0,
+      "total_ms": 1169.4,
+      "decode_tps": 39.3,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "json-articulos",
+      "category": "json",
+      "passed": true,
+      "detail": "schema and values valid",
+      "extracted": "{\n  \"items\": [\n    {\n      \"sku\": \"SKU-11\",\n      \"qty\": 2\n    },\n    {\n      \"sku\": \"SKU-42\",\n      \"qty\": 1\n    },\n    {\n      \"sku\": \"SKU-07\",\n      \"qty\": 5",
+      "answer_preview": "```json {   \"items\": [     {       \"sku\": \"SKU-11\",       \"qty\": 2     },     {       \"sku\": \"SKU-42\",       \"qty\": 1     },     {       \"sku\": \"SKU-07\",       ",
+      "answer_chars": 184,
+      "prompt_tokens": 84,
+      "completion_tokens": 90,
+      "ttft_ms": 171.5,
+      "total_ms": 1652.0,
+      "decode_tps": 60.12,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "tool-tiempo",
+      "category": "herramientas",
+      "passed": true,
+      "detail": "get_weather with the expected arguments",
+      "extracted": "{\"city\": \"Valencia\", \"unit\": \"celsius\"}",
+      "answer_preview": "",
+      "answer_chars": 0,
+      "prompt_tokens": 343,
+      "completion_tokens": 40,
+      "ttft_ms": 442.0,
+      "total_ms": 941.1,
+      "decode_tps": 78.17,
+      "finish_reason": "tool_calls",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": [
+        "get_weather"
+      ]
+    },
+    {
+      "id": "tool-orden",
+      "category": "herramientas",
+      "passed": true,
+      "detail": "search_notes with the expected arguments",
+      "extracted": "{\"query\": \"presupuesto 2027\"}",
+      "answer_preview": "",
+      "answer_chars": 0,
+      "prompt_tokens": 412,
+      "completion_tokens": 86,
+      "ttft_ms": 335.8,
+      "total_ms": 1607.5,
+      "decode_tps": 66.85,
+      "finish_reason": "tool_calls",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": [
+        "search_notes",
+        "create_task"
+      ]
+    },
+    {
+      "id": "math-iva",
+      "category": "calculo",
+      "passed": false,
+      "detail": "answer '1499,60 €' did not match /^\\s*1[.,]?500[.,]40\\s*€\\s*$/",
+      "extracted": "1499,60 €",
+      "answer_preview": "1499,60 €",
+      "answer_chars": 9,
+      "prompt_tokens": 58,
+      "completion_tokens": 9,
+      "ttft_ms": 198.5,
+      "total_ms": 694.9,
+      "decode_tps": 16.12,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "math-fecha",
+      "category": "calculo",
+      "passed": true,
+      "detail": "matched /^\\s*2026-12-12\\s*$/",
+      "extracted": "2026-12-12",
+      "answer_preview": "2026-12-12",
+      "answer_chars": 10,
+      "prompt_tokens": 51,
+      "completion_tokens": 11,
+      "ttft_ms": 189.5,
+      "total_ms": 561.2,
+      "decode_tps": 26.91,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "math-tornillos",
+      "category": "calculo",
+      "passed": true,
+      "detail": "matched /^\\s*59\\s*\\.?\\s*$/",
+      "extracted": "59",
+      "answer_preview": "59",
+      "answer_chars": 2,
+      "prompt_tokens": 47,
+      "completion_tokens": 3,
+      "ttft_ms": 179.8,
+      "total_ms": 429.0,
+      "decode_tps": 8.04,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "code-merge-intervals",
+      "category": "codigo",
+      "passed": true,
+      "detail": "tests passed in 50 ms",
+      "extracted": "def merge_intervals(intervals):\n    if not intervals:\n        return []\n    \n    intervals.sort(key=lambda x: x[0])\n    merged = [intervals[0]]\n    \n    for cur",
+      "answer_preview": "```python def merge_intervals(intervals):     if not intervals:         return []          intervals.sort(key=lambda x: x[0])     merged = [intervals[0]]       ",
+      "answer_chars": 389,
+      "prompt_tokens": 68,
+      "completion_tokens": 112,
+      "ttft_ms": 357.7,
+      "total_ms": 2390.5,
+      "decode_tps": 54.61,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "code-wordcount",
+      "category": "codigo",
+      "passed": true,
+      "detail": "tests passed in 46 ms",
+      "extracted": "def count_words(text):\n    import re\n    words = re.findall(r'\\b[a-zA-Z]+\\b', text.lower())\n    freq = {}\n    for word in words:\n        freq[word] = freq.get(w",
+      "answer_preview": "```python def count_words(text):     import re     words = re.findall(r'\\b[a-zA-Z]+\\b', text.lower())     freq = {}     for word in words:         freq[word] = ",
+      "answer_chars": 201,
+      "prompt_tokens": 57,
+      "completion_tokens": 65,
+      "ttft_ms": 202.2,
+      "total_ms": 1460.5,
+      "decode_tps": 50.87,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "code-bugfix",
+      "category": "codigo",
+      "passed": true,
+      "detail": "tests passed in 47 ms",
+      "extracted": "def longest_run(xs):\n    if not xs:\n        return 0\n    best = 1\n    current = 1\n    for index in range(1, len(xs)):\n        if xs[index] == xs[index - 1]:\n   ",
+      "answer_preview": "```python def longest_run(xs):     if not xs:         return 0     best = 1     current = 1     for index in range(1, len(xs)):         if xs[index] == xs[index",
+      "answer_chars": 283,
+      "prompt_tokens": 136,
+      "completion_tokens": 88,
+      "ttft_ms": 180.0,
+      "total_ms": 1564.9,
+      "decode_tps": 62.83,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "needle-24k",
+      "category": "contexto_largo",
+      "passed": true,
+      "detail": "matched 'ZAFIRO-4821'",
+      "extracted": "ZAFIRO-4821",
+      "answer_preview": "ZAFIRO-4821",
+      "answer_chars": 11,
+      "prompt_tokens": 9262,
+      "completion_tokens": 9,
+      "ttft_ms": 335.6,
+      "total_ms": 592.4,
+      "decode_tps": 31.18,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "needle-64k",
+      "category": "contexto_largo",
+      "passed": true,
+      "detail": "matched 'CUARZO-7390'",
+      "extracted": "CUARZO-7390",
+      "answer_preview": "CUARZO-7390",
+      "answer_chars": 11,
+      "prompt_tokens": 24574,
+      "completion_tokens": 9,
+      "ttft_ms": 510.1,
+      "total_ms": 779.1,
+      "decode_tps": 29.76,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "abstain-telefono",
+      "category": "abstencion",
+      "passed": true,
+      "detail": "matched /^\\s*no consta\\.?\\s*$/",
+      "extracted": "NO CONSTA",
+      "answer_preview": "NO CONSTA",
+      "answer_chars": 9,
+      "prompt_tokens": 87,
+      "completion_tokens": 4,
+      "ttft_ms": 280.2,
+      "total_ms": 406.6,
+      "decode_tps": 23.76,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "abstain-empleados",
+      "category": "abstencion",
+      "passed": true,
+      "detail": "matched /^\\s*no consta\\.?\\s*$/",
+      "extracted": "NO CONSTA",
+      "answer_preview": "NO CONSTA",
+      "answer_chars": 9,
+      "prompt_tokens": 74,
+      "completion_tokens": 4,
+      "ttft_ms": 206.2,
+      "total_ms": 331.0,
+      "decode_tps": 24.07,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "extract-factura",
+      "category": "extraccion",
+      "passed": true,
+      "detail": "all fields extracted",
+      "extracted": "NIF: B-12345678\nBase: 1250.00\nIVA: 262.50",
+      "answer_preview": "NIF: B-12345678 Base: 1250.00 IVA: 262.50",
+      "answer_chars": 41,
+      "prompt_tokens": 139,
+      "completion_tokens": 35,
+      "ttft_ms": 202.5,
+      "total_ms": 828.9,
+      "decode_tps": 54.29,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "extract-agenda",
+      "category": "extraccion",
+      "passed": true,
+      "detail": "all parts matched",
+      "extracted": "17:30 | sala Magnolia | Ana, Luis, Marta, Pablo",
+      "answer_preview": "17:30 | sala Magnolia | Ana, Luis, Marta, Pablo",
+      "answer_chars": 47,
+      "prompt_tokens": 101,
+      "completion_tokens": 18,
+      "ttft_ms": 335.1,
+      "total_ms": 709.1,
+      "decode_tps": 45.47,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "extract-responsable",
+      "category": "extraccion",
+      "passed": true,
+      "detail": "matched 'Diego'",
+      "extracted": "Diego",
+      "answer_preview": "Diego",
+      "answer_chars": 5,
+      "prompt_tokens": 84,
+      "completion_tokens": 3,
+      "ttft_ms": 191.9,
+      "total_ms": 317.6,
+      "decode_tps": 15.94,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    }
+  ]
+}

@@ -102,7 +102,7 @@ def test_run_eval_writes_a_schema_one_eval_document(tmp_path: Path) -> None:
     assert document["summary"]["errors"] == 0
     assert document["items"][0]["id"] == "math-tornillos"
     assert document["items"][0]["finish_reason"] == "stop"
-    assert document["eval"]["revision"] == 1
+    assert document["eval"]["revision"] == 3
 
 
 def test_summary_flags_leaked_reasoning_when_thinking_is_off() -> None:
@@ -114,11 +114,13 @@ def test_summary_flags_leaked_reasoning_when_thinking_is_off() -> None:
             "total_ms": 1000.0,
             "reasoning_chunks": 4,
             "thinking_leaked": True,
+            "finish_reason": "length",
         }
     ]
     summary = summarize_eval(records, thinking_expected=False)
     assert summary["thinking_leaked_items"] == ["math-tornillos"]
     assert summary["reasoning_chunks"] == 4
+    assert summary["truncated"] == 1
 
 
 def test_summary_does_not_flag_deliberate_thinking() -> None:
@@ -134,3 +136,27 @@ def test_summary_does_not_flag_deliberate_thinking() -> None:
     ]
     summary = summarize_eval(records, thinking_expected=True)
     assert summary["thinking_leaked_items"] == []
+
+
+def test_run_eval_can_declare_that_thinking_is_on(tmp_path: Path) -> None:
+    server = FakeServer(("127.0.0.1", 0), FakeHandler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        port = server.server_address[1]
+        path = run_eval(
+            _engine(port),
+            EvalSettings(needle_chars=2000, needle_long_chars=4000),
+            label="fake-thinking",
+            out=tmp_path / "thinking.json",
+            safety=False,
+            items=("math-tornillos",),
+            thinking_expected=True,
+        )
+    finally:
+        server.shutdown()
+        server.server_close()
+
+    document = json.loads(path.read_text(encoding="utf-8"))
+    assert document["eval"]["thinking_expected"] is True
+    assert document["summary"]["thinking_expected"] is True

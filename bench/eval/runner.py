@@ -93,6 +93,7 @@ def run_eval(
     safety: bool = True,
     only: tuple[str, ...] = (),
     items: tuple[str, ...] = (),
+    thinking_expected: bool | None = None,
 ) -> Path:
     label = label or f"{engine.label}-eval"
     base_url = (base_url or engine.base_url).rstrip("/")
@@ -102,7 +103,10 @@ def run_eval(
         effort = None
     kwargs = dict(engine.template_kwargs)
     kwargs.update(template_kwargs or {})
-    thinking_expected = kwargs.get("enable_thinking") is True
+    # An engine can think without a chat_template_kwargs switch (Splash only
+    # receives reasoning_effort), so the caller may state it explicitly.
+    if thinking_expected is None:
+        thinking_expected = kwargs.get("enable_thinking") is True
     tasks = _select_tasks(build_tasks(settings), only, items)
 
     if safety:
@@ -278,6 +282,7 @@ def summarize_eval(records: list[dict], *, thinking_expected: bool) -> dict:
         "accuracy": round(passed / len(graded), 4) if graded else None,
         "errors": len(records) - len(graded),
         "by_category": by_category,
+        "truncated": sum(1 for record in graded if record.get("finish_reason") == "length"),
         "reasoning_chunks": sum(record.get("reasoning_chunks") or 0 for record in graded),
         "thinking_expected": thinking_expected,
         "thinking_leaked_items": [

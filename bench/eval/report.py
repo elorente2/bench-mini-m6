@@ -122,15 +122,19 @@ def render_eval_report(docs: list[dict], *, title: str = "Precisión por modelo"
 
     lines.append("## Coste")
     lines.append("")
-    lines.append("| Ejecución | Ítems | Minutos | Prompt máx (tokens) | Ítem más lento |")
-    lines.append("|---|---:|---:|---:|---:|")
+    lines.append(
+        "| Ejecución | Ítems | Minutos | Truncados | Prompt máx (tokens) | Ítem más lento |"
+    )
+    lines.append("|---|---:|---:|---:|---:|---:|")
     for doc in docs:
         summary = doc.get("summary") or {}
         total_ms = summary.get("total_ms")
         minutes = f"{total_ms / 60000:.1f}" if total_ms else "—"
         slowest = f"{summary['slowest_ms'] / 1000:.1f} s" if summary.get("slowest_ms") else "—"
+        truncated = summary.get("truncated")
         lines.append(
             f"| `{doc['label']}` | {summary.get('items')} | {minutes} | "
+            f"{'—' if truncated is None else truncated} | "
             f"{summary.get('prompt_tokens_max') or '—'} | {slowest} |"
         )
     lines.append("")
@@ -164,8 +168,9 @@ def render_eval_report(docs: list[dict], *, title: str = "Precisión por modelo"
             )
         lines.append("")
         lines.append(
-            "La decisión solo compara ejecuciones con la misma revisión y sin fallos de "
-            "infraestructura. Un empate incluye todas las que empatan en la primera posición."
+            "La decisión solo compara ejecuciones de la revisión más reciente y sin "
+            "fallos de infraestructura. Un empate incluye todas las que empatan en la "
+            "primera posición."
         )
     lines.append("")
 
@@ -184,16 +189,18 @@ def render_eval_report(docs: list[dict], *, title: str = "Precisión por modelo"
 
 
 def _comparable(docs: list[dict]) -> set:
-    """Revisions shared by the largest group, i.e. the comparison base."""
+    """Only the newest revision is comparable: it is the current contract.
 
-    counts: dict = {}
-    for doc in docs:
-        revision = (doc.get("eval") or {}).get("revision")
-        counts[revision] = counts.get(revision, 0) + 1
-    if not counts:
-        return set()
-    top = max(counts.values())
-    return {revision for revision, count in counts.items() if count == top}
+    A newer revision supersedes the older one by definition, so mixing them is
+    never allowed; the older rows stay in the table as history.
+    """
+
+    revisions = [
+        revision
+        for revision in ((doc.get("eval") or {}).get("revision") for doc in docs)
+        if isinstance(revision, int)
+    ]
+    return {max(revisions)} if revisions else set()
 
 
 def _render_discrimination(docs: list[dict]) -> list[str]:

@@ -28,12 +28,27 @@ interchangeable documents.
 | Sampling | `temperature: 0`, `seed: 0` |
 | Thinking | Off by default; the run records how it was disabled |
 | Items | 21, fixed order, 8 categories |
-| Output limit | Per item in `bench/eval/tasks.py`; a global ceiling in the config |
+| Output limit | Per item in `bench/eval/tasks.py`, plus `[eval].reasoning_headroom` |
 | Grading | Code only. No LLM judge, no human rubric |
 | Retries | None. One request per item |
 
 Changing a prompt, a limit, a grader, an item or their order means bumping the
-revision. Results from different revisions are never compared.
+revision. Results from different revisions are never compared; the decision
+table only uses the newest revision.
+
+### Reasoning headroom
+
+A thinking model spends part of its budget reasoning, and the per-item limits
+were written for a direct answer: with thinking on, Qwen3.8-27B ended every
+answer at `finish_reason: length` without reaching a result. So revision 2
+added `[eval].reasoning_headroom` and revision 3 raised it to 4096 tokens,
+after `math-fecha` needed 1169 tokens to finish. The headroom is added to every
+item, so `reasoning_headroom = 0` reproduces the revision-1 limits exactly.
+
+Truncation is not treated as a wrong answer that a model "deserves": each run
+records `summary.truncated`, the report shows it in the cost table, and an item
+that keeps hitting the limit at the current revision is a budget bug, not a
+finding about the model.
 
 ## Categories and items
 
@@ -91,7 +106,8 @@ A run supports a decision only if all of these hold:
 1. `summary.errors == 0` — every item produced an HTTP response.
 2. `summary.thinking_leaked_items` is empty when thinking was expected to be
    off. Reasoning tokens change the answer and break the comparison.
-3. The run has the revision shared by the group being compared.
+3. The run belongs to the newest revision: older revisions are history, not a
+   comparison base.
 
 `bench eval-validate --strict` exits non-zero when a gate fails, so a CI job or
 a handoff check can reject the run.
@@ -130,17 +146,18 @@ argument, so the same switch works for an engine that needs
 Schema 1, `kind: "eval"`. Each item records `passed`, `detail`, the extracted
 value, the answer preview, tokens, TTFT, total latency, reasoning chunk count,
 whether thinking leaked and the tool names that were called. The summary keeps
-accuracy overall and per category, the error count and the slowest item. The
-eval block keeps the revision, limits, thinking flag and the item list with its
-grader, so an old result still explains how it was scored.
+accuracy overall and per category, the error count, how many answers hit the
+token limit (`truncated`) and the slowest item. The eval block keeps the
+revision, limits, thinking flag and the item list with its grader, so an old
+result still explains how it was scored.
 
 ## Decision table
 
 `make eval-report` writes `reports/eval-latest.md`. The decision section picks,
-for each category, the highest accuracy among valid runs of the same revision,
-and lists the runs that tie. A model only "wins a task" when it is not tied.
-Ties are reported as ties, not broken by speed: speed belongs to the other
-axis.
+for each category, the highest accuracy among valid runs of the newest
+revision, and lists the runs that tie. A model only "wins a task" when it is
+not tied. Ties are reported as ties, not broken by speed: speed belongs to the
+other axis.
 
 The report also lists items that every run passed or every run failed:
 
