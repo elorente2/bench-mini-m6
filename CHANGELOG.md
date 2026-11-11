@@ -16,10 +16,17 @@
 - `bench eval --thinking-expected` declares thinking on for engines that have
   no `enable_thinking` template switch, so their reasoning is not flagged as a
   leak.
-- First results: Qwen3.8-27B UD-Q3_K_XL on Splash, revision 3, 20/21 with
-  thinking off and 21/21 with thinking on. The off run misses `math-iva`
-  (answers 1499.60 € where 1240 × 1.21 = 1500.40 €), so that item separates
-  thinking from not thinking.
+- First results: Qwen3.8-27B UD-Q3_K_XL on Splash and 4-bit MLX on oMLX,
+  revision 3: 20/21 with thinking off and 21/21 with thinking on for both. The
+  off runs miss `math-iva` (answers 1499.60 € where 1240 × 1.21 = 1500.40 €), so
+  that item separates thinking from not thinking. The quantization and the
+  engine changed neither the score nor the wrong answer.
+- The decision table now names every run that ties for first place instead of
+  showing one and listing the losers as ties.
+- oMLX starts with `--memory-guard off`: the balanced guard ceilings the process
+  below the size of the 4-bit weights and evicts the model mid-run.
+- `docs/engines.md` records that `brew uninstall omlx` also removes
+  `python@3.11`, the interpreter the venv points at, and how to recover.
 - Eval CLI: `eval`, `eval-report` and `eval-validate --strict` (gates for
   request errors and leaked reasoning).
 - `AGENTS.md` rule 6 rewritten: accuracy is a separate axis from engine speed,

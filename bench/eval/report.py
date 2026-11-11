@@ -149,7 +149,7 @@ def render_eval_report(docs: list[dict], *, title: str = "Precisión por modelo"
     if not valid:
         lines.append("No hay ejecuciones válidas todavía; no se puede recomendar un modelo.")
     else:
-        lines.append("| Tarea | Mejor | Acierto | Empate técnico |")
+        lines.append("| Tarea | Mejor | Acierto | Empatan en el primer puesto |")
         lines.append("|---|---|---:|---|")
         for category in CATEGORIES:
             candidates = [
@@ -161,16 +161,18 @@ def render_eval_report(docs: list[dict], *, title: str = "Precisión por modelo"
                 continue
             best = max(accuracy for accuracy, _ in candidates)
             winners = sorted(label for accuracy, label in candidates if accuracy == best)
-            others = [label for accuracy, label in candidates if accuracy < best]
-            lines.append(
-                f"| {CATEGORY_LABELS[category]} | `{winners[0]}` | {_pct(best)} | "
-                f"{', '.join(f'`{item}`' for item in others) or '—'} |"
-            )
+            if len(winners) == 1:
+                who = f"`{winners[0]}`"
+                ties = "—"
+            else:
+                who = f"empate ({len(winners)})"
+                ties = ", ".join(f"`{label}`" for label in winners)
+            lines.append(f"| {CATEGORY_LABELS[category]} | {who} | {_pct(best)} | {ties} |")
         lines.append("")
         lines.append(
             "La decisión solo compara ejecuciones de la revisión más reciente y sin "
-            "fallos de infraestructura. Un empate incluye todas las que empatan en la "
-            "primera posición."
+            "fallos de infraestructura. Si varias empatan en el primer puesto, la fila "
+            "lo dice y las nombra: el empate no se rompe por velocidad."
         )
     lines.append("")
 

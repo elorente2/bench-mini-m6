@@ -250,6 +250,22 @@ ln -sf ~/.venvs/omlx/bin/omlx ~/.local/bin/omlx
 omlx --version
 ```
 
+**Do not `brew uninstall omlx` while the venv is your only oMLX.** Homebrew
+installed `python@3.11` as a dependency of the formula, so removing the formula
+removes the interpreter the venv points at (`~/.venvs/omlx/bin/python3.11` is a
+symlink into `/opt/homebrew/opt/python@3.11`) and every venv binary dies with
+`bad interpreter`. The venv stays broken until `brew install python@3.11`
+restores the same interpreter; the packages in `site-packages` are untouched.
+If the Homebrew copy has to go, reinstall the interpreter in the same command
+and check `omlx --version` afterwards.
+
+**Disable the memory guard for a single-model benchmark.** `omlx serve` starts
+a process enforcer whose `balanced` tier ceilings the process at roughly 14.6 GB
+on a 32 GB machine, below the 16.1 GB of the 4-bit weights, so it evicts the
+model in the middle of a run. `config/engines.toml` starts oMLX with
+`--memory-guard off`; the harness already enforces one model-loaded engine at a
+time.
+
 ### Do not benchmark a GGUF through oMLX
 
 oMLX lists `.gguf` files but runs them on Splash's engine as an external

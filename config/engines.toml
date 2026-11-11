@@ -88,7 +88,10 @@ conflicts = ['splash serve-native|server\.server', '(^|/)mirai (--model|server)'
 # oMLX forwards reasoning_effort into the model chat template and may downgrade
 # "none" to a lower level that still thinks, so thinking is disabled explicitly.
 chat_template_kwargs = { enable_thinking = false }
-start = ["omlx", "serve", "--port", "8000", "--headless"]
+# --memory-guard off: the balanced guard ceilings the process at ~14.6 GB,
+# below the 16.1 GB of weights, so it would evict the model mid-run. One model
+# at a time is already enforced by the harness.
+start = ["omlx", "serve", "--port", "8000", "--headless", "--memory-guard", "off"]
 version_cmd = ["omlx", "--version"]
 persistent = false
 notes = "MLX server on MLX weights, not the Q3_K_XL GGUF. A .gguf in the model dir runs on Splash's engine through oMLX and is not an oMLX measurement."

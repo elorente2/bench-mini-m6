@@ -82,3 +82,12 @@ def test_single_document_still_renders() -> None:
     report = render_eval_report([make_doc("only", accuracy=0.8)])
     assert "No hay ejecuciones válidas todavía" not in report
     assert "`only`" in report
+
+
+def test_a_tie_names_every_run_instead_of_picking_one() -> None:
+    docs = [make_doc("a", accuracy=1.0), make_doc("b", accuracy=1.0)]
+    report = render_eval_report(docs)
+    decision = report.split("## Decisión por tarea")[1].split("##")[0]
+    assert "empate (2)" in decision
+    assert "`a`" in decision and "`b`" in decision
+    assert "| `a` |" not in decision  # no single winner is invented

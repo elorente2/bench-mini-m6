@@ -74,9 +74,11 @@ more than a nice-looking table.
 
 ## Known pending work
 
-- Accuracy pilot on Qwen3.8-27B 4-bit (oMLX) with thinking off and on.
-- A second model in the accuracy suite once the pilot proves the items
-  discriminate.
+- Eval revision 4: 19 of 21 items pass for every run at revision 3, so the
+  suite is saturated for 27B-class weights. Harden the saturated categories
+  before adding another model.
+- A second model that differs from Qwen3.8-27B in a way this machine can hold.
+  Another 27B quantization ties on the current items.
 - Optional second repetition of the long-context decode case to check variance.
 - Optional long-context stress test for Splash beyond 18K.
 - Optional image/PDF checks for Splash and Ollama native (not throughput).

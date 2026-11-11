@@ -187,6 +187,37 @@ After a trial round:
 The point is not to accumulate benchmarks. It is to keep the smallest set of
 models and items that answers "which model for this task".
 
+## What the pilot showed
+
+Revision 3 was measured against two sets of Qwen3.8-27B weights: UD-Q3_K_XL on
+Splash and 4-bit MLX on oMLX, each with thinking off and on.
+
+| Run | Accuracy | Cálculo | Thinking |
+|---|---:|---:|---|
+| Q3_K_XL · Splash | 20/21 | 2/3 | off |
+| Q3_K_XL · Splash | 21/21 | 3/3 | on |
+| 4-bit MLX · oMLX | 20/21 | 2/3 | off |
+| 4-bit MLX · oMLX | 21/21 | 3/3 | on |
+
+Three conclusions, all of them about the suite rather than the models:
+
+1. **The quantization does not matter at this size.** Q3_K_XL and 4-bit MLX tie
+   on every category, including the same wrong arithmetic answer with thinking
+   off (1499.60 € where 1240 × 1.21 = 1500.40 €). The engine did not change the
+   answer either, which is the point of fixing one engine per model.
+2. **Thinking is the only axis that separates.** Turning it on fixes `math-iva`
+   in both runs and breaks nothing else.
+3. **19 of the 21 items do not discriminate.** Every run passes them, so they
+   cost time without adding information. Only `math-iva` and `math-fecha` moved,
+   and only because of thinking.
+
+So the next move is **not** another 27B checkpoint: it would tie again. The
+suite needs a revision 4 with harder variants of the saturated categories (or
+items aimed at what actually goes wrong in daily use), and the decision table
+needs at least two models that differ in a way this machine can hold. Keeping
+the four current runs is still useful: they are the baseline any harder item
+must beat.
+
 ## Limits
 
 - The pilot has 21 items; a single item is worth 4.8 points. Treat differences
