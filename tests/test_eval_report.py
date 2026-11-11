@@ -91,3 +91,24 @@ def test_a_tie_names_every_run_instead_of_picking_one() -> None:
     assert "empate (2)" in decision
     assert "`a`" in decision and "`b`" in decision
     assert "| `a` |" not in decision  # no single winner is invented
+
+
+def test_the_report_shows_max_context_and_how_much_of_it_is_exercised() -> None:
+    doc = make_doc("ctx", accuracy=1.0)
+    doc["model"]["context"] = 262144
+    doc["model"]["context_source"] = "api"
+    doc["summary"]["prompt_tokens_max"] = 24574
+    report = render_eval_report([doc])
+    assert "Contexto máx" in report
+    assert "262,144" in report
+    assert "9 %" in report
+
+
+def test_a_config_context_is_marked_and_missing_context_is_a_dash() -> None:
+    doc = make_doc("ctx", accuracy=1.0)
+    doc["model"]["context"] = 32768
+    doc["model"]["context_source"] = "config"
+    assert "32,768*" in render_eval_report([doc])
+    doc["model"]["context"] = None
+    doc["summary"]["prompt_tokens_max"] = None
+    assert "—" in render_eval_report([doc])

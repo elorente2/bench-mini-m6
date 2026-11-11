@@ -168,6 +168,7 @@ def cmd_eval_validate(args: argparse.Namespace) -> int:
                 "revision": (doc.get("eval") or {}).get("revision"),
                 "accuracy": summary.get("accuracy"),
                 "items": summary.get("items"),
+                "context": (doc.get("model") or {}).get("context"),
                 "errors": summary.get("errors"),
                 "thinking_leaked_items": summary.get("thinking_leaked_items"),
                 "gate_problems": problems,

@@ -58,6 +58,24 @@ def _engine_name(engine: dict) -> str:
     return " ".join(part for part in (name, version) if part) or "—"
 
 
+def _context_cell(model: dict) -> str:
+    """Max context the engine declared, with ``*`` when it comes from config."""
+
+    context = model.get("context")
+    if not isinstance(context, int) or context <= 0:
+        return "—"
+    suffix = "*" if model.get("context_source") == "config" else ""
+    return f"{context:,}{suffix}"
+
+
+def _coverage(prompt_max, context) -> str:
+    """Share of the declared context the longest suite prompt actually uses."""
+
+    if not isinstance(prompt_max, int) or not isinstance(context, int) or context <= 0:
+        return "—"
+    return f"{prompt_max / context * 100:.0f} %"
+
+
 def render_eval_report(docs: list[dict], *, title: str = "Precisión por modelo") -> str:
     if not docs:
         raise ValueError("no eval documents to render")
@@ -108,35 +126,53 @@ def render_eval_report(docs: list[dict], *, title: str = "Precisión por modelo"
 
     lines.append("## Modelos y motores")
     lines.append("")
-    lines.append("| Ejecución | Modelo | Motor | Pensamiento | Cuantización |")
-    lines.append("|---|---|---|---|---|")
+    lines.append("| Ejecución | Modelo | Motor | Pensamiento | Cuantización | Contexto máx |")
+    lines.append("|---|---|---|---|---|---:|")
     for doc in docs:
         model = doc.get("model") or {}
         engine = doc.get("engine") or {}
         thinking = "sí" if (doc.get("eval") or {}).get("thinking_expected") else "no"
         lines.append(
             f"| `{doc['label']}` | `{model.get('id')}` | {_engine_name(engine)} "
-            f"| {thinking} | {model.get('quantization') or '—'} |"
+            f"| {thinking} | {model.get('quantization') or '—'} "
+            f"| {_context_cell(model)} |"
         )
+    lines.append("")
+    lines.append(
+        "El contexto máximo es el que declara la API del motor; `*` marca el que "
+        "sale de la configuración porque la API no lo informa. No es una medida de "
+        "recuperación: eso lo dicen los ítems de contexto largo con su prompt real."
+    )
     lines.append("")
 
     lines.append("## Coste")
     lines.append("")
     lines.append(
-        "| Ejecución | Ítems | Minutos | Truncados | Prompt máx (tokens) | Ítem más lento |"
+        "| Ejecución | Ítems | Minutos | Truncados | Prompt máx (tokens) | "
+        "Cobertura del contexto | Ítem más lento |"
     )
-    lines.append("|---|---:|---:|---:|---:|---:|")
+    lines.append("|---|---:|---:|---:|---:|---:|---:|")
     for doc in docs:
         summary = doc.get("summary") or {}
         total_ms = summary.get("total_ms")
         minutes = f"{total_ms / 60000:.1f}" if total_ms else "—"
         slowest = f"{summary['slowest_ms'] / 1000:.1f} s" if summary.get("slowest_ms") else "—"
         truncated = summary.get("truncated")
+        coverage = _coverage(
+            summary.get("prompt_tokens_max"), (doc.get("model") or {}).get("context")
+        )
         lines.append(
             f"| `{doc['label']}` | {summary.get('items')} | {minutes} | "
             f"{'—' if truncated is None else truncated} | "
-            f"{summary.get('prompt_tokens_max') or '—'} | {slowest} |"
+            f"{summary.get('prompt_tokens_max') or '—'} | {coverage} | {slowest} |"
         )
+    lines.append("")
+    lines.append(
+        "La cobertura es la parte del contexto máximo que se ejercita de verdad: "
+        "el prompt más largo de la suite dividido por el contexto que declara el "
+        "motor. Una cobertura baja no dice que el resto del contexto falle; dice "
+        "que este piloto no lo ha probado."
+    )
     lines.append("")
 
     valid = [

@@ -20,27 +20,31 @@ Apple M6 (Mac18,5) · 34.4 GB · revisión de la suite 1, 2, 3 · 7 ejecuciones 
 
 ## Modelos y motores
 
-| Ejecución | Modelo | Motor | Pensamiento | Cuantización |
-|---|---|---|---|---|
-| `qwen3.8-4bit-omlx-r3-thinkoff` | `Qwen3.8-27B-4bit` | oMLX 0.7.3 | no | 4-bit MLX |
-| `qwen3.8-4bit-omlx-r3-thinkon` | `Qwen3.8-27B-4bit` | oMLX 0.7.3 | sí | 4-bit MLX |
-| `qwen3.8-q3kxl-splash` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | no | Q3_K_XL (~3-bit) |
-| `qwen3.8-q3kxl-splash-r2-thinkoff` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | no | Q3_K_XL (~3-bit) |
-| `qwen3.8-q3kxl-splash-r2-thinkon` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | sí | Q3_K_XL (~3-bit) |
-| `qwen3.8-q3kxl-splash-r3-thinkoff` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | no | Q3_K_XL (~3-bit) |
-| `qwen3.8-q3kxl-splash-r3-thinkon` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | sí | Q3_K_XL (~3-bit) |
+| Ejecución | Modelo | Motor | Pensamiento | Cuantización | Contexto máx |
+|---|---|---|---|---|---:|
+| `qwen3.8-4bit-omlx-r3-thinkoff` | `Qwen3.8-27B-4bit` | oMLX 0.7.3 | no | 4-bit MLX | 262,144 |
+| `qwen3.8-4bit-omlx-r3-thinkon` | `Qwen3.8-27B-4bit` | oMLX 0.7.3 | sí | 4-bit MLX | 262,144 |
+| `qwen3.8-q3kxl-splash` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | no | Q3_K_XL (~3-bit) | 217,081 |
+| `qwen3.8-q3kxl-splash-r2-thinkoff` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | no | Q3_K_XL (~3-bit) | 217,081 |
+| `qwen3.8-q3kxl-splash-r2-thinkon` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | sí | Q3_K_XL (~3-bit) | 217,081 |
+| `qwen3.8-q3kxl-splash-r3-thinkoff` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | no | Q3_K_XL (~3-bit) | 217,081 |
+| `qwen3.8-q3kxl-splash-r3-thinkon` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | sí | Q3_K_XL (~3-bit) | 217,081 |
+
+El contexto máximo es el que declara la API del motor; `*` marca el que sale de la configuración porque la API no lo informa. No es una medida de recuperación: eso lo dicen los ítems de contexto largo con su prompt real.
 
 ## Coste
 
-| Ejecución | Ítems | Minutos | Truncados | Prompt máx (tokens) | Ítem más lento |
-|---|---:|---:|---:|---:|---:|
-| `qwen3.8-4bit-omlx-r3-thinkoff` | 21 | 4.1 | 0 | 24574 | 119.1 s |
-| `qwen3.8-4bit-omlx-r3-thinkon` | 21 | 15.2 | 0 | 24614 | 216.3 s |
-| `qwen3.8-q3kxl-splash` | 21 | 1.9 | — | 24574 | 64.4 s |
-| `qwen3.8-q3kxl-splash-r2-thinkoff` | 21 | 0.4 | 0 | 24574 | 4.6 s |
-| `qwen3.8-q3kxl-splash-r2-thinkon` | 21 | 4.3 | 1 | 24614 | 62.8 s |
-| `qwen3.8-q3kxl-splash-r3-thinkoff` | 21 | 0.4 | 0 | 24574 | 4.7 s |
-| `qwen3.8-q3kxl-splash-r3-thinkon` | 21 | 4.2 | 0 | 24614 | 116.6 s |
+| Ejecución | Ítems | Minutos | Truncados | Prompt máx (tokens) | Cobertura del contexto | Ítem más lento |
+|---|---:|---:|---:|---:|---:|---:|
+| `qwen3.8-4bit-omlx-r3-thinkoff` | 21 | 4.1 | 0 | 24574 | 9 % | 119.1 s |
+| `qwen3.8-4bit-omlx-r3-thinkon` | 21 | 15.2 | 0 | 24614 | 9 % | 216.3 s |
+| `qwen3.8-q3kxl-splash` | 21 | 1.9 | — | 24574 | 11 % | 64.4 s |
+| `qwen3.8-q3kxl-splash-r2-thinkoff` | 21 | 0.4 | 0 | 24574 | 11 % | 4.6 s |
+| `qwen3.8-q3kxl-splash-r2-thinkon` | 21 | 4.3 | 1 | 24614 | 11 % | 62.8 s |
+| `qwen3.8-q3kxl-splash-r3-thinkoff` | 21 | 0.4 | 0 | 24574 | 11 % | 4.7 s |
+| `qwen3.8-q3kxl-splash-r3-thinkon` | 21 | 4.2 | 0 | 24614 | 11 % | 116.6 s |
+
+La cobertura es la parte del contexto máximo que se ejercita de verdad: el prompt más largo de la suite dividido por el contexto que declara el motor. Una cobertura baja no dice que el resto del contexto falle; dice que este piloto no lo ha probado.
 
 ## Decisión por tarea
 

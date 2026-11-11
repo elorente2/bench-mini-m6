@@ -225,7 +225,11 @@ must beat.
 - One repetition per item. `temperature: 0` and a fixed seed reduce variance on
   the server side, not on the tokenizer or the sampler.
 - The long-context items measure retrieval at the prompt sizes recorded in the
-  result, not the advertised context window.
+  result, not the advertised context window. The report compares the longest
+  prompt with the declared maximum: at revision 3 that is 24.6K tokens against
+  217K (Splash) and 262K (oMLX), so **9–11 % of the window is exercised**. A low
+  coverage is not a failure, it is an untested region. A near-max item costs
+  10–17 minutes of prefill per run on this machine.
 - No vision, PDF or OCR item yet. Splash and Ollama native advertise those
   capabilities; they are not measured here.
 - The sandbox is best effort, as described above.
