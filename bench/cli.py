@@ -351,7 +351,7 @@ def build_parser() -> argparse.ArgumentParser:
     eval_report = sub.add_parser("eval-report", help="write a Markdown accuracy report")
     eval_report.add_argument("files", nargs="+")
     eval_report.add_argument("--out", default=str(REPO_ROOT / "reports" / "eval-latest.md"))
-    eval_report.add_argument("--title", default="Precisión por modelo")
+    eval_report.add_argument("--title", default="Accuracy by model")
     eval_report.set_defaults(func=cmd_eval_report)
 
     eval_validate = sub.add_parser("eval-validate", help="check the gates of one eval result")
@@ -373,7 +373,7 @@ def build_parser() -> argparse.ArgumentParser:
     vision_report = sub.add_parser("vision-report", help="write a Markdown vision report")
     vision_report.add_argument("files", nargs="+")
     vision_report.add_argument("--out", default=str(REPO_ROOT / "reports" / "vision-latest.md"))
-    vision_report.add_argument("--title", default="Visión por modelo")
+    vision_report.add_argument("--title", default="Vision by model")
     vision_report.set_defaults(func=cmd_vision_report)
 
     return parser

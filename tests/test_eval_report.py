@@ -48,8 +48,8 @@ def test_report_renders_a_category_table_and_a_decision() -> None:
         make_doc("slow", accuracy=0.5),
     ]
     report = render_eval_report(docs)
-    assert "## Acierto por categoría" in report
-    assert "## Decisión por tarea" in report
+    assert "## Accuracy by category" in report
+    assert "## Decision by task" in report
     assert "`fast`" in report
     assert "100 %" in report
 
@@ -58,7 +58,7 @@ def test_revision_mismatch_is_flagged() -> None:
     report = render_eval_report(
         [make_doc("a", accuracy=1.0), make_doc("b", accuracy=1.0, revision=2)]
     )
-    assert "revisiones distintas" in report
+    assert "span more than one revision" in report
 
 
 def test_gates_flag_errors_and_leaked_reasoning() -> None:
@@ -73,22 +73,22 @@ def test_items_every_run_passes_are_listed_for_pruning() -> None:
         make_doc("b", accuracy=1.0, items=(("json-pedido", True), ("json-articulos", True))),
     ]
     report = render_eval_report(docs)
-    assert "## Ítems que no discriminan" in report
+    assert "## Items that do not discriminate" in report
     assert "`json-pedido`" in report
-    assert "`json-articulos`" not in report.split("## Ítems que no discriminan")[1]
+    assert "`json-articulos`" not in report.split("## Items that do not discriminate")[1]
 
 
 def test_single_document_still_renders() -> None:
     report = render_eval_report([make_doc("only", accuracy=0.8)])
-    assert "No hay ejecuciones válidas todavía" not in report
+    assert "No valid runs yet" not in report
     assert "`only`" in report
 
 
 def test_a_tie_names_every_run_instead_of_picking_one() -> None:
     docs = [make_doc("a", accuracy=1.0), make_doc("b", accuracy=1.0)]
     report = render_eval_report(docs)
-    decision = report.split("## Decisión por tarea")[1].split("##")[0]
-    assert "empate (2)" in decision
+    decision = report.split("## Decision by task")[1].split("##")[0]
+    assert "tie (2)" in decision
     assert "`a`" in decision and "`b`" in decision
     assert "| `a` |" not in decision  # no single winner is invented
 
@@ -99,7 +99,7 @@ def test_the_report_shows_max_context_and_how_much_of_it_is_exercised() -> None:
     doc["model"]["context_source"] = "api"
     doc["summary"]["prompt_tokens_max"] = 24574
     report = render_eval_report([doc])
-    assert "Contexto máx" in report
+    assert "Max context" in report
     assert "262,144" in report
     assert "9 %" in report
 

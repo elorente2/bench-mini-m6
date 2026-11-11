@@ -6,15 +6,15 @@ from pathlib import Path
 from .tasks import CATEGORIES
 
 CATEGORY_LABELS = {
-    "instrucciones": "Instrucciones",
+    "instrucciones": "Instructions",
     "json": "JSON",
-    "herramientas": "Herramientas",
-    "arquitectura": "Arquitectura",
-    "calculo": "Cálculo",
-    "codigo": "Código",
-    "contexto_largo": "Contexto largo",
-    "abstencion": "Abstención",
-    "extraccion": "Extracción",
+    "herramientas": "Tools",
+    "arquitectura": "Architecture",
+    "calculo": "Calculation",
+    "codigo": "Code",
+    "contexto_largo": "Long context",
+    "abstencion": "Abstention",
+    "extraccion": "Extraction",
 }
 
 
@@ -77,7 +77,7 @@ def _coverage(prompt_max, context) -> str:
     return f"{prompt_max / context * 100:.0f} %"
 
 
-def render_eval_report(docs: list[dict], *, title: str = "Precisión por modelo") -> str:
+def render_eval_report(docs: list[dict], *, title: str = "Accuracy by model") -> str:
     if not docs:
         raise ValueError("no eval documents to render")
     docs = sorted(docs, key=lambda doc: doc.get("label") or "")
@@ -91,20 +91,20 @@ def render_eval_report(docs: list[dict], *, title: str = "Precisión por modelo"
         hardware = f"{machine['chip']} ({machine['model']})"
     lines.append(
         f"{hardware} · {machine.get('memory_gb') or '?'} GB · "
-        f"revisión de la suite {', '.join(str(item) for item in sorted(revisions))} · "
-        f"{len(docs)} ejecuciones · temperatura 0"
+        f"suite revision {', '.join(str(item) for item in sorted(revisions))} · "
+        f"{len(docs)} runs · temperature 0"
     )
     lines.append("")
     if len(revisions) > 1:
         lines.append(
-            "> Aviso: hay resultados de revisiones distintas. No se comparan entre sí "
-            "ni entran en la decisión final."
+            "> Warning: these results span more than one revision. They are not "
+            "compared with each other, and only the newest revision decides."
         )
         lines.append("")
 
-    lines.append("## Acierto por categoría")
+    lines.append("## Accuracy by category")
     lines.append("")
-    header = ["Modelo / motor", *[CATEGORY_LABELS[item] for item in CATEGORIES], "Total"]
+    header = ["Model / engine", *[CATEGORY_LABELS[item] for item in CATEGORIES], "Total"]
     lines.append("| " + " | ".join(header) + " |")
     lines.append("|---|" + "---:|" * len(CATEGORIES) + "---:|")
     for doc in docs:
@@ -122,17 +122,17 @@ def render_eval_report(docs: list[dict], *, title: str = "Precisión por modelo"
             total = f"⚠ {total}"
         lines.append(f"| {name} | " + " | ".join(cells) + f" | {total} |")
     lines.append("")
-    lines.append("⚠ = ejecución no válida para decidir (ver la sección de puertas).")
+    lines.append("⚠ = run that cannot support a decision (see the gates section).")
     lines.append("")
 
-    lines.append("## Modelos y motores")
+    lines.append("## Models and engines")
     lines.append("")
-    lines.append("| Ejecución | Modelo | Motor | Pensamiento | Cuantización | Contexto máx |")
+    lines.append("| Run | Model | Engine | Thinking | Quantization | Max context |")
     lines.append("|---|---|---|---|---|---:|")
     for doc in docs:
         model = doc.get("model") or {}
         engine = doc.get("engine") or {}
-        thinking = "sí" if (doc.get("eval") or {}).get("thinking_expected") else "no"
+        thinking = "on" if (doc.get("eval") or {}).get("thinking_expected") else "off"
         lines.append(
             f"| `{doc['label']}` | `{model.get('id')}` | {_engine_name(engine)} "
             f"| {thinking} | {model.get('quantization') or '—'} "
@@ -140,17 +140,17 @@ def render_eval_report(docs: list[dict], *, title: str = "Precisión por modelo"
         )
     lines.append("")
     lines.append(
-        "El contexto máximo es el que declara la API del motor; `*` marca el que "
-        "sale de la configuración porque la API no lo informa. No es una medida de "
-        "recuperación: eso lo dicen los ítems de contexto largo con su prompt real."
+        "Max context is what the engine's API declares; `*` marks the value taken "
+        "from the configuration because the API reports none. It is not a retrieval "
+        "measure: the long-context items say that with their real prompt."
     )
     lines.append("")
 
-    lines.append("## Coste")
+    lines.append("## Cost")
     lines.append("")
     lines.append(
-        "| Ejecución | Ítems | Minutos | Truncados | Prompt máx (tokens) | "
-        "Cobertura del contexto | Ítem más lento |"
+        "| Run | Items | Minutes | Truncated | Max prompt (tokens) | "
+        "Context coverage | Slowest item |"
     )
     lines.append("|---|---:|---:|---:|---:|---:|---:|")
     for doc in docs:
@@ -169,10 +169,9 @@ def render_eval_report(docs: list[dict], *, title: str = "Precisión por modelo"
         )
     lines.append("")
     lines.append(
-        "La cobertura es la parte del contexto máximo que se ejercita de verdad: "
-        "el prompt más largo de la suite dividido por el contexto que declara el "
-        "motor. Una cobertura baja no dice que el resto del contexto falle; dice "
-        "que este piloto no lo ha probado."
+        "Coverage is the share of the declared window the suite actually exercises: "
+        "the longest prompt divided by the engine's max context. Low coverage does "
+        "not mean the rest of the window fails; it means this suite has not tried it."
     )
     lines.append("")
 
@@ -181,12 +180,12 @@ def render_eval_report(docs: list[dict], *, title: str = "Precisión por modelo"
         for doc in docs
         if not gate_problems(doc) and doc.get("eval", {}).get("revision") in _comparable(docs)
     ]
-    lines.append("## Decisión por tarea")
+    lines.append("## Decision by task")
     lines.append("")
     if not valid:
-        lines.append("No hay ejecuciones válidas todavía; no se puede recomendar un modelo.")
+        lines.append("No valid runs yet, so no model can be recommended.")
     else:
-        lines.append("| Tarea | Mejor | Acierto | Empatan en el primer puesto |")
+        lines.append("| Task | Best | Accuracy | Tied for first |")
         lines.append("|---|---|---:|---|")
         for category in CATEGORIES:
             candidates = [
@@ -202,27 +201,27 @@ def render_eval_report(docs: list[dict], *, title: str = "Precisión por modelo"
                 who = f"`{winners[0]}`"
                 ties = "—"
             else:
-                who = f"empate ({len(winners)})"
+                who = f"tie ({len(winners)})"
                 ties = ", ".join(f"`{label}`" for label in winners)
             lines.append(f"| {CATEGORY_LABELS[category]} | {who} | {_pct(best)} | {ties} |")
         lines.append("")
         lines.append(
-            "La decisión solo compara ejecuciones de la revisión más reciente y sin "
-            "fallos de infraestructura. Si varias empatan en el primer puesto, la fila "
-            "lo dice y las nombra: el empate no se rompe por velocidad."
+            "The decision compares only runs of the newest revision without "
+            "infrastructure failures. When several tie for first, the row says so "
+            "and names them: a tie is never broken by speed."
         )
     lines.append("")
 
     lines.extend(_render_discrimination(docs))
 
-    lines.append("## Puertas")
+    lines.append("## Gates")
     lines.append("")
     for doc in docs:
         problems = gate_problems(doc)
         if problems:
             lines.append(f"- `{doc['label']}`: " + "; ".join(problems))
     if not any(gate_problems(doc) for doc in docs):
-        lines.append("- Todas las ejecuciones pasan las puertas.")
+        lines.append("- All runs pass the gates.")
     lines.append("")
     return "\n".join(lines)
 
@@ -253,8 +252,8 @@ def _render_discrimination(docs: list[dict]) -> list[str]:
             seen.setdefault(item["id"], []).append(bool(item["passed"]))
     if not seen or len(docs) < 2:
         return []
-    lines = ["## Ítems que no discriminan", ""]
-    lines.append("| Ítem | Resultado | Lectura |")
+    lines = ["## Items that do not discriminate", ""]
+    lines.append("| Item | Result | Reading |")
     lines.append("|---|---|---|")
     found = False
     for item_id, results in sorted(seen.items()):
@@ -262,15 +261,15 @@ def _render_discrimination(docs: list[dict]) -> list[str]:
             continue
         if all(results):
             lines.append(
-                f"| `{item_id}` | todos aciertan | candidato a poda o a subir dificultad |"
+                f"| `{item_id}` | everyone passes | candidate for pruning or a harder variant |"
             )
             found = True
         elif not any(results):
             lines.append(
-                f"| `{item_id}` | todos fallan | puede ser un techo o un ítem mal planteado |"
+                f"| `{item_id}` | everyone fails | either a ceiling or a badly written item |"
             )
             found = True
     if not found:
-        lines.append("| — | — | todos los ítems separan al menos una ejecución |")
+        lines.append("| — | — | every item separates at least one run |")
     lines.append("")
     return lines

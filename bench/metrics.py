@@ -24,8 +24,9 @@ def run_cmd(cmd: list[str], timeout: int = 15) -> str:
 
 def machine_info() -> dict:
     memory_bytes = run_cmd(["sysctl", "-n", "hw.memsize"])
+    # No hostname: results are published, and `os`, `model`, `chip` and memory
+    # already describe the machine without naming somebody's computer.
     return {
-        "host": platform.node(),
         "os": f"{platform.system()} {platform.release()}",
         "macos": run_cmd(["sw_vers", "-productVersion"]),
         "model": run_cmd(["sysctl", "-n", "hw.model"]),

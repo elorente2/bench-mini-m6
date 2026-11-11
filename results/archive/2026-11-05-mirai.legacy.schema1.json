@@ -52,7 +52,7 @@
     ]
   },
   "machine": {
-    "host": "mac-mini-m6",
+    "host": "redacted",
     "os": "Darwin 27.2.0",
     "macos": "27.2",
     "model": "Mac18,5",

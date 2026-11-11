@@ -1,26 +1,26 @@
-# Visión por modelo
+# Vision by model
 
-Apple M6 · 34.4 GB · revisión de la suite de visión 3 · 2 ejecuciones · temperatura 0
+Apple M6 · 34.4 GB · vision suite revision 3 · 2 runs · temperature 0
 
-> 3 ejecuciones de revisiones anteriores quedan fuera de la tabla: la suite de visión cambia de ítems y no se comparan entre revisiones.
+> 3 runs from older revisions are left out of the table: the vision suite changes its items, and revisions are never compared.
 
-## Acierto por imagen
+## Accuracy per image
 
-| Modelo / motor | vision-conteo | vision-color | vision-posicion | vision-total | vision-digito | vision-solape | vision-cuentanueve | vision-digitos | Total |
+| Model / engine | vision-conteo | vision-color | vision-posicion | vision-total | vision-digito | vision-solape | vision-cuentanueve | vision-digitos | Total |
 |---|---|---|---|---|---|---|---|---:|
 | `ollama-qwen35-9b-vision` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | 8/8 (100 %) |
 | `qwen3.8-q3kxl-splash-vision` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | 8/8 (100 %) |
 
-## Ejecuciones
+## Runs
 
-| Ejecución | Modelo | Motor | Tamaño |
+| Run | Model | Engine | Size |
 |---|---|---|---:|
 | `ollama-qwen35-9b-vision` | `qwen3.5-9b-vision:latest` | Ollama (native tag) ollama version is 0.40.14 | 320 px |
 | `qwen3.8-q3kxl-splash-vision` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | 320 px |
 
-## Respuestas
+## Answers
 
-| Ejecución | Imagen | Acierto | Respuesta |
+| Run | Image | Correct | Answer |
 |---|---|---|---|
 | `ollama-qwen35-9b-vision` | `vision-conteo` | ✓ | 3 |
 | `ollama-qwen35-9b-vision` | `vision-color` | ✓ | Verde |
@@ -39,4 +39,4 @@ Apple M6 · 34.4 GB · revisión de la suite de visión 3 · 2 ejecuciones · te
 | `qwen3.8-q3kxl-splash-vision` | `vision-cuentanueve` | ✓ | 9 |
 | `qwen3.8-q3kxl-splash-vision` | `vision-digitos` | ✓ | 417 |
 
-Las imágenes se generan con código y su hash queda en el resultado, así que una nota solo puede ser un fallo del modelo o del generador, nunca de un fichero que alguien cambió.
+Images are generated in code and their hash is stored in the result, so a wrong grade is a model or generator bug, never a file somebody replaced.

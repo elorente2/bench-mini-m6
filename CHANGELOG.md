@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Published the repository. Results no longer record the machine hostname
+  (`bench/metrics.py`), and the 39 files that had it store `redacted` instead;
+  nothing else in those files changed. Reports, docs, comments and commit
+  messages are in English; the eval and vision prompts stay in Spanish on
+  purpose, because Spanish instruction-following is what they measure.
+
 - Vision suite (`bench vision`): eight items with images generated in code
   (PNG written with `zlib` and `struct`, no dependency) and answers graded by
   code: counting, majority colour, relative position, a seven-segment digit,

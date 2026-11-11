@@ -1,12 +1,12 @@
-# Precisión por modelo
+# Accuracy by model
 
-Apple M6 (Mac18,5) · 34.4 GB · revisión de la suite 1, 2, 3, 4, 5 · 16 ejecuciones · temperatura 0
+Apple M6 (Mac18,5) · 34.4 GB · suite revision 1, 2, 3, 4, 5 · 16 runs · temperature 0
 
-> Aviso: hay resultados de revisiones distintas. No se comparan entre sí ni entran en la decisión final.
+> Warning: these results span more than one revision. They are not compared with each other, and only the newest revision decides.
 
-## Acierto por categoría
+## Accuracy by category
 
-| Modelo / motor | Instrucciones | JSON | Herramientas | Arquitectura | Cálculo | Código | Contexto largo | Abstención | Extracción | Total |
+| Model / engine | Instructions | JSON | Tools | Architecture | Calculation | Code | Long context | Abstention | Extraction | Total |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
 | `ollama-coder-7b-r5-off` | 1/2 (50 %) | 1/2 (50 %) | 0/2 (0 %) | 0/3 (0 %) | 1/2 (50 %) | 1/3 (33 %) | — | 2/2 (100 %) | 1/2 (50 %) | 7/18 (39 %) |
 | `ollama-qwen35-9b-r5-off` | 2/2 (100 %) | 2/2 (100 %) | 2/2 (100 %) | 2/3 (67 %) | 1/2 (50 %) | 1/3 (33 %) | — | 2/2 (100 %) | 2/2 (100 %) | 14/18 (78 %) |
@@ -25,34 +25,34 @@ Apple M6 (Mac18,5) · 34.4 GB · revisión de la suite 1, 2, 3, 4, 5 · 16 ejecu
 | `qwen3.8-q3kxl-splash-r5-thinkoff` | 2/2 (100 %) | 1/2 (50 %) | 2/2 (100 %) | 2/3 (67 %) | 1/2 (50 %) | 3/3 (100 %) | 2/2 (100 %) | 2/2 (100 %) | 2/2 (100 %) | 17/20 (85 %) |
 | `qwen3.8-q3kxl-splash-r5-thinkon` | 2/2 (100 %) | 2/2 (100 %) | 2/2 (100 %) | 3/3 (100 %) | 2/2 (100 %) | 2/3 (67 %) | 2/2 (100 %) | 2/2 (100 %) | 2/2 (100 %) | 19/20 (95 %) |
 
-⚠ = ejecución no válida para decidir (ver la sección de puertas).
+⚠ = run that cannot support a decision (see the gates section).
 
-## Modelos y motores
+## Models and engines
 
-| Ejecución | Modelo | Motor | Pensamiento | Cuantización | Contexto máx |
+| Run | Model | Engine | Thinking | Quantization | Max context |
 |---|---|---|---|---|---:|
-| `ollama-coder-7b-r5-off` | `qwen2.5-coder:7b` | Ollama (native tag) ollama version is 0.40.14 | no | Ollama native (nvfp4) | 32,768* |
-| `ollama-qwen35-9b-r5-off` | `qwen3.5-9b-q4:latest` | Ollama (native tag) ollama version is 0.40.14 | no | Ollama native (nvfp4) | 32,768* |
-| `ollama-qwen35-9b-r5-thinkon` | `qwen3.5-9b-q4:latest` | Ollama (native tag) ollama version is 0.40.14 | sí | Ollama native (nvfp4) | 32,768* |
-| `qwen3.8-4bit-omlx-r3-thinkoff` | `Qwen3.8-27B-4bit` | oMLX 0.7.3 | no | 4-bit MLX | 262,144 |
-| `qwen3.8-4bit-omlx-r3-thinkon` | `Qwen3.8-27B-4bit` | oMLX 0.7.3 | sí | 4-bit MLX | 262,144 |
-| `qwen3.8-4bit-omlx-r5-thinkoff` | `Qwen3.8-27B-4bit` | oMLX 0.7.3 | no | 4-bit MLX | 262,144 |
-| `qwen3.8-4bit-omlx-r5-thinkon` | `Qwen3.8-27B-4bit` | oMLX 0.7.3 | sí | 4-bit MLX | 262,144 |
-| `qwen3.8-q3kxl-splash` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | no | Q3_K_XL (~3-bit) | 217,081 |
-| `qwen3.8-q3kxl-splash-r2-thinkoff` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | no | Q3_K_XL (~3-bit) | 217,081 |
-| `qwen3.8-q3kxl-splash-r2-thinkon` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | sí | Q3_K_XL (~3-bit) | 217,081 |
-| `qwen3.8-q3kxl-splash-r3-thinkoff` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | no | Q3_K_XL (~3-bit) | 217,081 |
-| `qwen3.8-q3kxl-splash-r3-thinkon` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | sí | Q3_K_XL (~3-bit) | 217,081 |
-| `qwen3.8-q3kxl-splash-r4-thinkoff` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | no | Q3_K_XL (~3-bit) | 217,081 |
-| `qwen3.8-q3kxl-splash-r4-thinkon` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | sí | Q3_K_XL (~3-bit) | 217,081 |
-| `qwen3.8-q3kxl-splash-r5-thinkoff` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | no | Q3_K_XL (~3-bit) | 217,081 |
-| `qwen3.8-q3kxl-splash-r5-thinkon` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | sí | Q3_K_XL (~3-bit) | 217,081 |
+| `ollama-coder-7b-r5-off` | `qwen2.5-coder:7b` | Ollama (native tag) ollama version is 0.40.14 | off | Ollama native (nvfp4) | 32,768* |
+| `ollama-qwen35-9b-r5-off` | `qwen3.5-9b-q4:latest` | Ollama (native tag) ollama version is 0.40.14 | off | Ollama native (nvfp4) | 32,768* |
+| `ollama-qwen35-9b-r5-thinkon` | `qwen3.5-9b-q4:latest` | Ollama (native tag) ollama version is 0.40.14 | on | Ollama native (nvfp4) | 32,768* |
+| `qwen3.8-4bit-omlx-r3-thinkoff` | `Qwen3.8-27B-4bit` | oMLX 0.7.3 | off | 4-bit MLX | 262,144 |
+| `qwen3.8-4bit-omlx-r3-thinkon` | `Qwen3.8-27B-4bit` | oMLX 0.7.3 | on | 4-bit MLX | 262,144 |
+| `qwen3.8-4bit-omlx-r5-thinkoff` | `Qwen3.8-27B-4bit` | oMLX 0.7.3 | off | 4-bit MLX | 262,144 |
+| `qwen3.8-4bit-omlx-r5-thinkon` | `Qwen3.8-27B-4bit` | oMLX 0.7.3 | on | 4-bit MLX | 262,144 |
+| `qwen3.8-q3kxl-splash` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | off | Q3_K_XL (~3-bit) | 217,081 |
+| `qwen3.8-q3kxl-splash-r2-thinkoff` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | off | Q3_K_XL (~3-bit) | 217,081 |
+| `qwen3.8-q3kxl-splash-r2-thinkon` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | on | Q3_K_XL (~3-bit) | 217,081 |
+| `qwen3.8-q3kxl-splash-r3-thinkoff` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | off | Q3_K_XL (~3-bit) | 217,081 |
+| `qwen3.8-q3kxl-splash-r3-thinkon` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | on | Q3_K_XL (~3-bit) | 217,081 |
+| `qwen3.8-q3kxl-splash-r4-thinkoff` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | off | Q3_K_XL (~3-bit) | 217,081 |
+| `qwen3.8-q3kxl-splash-r4-thinkon` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | on | Q3_K_XL (~3-bit) | 217,081 |
+| `qwen3.8-q3kxl-splash-r5-thinkoff` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | off | Q3_K_XL (~3-bit) | 217,081 |
+| `qwen3.8-q3kxl-splash-r5-thinkon` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | on | Q3_K_XL (~3-bit) | 217,081 |
 
-El contexto máximo es el que declara la API del motor; `*` marca el que sale de la configuración porque la API no lo informa. No es una medida de recuperación: eso lo dicen los ítems de contexto largo con su prompt real.
+Max context is what the engine's API declares; `*` marks the value taken from the configuration because the API reports none. It is not a retrieval measure: the long-context items say that with their real prompt.
 
-## Coste
+## Cost
 
-| Ejecución | Ítems | Minutos | Truncados | Prompt máx (tokens) | Cobertura del contexto | Ítem más lento |
+| Run | Items | Minutes | Truncated | Max prompt (tokens) | Context coverage | Slowest item |
 |---|---:|---:|---:|---:|---:|---:|
 | `ollama-coder-7b-r5-off` | 18 | 0.7 | 0 | — | — | 7.0 s |
 | `ollama-qwen35-9b-r5-off` | 18 | 0.9 | 0 | — | — | 14.9 s |
@@ -71,31 +71,31 @@ El contexto máximo es el que declara la API del motor; `*` marca el que sale de
 | `qwen3.8-q3kxl-splash-r5-thinkoff` | 20 | 0.6 | 0 | 65124 | 30 % | 9.4 s |
 | `qwen3.8-q3kxl-splash-r5-thinkon` | 20 | 8.4 | 1 | 65164 | 30 % | 292.3 s |
 
-La cobertura es la parte del contexto máximo que se ejercita de verdad: el prompt más largo de la suite dividido por el contexto que declara el motor. Una cobertura baja no dice que el resto del contexto falle; dice que este piloto no lo ha probado.
+Coverage is the share of the declared window the suite actually exercises: the longest prompt divided by the engine's max context. Low coverage does not mean the rest of the window fails; it means this suite has not tried it.
 
-## Decisión por tarea
+## Decision by task
 
-| Tarea | Mejor | Acierto | Empatan en el primer puesto |
+| Task | Best | Accuracy | Tied for first |
 |---|---|---:|---|
-| Instrucciones | empate (6) | 100 % | `ollama-qwen35-9b-r5-off`, `ollama-qwen35-9b-r5-thinkon`, `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkon` |
-| JSON | empate (3) | 100 % | `ollama-qwen35-9b-r5-off`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkon` |
-| Herramientas | empate (6) | 100 % | `ollama-qwen35-9b-r5-off`, `ollama-qwen35-9b-r5-thinkon`, `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkon` |
-| Arquitectura | empate (3) | 100 % | `ollama-qwen35-9b-r5-thinkon`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkon` |
-| Cálculo | empate (2) | 100 % | `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkon` |
-| Código | empate (2) | 100 % | `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkoff` |
-| Contexto largo | empate (4) | 100 % | `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkon` |
-| Abstención | empate (7) | 100 % | `ollama-coder-7b-r5-off`, `ollama-qwen35-9b-r5-off`, `ollama-qwen35-9b-r5-thinkon`, `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkon` |
-| Extracción | empate (6) | 100 % | `ollama-qwen35-9b-r5-off`, `ollama-qwen35-9b-r5-thinkon`, `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkon` |
+| Instructions | tie (6) | 100 % | `ollama-qwen35-9b-r5-off`, `ollama-qwen35-9b-r5-thinkon`, `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkon` |
+| JSON | tie (3) | 100 % | `ollama-qwen35-9b-r5-off`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkon` |
+| Tools | tie (6) | 100 % | `ollama-qwen35-9b-r5-off`, `ollama-qwen35-9b-r5-thinkon`, `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkon` |
+| Architecture | tie (3) | 100 % | `ollama-qwen35-9b-r5-thinkon`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkon` |
+| Calculation | tie (2) | 100 % | `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkon` |
+| Code | tie (2) | 100 % | `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkoff` |
+| Long context | tie (4) | 100 % | `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkon` |
+| Abstention | tie (7) | 100 % | `ollama-coder-7b-r5-off`, `ollama-qwen35-9b-r5-off`, `ollama-qwen35-9b-r5-thinkon`, `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkon` |
+| Extraction | tie (6) | 100 % | `ollama-qwen35-9b-r5-off`, `ollama-qwen35-9b-r5-thinkon`, `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkon` |
 
-La decisión solo compara ejecuciones de la revisión más reciente y sin fallos de infraestructura. Si varias empatan en el primer puesto, la fila lo dice y las nombra: el empate no se rompe por velocidad.
+The decision compares only runs of the newest revision without infrastructure failures. When several tie for first, the row says so and names them: a tie is never broken by speed.
 
-## Ítems que no discriminan
+## Items that do not discriminate
 
-| Ítem | Resultado | Lectura |
+| Item | Result | Reading |
 |---|---|---|
-| `abstain-telefono` | todos aciertan | candidato a poda o a subir dificultad |
-| `es-formato-vinetas` | todos aciertan | candidato a poda o a subir dificultad |
+| `abstain-telefono` | everyone passes | candidate for pruning or a harder variant |
+| `es-formato-vinetas` | everyone passes | candidate for pruning or a harder variant |
 
-## Puertas
+## Gates
 
-- Todas las ejecuciones pasan las puertas.
+- All runs pass the gates.

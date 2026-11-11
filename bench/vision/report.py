@@ -24,7 +24,7 @@ def item_ids(docs: list[dict]) -> list[str]:
     return seen
 
 
-def render_vision_report(docs: list[dict], *, title: str = "Visión por modelo") -> str:
+def render_vision_report(docs: list[dict], *, title: str = "Vision by model") -> str:
     if not docs:
         raise ValueError("no vision documents to render")
     older = 0
@@ -46,22 +46,21 @@ def render_vision_report(docs: list[dict], *, title: str = "Visión por modelo")
     lines = [f"# {title}", ""]
     lines.append(
         f"{hardware} · {machine.get('memory_gb') or '?'} GB · "
-        f"revisión de la suite de visión {', '.join(str(item) for item in sorted(revisions))} · "
-        f"{len(docs)} ejecuciones · temperatura 0"
+        f"vision suite revision {', '.join(str(item) for item in sorted(revisions))} · "
+        f"{len(docs)} runs · temperature 0"
     )
     lines.append("")
     if older:
         lines.append(
-            f"> {older} ejecuciones de revisiones anteriores quedan fuera de la "
-            "tabla: la suite de visión cambia de ítems y no se comparan entre "
-            "revisiones."
+            f"> {older} runs from older revisions are left out of the table: the "
+            "vision suite changes its items, and revisions are never compared."
         )
         lines.append("")
 
     tasks = item_ids(docs)
-    lines.append("## Acierto por imagen")
+    lines.append("## Accuracy per image")
     lines.append("")
-    header = ["Modelo / motor", *tasks, "Total"]
+    header = ["Model / engine", *tasks, "Total"]
     lines.append("| " + " | ".join(header) + " |")
     lines.append("|" + "|".join(["---"] * len(tasks)) + "|---:|")
     for doc in docs:
@@ -74,9 +73,9 @@ def render_vision_report(docs: list[dict], *, title: str = "Visión por modelo")
         lines.append(f"| `{doc['label']}` | " + " | ".join(cells) + f" | {total} |")
     lines.append("")
 
-    lines.append("## Ejecuciones")
+    lines.append("## Runs")
     lines.append("")
-    lines.append("| Ejecución | Modelo | Motor | Tamaño |")
+    lines.append("| Run | Model | Engine | Size |")
     lines.append("|---|---|---|---:|")
     for doc in docs:
         model = doc.get("model") or {}
@@ -91,9 +90,9 @@ def render_vision_report(docs: list[dict], *, title: str = "Visión por modelo")
         lines.append(f"| `{doc['label']}` | `{model.get('id')}` | {engine_text} | {size} px |")
     lines.append("")
 
-    lines.append("## Respuestas")
+    lines.append("## Answers")
     lines.append("")
-    lines.append("| Ejecución | Imagen | Acierto | Respuesta |")
+    lines.append("| Run | Image | Correct | Answer |")
     lines.append("|---|---|---|---|")
     for doc in docs:
         for entry in doc.get("items") or []:
@@ -104,9 +103,8 @@ def render_vision_report(docs: list[dict], *, title: str = "Visión por modelo")
             )
     lines.append("")
     lines.append(
-        "Las imágenes se generan con código y su hash queda en el resultado, así "
-        "que una nota solo puede ser un fallo del modelo o del generador, nunca de "
-        "un fichero que alguien cambió."
+        "Images are generated in code and their hash is stored in the result, so a "
+        "wrong grade is a model or generator bug, never a file somebody replaced."
     )
     lines.append("")
     return "\n".join(lines)

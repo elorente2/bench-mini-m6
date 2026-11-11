@@ -91,7 +91,7 @@ def test_a_report_shows_each_image_and_the_answer() -> None:
         ],
     }
     report = render_vision_report([doc])
-    assert "Acierto por imagen" in report
+    assert "Accuracy per image" in report
     assert "`vision-conteo`" in report
     assert "75 %" in report
     assert "amarillo" in report
