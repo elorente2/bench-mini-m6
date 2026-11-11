@@ -32,16 +32,23 @@ def validate_cache_hit(cold: dict | None, cached: dict | None) -> dict:
 
     cold_ttft = cold.get("ttft_ms") if cold else None
     cached_ttft = cached.get("ttft_ms") if cached else None
+    cold_start_confirmed = True
     if cold_ttft is None or cached_ttft is None:
         if cold is not None and cached is not None:
             reasons.append("TTFT is missing on one of the runs")
+        cold_start_confirmed = False
     elif cached_ttft >= cold_ttft * 0.5 and cached_ttft > 1000:
         reasons.append(
             f"cached TTFT ({cached_ttft:.0f} ms) is not meaningfully lower than "
             f"cold TTFT ({cold_ttft:.0f} ms)"
         )
+        cold_start_confirmed = False
 
-    return {"valid": not reasons, "reasons": reasons}
+    return {
+        "valid": not reasons,
+        "reasons": reasons,
+        "cold_start_confirmed": cold_start_confirmed,
+    }
 
 
 def group_runs(runs: Iterable[dict]) -> dict[str, list[dict]]:
@@ -58,7 +65,18 @@ def validate_runs(grouped: dict[str, list[dict]], cases) -> dict[str, dict]:
         if case.validate == "cache_hit":
             cold = (grouped.get(case.compare_to or "", []) or [None])[0]
             cached = (case_runs or [None])[0]
-            validation[case.name] = validate_cache_hit(cold, cached)
+            result = validate_cache_hit(cold, cached)
+            validation[case.name] = result
+            # The pair proves a cold start together: if the second request was
+            # not clearly faster, the first one was not cold either. That is how
+            # an engine with a persisted prefix cache reports a fake prefill.
+            if case.compare_to and not result.get("cold_start_confirmed", True):
+                validation[case.compare_to] = {
+                    "valid": False,
+                    "reasons": [
+                        "cold prefill looks cached: the cached turn was not clearly faster"
+                    ],
+                }
         else:
             validation[case.name] = {
                 "valid": bool(case_runs),

@@ -212,6 +212,7 @@ def run_eval(
             "port": port,
             "reasoning_effort": effort,
             "chat_template_kwargs": kwargs or None,
+            "start_command": list(engine.start),
             "persistent": engine.persistent,
         },
         "model": {

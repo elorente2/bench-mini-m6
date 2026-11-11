@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- oMLX measured for speed (suite 5, 4-bit MLX): 9.2 tok/s short decode, 8.1 at
+  18K, 200.4 tok/s prefill, 90.3 s cold TTFT, 1.5 s cached, 23.62 GB wired and
+  9,500 MB RSS. The 6× gap to Splash and Mirai is speculative decoding: oMLX
+  ships no draft model, so decode is memory-bandwidth bound.
+- The speed report now refuses to use a case the run invalidated, keeps only the
+  newest run per label, and excludes invalid runs from the verdict. A persisted
+  prefix cache that made the "cold" prefill look like a 13,847 tok/s hit can no
+  longer win the prefill row.
+- The cache-hit validation also invalidates the cold prefill case when the
+  cached turn was not clearly faster: the pair proves the cold start together.
+- Speed results record `engine.start_command`, so a flag that changes
+  performance is auditable from the result file.
 - Accuracy suite (`bench eval`): 21 auto-graded items in 8 categories
   (instructions, JSON, tools, arithmetic, code, long context, abstention,
   extraction), graded by code with no LLM judge. Code items run in a

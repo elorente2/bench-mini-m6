@@ -5,26 +5,36 @@ Silicon macOS. One engine loaded at a time, the same prompt suite for every
 contender, raw JSON for every run.
 
 Current test: **Qwen3.8-27B** on a **Mac mini M6, 32 GB**, comparing
-**Splash 1.5.0**, **Mirai/uzu 0.6.17** and two **Ollama 0.40.14** labels:
-the same Q3_K_XL GGUF imported into Ollama and the native `qwen3.8:27b` tag.
+**Splash 1.5.0**, **Mirai/uzu 0.6.17**, **oMLX 0.7.3** and two
+**Ollama 0.40.14** labels: the same Q3_K_XL GGUF imported into Ollama and the
+native `qwen3.8:27b` tag.
 
 ## Results — November 2026
 
-| Metric | Splash | Mirai/uzu | Ollama Q3_K_XL | Ollama native |
-|---|---:|---:|---:|---:|
-| Short decode | 56.3 tok/s | **60.8 tok/s** | 11.0 tok/s | 30.6 tok/s |
-| Decode @ 18K context | **44.8 tok/s** | 39.6 tok/s | 9.6 tok/s | 20.1 tok/s |
-| Prefill @ 18K | 440.7 tok/s | **530.7 tok/s** | 212.2 tok/s | 271.6 tok/s |
-| Cold TTFT @ 18K | 41.0 s | **34.1 s** | 85.3 s | 66.6 s |
-| Cached TTFT (prefix extension) | 463 ms | **250 ms** | 830 ms | 510 ms |
-| Peak wired memory | 21.64 GB | 19.63 GB | **16.16 GB** | 24.85 GB |
-| Peak engine RSS[^rss] | **2,596 MB** | 15,474 MB | 14,832 MB | 11,526 MB |
-| Quantization | Q3_K_XL (~3-bit) | 4-bit | Q3_K_XL (~3-bit) | nvfp4 |
-| Context window (API/config) | **217,081** | not reported | 32,768 | 32,768 |
+| Metric | Splash | Mirai/uzu | oMLX | Ollama Q3_K_XL | Ollama native |
+|---|---:|---:|---:|---:|---:|
+| Short decode | 56.3 tok/s | **60.8 tok/s** | 9.2 tok/s | 11.0 tok/s | 30.6 tok/s |
+| Decode @ 18K context | **44.8 tok/s** | 39.6 tok/s | 8.1 tok/s | 9.6 tok/s | 20.1 tok/s |
+| Prefill @ 18K | 440.7 tok/s | **530.7 tok/s** | 200.4 tok/s | 212.2 tok/s | 271.6 tok/s |
+| Cold TTFT @ 18K | 41.0 s | **34.1 s** | 90.3 s | 85.3 s | 66.6 s |
+| Cached TTFT (prefix extension) | 463 ms | **250 ms** | 1.5 s | 830 ms | 510 ms |
+| Peak wired memory | 21.64 GB | 19.63 GB | 23.62 GB | **16.16 GB** | 24.85 GB |
+| Peak engine RSS[^rss] | **2,596 MB** | 15,474 MB | 9,500 MB | 14,832 MB | 11,526 MB |
+| Quantization | Q3_K_XL (~3-bit) | 4-bit | 4-bit MLX | Q3_K_XL (~3-bit) | nvfp4 |
+| Speculative decoding | yes | yes | **no** | no | no |
+| Context window (API/config) | 217,081 | not reported | **262,144** | 32,768 | 32,768 |
 
 Splash and Mirai are clean suite-v5 runs from 2026-11-05; both Ollama labels
 are clean suite-v5 runs from 2026-11-06 with 32K context and thinking disabled.
-All four cache cases validate.
+oMLX is a clean suite-v5 run from 2026-11-11 on 4-bit MLX weights.
+
+oMLX decodes at ~9 tok/s because it has no draft model: without speculation the
+27B has to read its 16 GB of weights for every token, which is what the memory
+bandwidth allows. Splash and Mirai generate 6–8 tokens per pass with a
+speculator and that is where their 6× advantage comes from. The comparison is
+still valid — it is engine speed with the features each engine ships — but do
+not read it as "MLX is slow". `--hot-cache-max-size` made no measurable
+difference and everything else is stock.
 
 [^rss]: On macOS, Metal allocations are wired rather than counted in ordinary
     process RSS. Peak wired memory is the meaningful memory figure here.

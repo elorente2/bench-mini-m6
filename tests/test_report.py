@@ -50,3 +50,36 @@ def test_render_marks_winners_and_invalid_cases() -> None:
     assert "not a cache hit" in output
     assert "Text and code" in output
     assert "Memory" in output
+
+
+def test_an_invalidated_case_cannot_win_its_row() -> None:
+    fake = doc(
+        "omlx",
+        decode_short_tps=9.2,
+        decode_at_long_tps=8.1,
+        prefill_long_tps=13847.8,
+        cold_ttft_long_ms=1306.4,
+        cached_ttft_long_ms=None,
+        invalid_cases=["cached_ttft_long"],
+    )
+    real = doc(
+        "splash",
+        decode_short_tps=56.1,
+        decode_at_long_tps=37.8,
+        prefill_long_tps=446.3,
+        cold_ttft_long_ms=40617.4,
+        cached_ttft_long_ms=463.0,
+        invalid_cases=[],
+    )
+    output = render([fake, real])
+    assert "13,847.8" not in output
+    assert "**446.3 tok/s**" in output
+    assert "**40.6 s**" in output
+
+
+def test_a_repeated_label_keeps_only_the_newest_run() -> None:
+    old = doc("omlx", decode_short_tps=9.55, timestamp="2026-11-11T13:00:00", invalid_cases=[])
+    new = doc("omlx", decode_short_tps=9.24, timestamp="2026-11-11T13:17:00", invalid_cases=[])
+    output = render([old, new])
+    assert output.count("omlx") == 1 or "9.55" not in output
+    assert "9.2 tok/s" in output

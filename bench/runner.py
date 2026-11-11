@@ -174,6 +174,7 @@ def run_pass(
             "reasoning_effort": effort,
             "chat_template_kwargs": engine.template_kwargs or None,
             "proc_pattern": pattern,
+            "start_command": list(engine.start),
             "persistent": engine.persistent,
         },
         "model": {

@@ -30,6 +30,8 @@ ENGINE_ORDER = {
     "mirai": 1,
     "ollama-q3kxl": 2,
     "ollama-default": 3,
+    "omlx-4bit": 4,
+    "omlx-4bit-hot4g": 5,
 }
 
 SPEED_METRICS = tuple(metric for metric in METRICS if metric.group == "speed")
@@ -39,6 +41,46 @@ MEMORY_METRICS = tuple(metric for metric in METRICS if metric.group == "memory")
 def load_doc(path: Path | str) -> dict:
     with Path(path).open(encoding="utf-8") as handle:
         return json.load(handle)
+
+
+# A case the run invalidated cannot contribute its metrics: a "cold" prefill
+# that hit a persisted prefix cache must not win the prefill row.
+INVALID_CASE_METRICS = {
+    "decode_short": ("decode_short_tps",),
+    "prefill_cold_long": ("prefill_long_tps", "cold_ttft_long_ms"),
+    "decode_at_long": ("decode_at_long_tps",),
+    "cached_ttft_long": ("cached_ttft_long_ms", "decode_at_long_tps"),
+}
+
+
+def prepare_docs(docs: list[dict]) -> list[dict]:
+    """Keep the newest run per label and blank the metrics of invalid cases.
+
+    Re-running the same label is a re-measurement: the newest file supersedes
+    the older one in the table, while both stay on disk.
+    """
+
+    newest: dict[str, dict] = {}
+    for doc in docs:
+        label = doc.get("label") or ""
+        previous = newest.get(label)
+        if previous is None or (doc.get("timestamp") or "") >= (previous.get("timestamp") or ""):
+            newest[label] = doc
+
+    prepared: list[dict] = []
+    for doc in newest.values():
+        summary = dict(doc.get("summary") or {})
+        invalid = set(summary.get("invalid_cases") or [])
+        # The cache-hit pair proves the cold start together. Without a clearly
+        # faster cached turn, the "cold" prefill is unproven as well, so its
+        # numbers must not reach the table.
+        if "cached_ttft_long" in invalid:
+            invalid.add("prefill_cold_long")
+        for case in invalid:
+            for key in INVALID_CASE_METRICS.get(case, ()):
+                summary[key] = None
+        prepared.append({**doc, "summary": summary})
+    return prepared
 
 
 def format_value(metric: Metric, value) -> str:
@@ -121,7 +163,7 @@ def render(docs: list[dict], *, title: str = "Local LLM benchmark") -> str:
     if not docs:
         raise ValueError("no result documents to render")
     docs = sorted(
-        docs,
+        prepare_docs(docs),
         key=lambda doc: (
             ENGINE_ORDER.get(doc["label"], len(ENGINE_ORDER)),
             doc["label"],
@@ -177,11 +219,24 @@ def render(docs: list[dict], *, title: str = "Local LLM benchmark") -> str:
         lines.extend(["", "## Validity", "", *invalid_lines])
 
     lines.extend(["", "## Verdict", ""])
-    speed_scores = _wins(SPEED_METRICS, docs)
-    lines.append(f"**Text and code:** {_winners_text(speed_scores, docs)}")
+    # A run with an invalidated case does not decide anything, whatever the
+    # rest of its numbers look like. It stays in the table as evidence.
+    verdict_docs = [
+        doc for doc in docs if not (doc.get("summary") or {}).get("invalid_cases")
+    ] or docs
+    if len(verdict_docs) < len(docs):
+        skipped = [doc["label"] for doc in docs if doc not in verdict_docs]
+        lines.append(
+            "Excluded from the verdict for an invalid case: "
+            + ", ".join(f"`{label}`" for label in skipped)
+            + "."
+        )
+        lines.append("")
+    speed_scores = _wins(SPEED_METRICS, verdict_docs)
+    lines.append(f"**Text and code:** {_winners_text(speed_scores, verdict_docs)}")
 
     wired = next(metric for metric in MEMORY_METRICS if metric.key == "wired_peak_gb")
-    wired_best = best_labels(wired, docs)
+    wired_best = best_labels(wired, verdict_docs)
     if wired_best:
         values = {doc["label"]: (doc.get("summary") or {}).get("wired_peak_gb") for doc in docs}
         if len(wired_best) == 1:
@@ -205,7 +260,7 @@ def render(docs: list[dict], *, title: str = "Local LLM benchmark") -> str:
         )
 
     context_docs = [
-        doc for doc in docs if isinstance((doc.get("summary") or {}).get("context"), int)
+        doc for doc in verdict_docs if isinstance((doc.get("summary") or {}).get("context"), int)
     ]
     if context_docs:
         largest = max(context_docs, key=lambda doc: doc["summary"]["context"])

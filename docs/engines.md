@@ -266,6 +266,20 @@ model in the middle of a run. `config/engines.toml` starts oMLX with
 `--memory-guard off`; the harness already enforces one model-loaded engine at a
 time.
 
+**Clear the persisted prefix cache before a speed pass.** oMLX keeps its paged
+prefix cache on disk (`~/.omlx/cache`, 100 GB by default) and it **survives a
+restart**. If it already holds the suite's long prompt, the "cold prefill" case
+returns in 1.3 s and reports 13,847 tok/s. Run `rm -rf ~/.omlx/cache` before
+starting the engine for a pass. The report now refuses to use the prefill
+numbers when the cached turn was not clearly faster, because the pair proves the
+cold start together.
+
+**oMLX has no speculative decoding.** Decode is bandwidth bound at ~9 tok/s for
+the 27B 4-bit: every token reads the weights again. Splash and Mirai generate
+6–8 tokens per pass with a draft model, which is the whole 6× gap. Raising the
+in-RAM hot cache (`--hot-cache-max-size 4GB`) changed nothing measurable, so the
+engine runs stock apart from the memory guard.
+
 ### Do not benchmark a GGUF through oMLX
 
 oMLX lists `.gguf` files but runs them on Splash's engine as an external

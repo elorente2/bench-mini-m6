@@ -1,0 +1,209 @@
+{
+  "schema_version": 1,
+  "label": "omlx-4bit-hot4g",
+  "timestamp": "2026-11-11T12:09:41.348041+00:00",
+  "finished_at": "2026-11-11T12:11:22.101062+00:00",
+  "source": "bench",
+  "engine": {
+    "label": "omlx",
+    "name": "oMLX",
+    "version": "0.7.3",
+    "base_url": "http://127.0.0.1:8000/v1",
+    "port": 8000,
+    "reasoning_effort": "none",
+    "chat_template_kwargs": {
+      "enable_thinking": false
+    },
+    "proc_pattern": "omlx-server",
+    "start_command": [
+      "omlx",
+      "serve",
+      "--port",
+      "8000",
+      "--headless",
+      "--memory-guard",
+      "off",
+      "--hot-cache-max-size",
+      "4GB"
+    ],
+    "persistent": false
+  },
+  "model": {
+    "id": "Qwen3.8-27B-4bit",
+    "configured_id": "Qwen3.8-27B-4bit",
+    "quantization": "4-bit MLX",
+    "context": 262144,
+    "context_source": "api"
+  },
+  "suite": {
+    "revision": 5,
+    "prefill_target_chars": 32000,
+    "warmup_max_tokens": 8,
+    "cases": [
+      {
+        "name": "decode_short",
+        "prompt": "short",
+        "max_tokens": 256,
+        "reps": 3,
+        "validate": null,
+        "compare_to": null
+      },
+      {
+        "name": "prefill_cold_long",
+        "prompt": "long",
+        "max_tokens": 64,
+        "reps": 1,
+        "validate": null,
+        "compare_to": null
+      },
+      {
+        "name": "cached_ttft_long",
+        "prompt": "long_cached",
+        "max_tokens": 128,
+        "reps": 1,
+        "validate": "cache_hit",
+        "compare_to": "prefill_cold_long"
+      }
+    ]
+  },
+  "machine": {
+    "host": "Macmini-de-Emilio.local",
+    "os": "Darwin 27.2.0",
+    "macos": "27.2",
+    "model": "Mac18,5",
+    "chip": "Apple M6",
+    "memory_gb": 34.4,
+    "python": "3.15.2"
+  },
+  "summary": {
+    "decode_short_tps": 9.5,
+    "decode_at_long_tps": 8.34,
+    "prefill_long_tps": 13847.83,
+    "cold_ttft_long_ms": 1306.4,
+    "cached_ttft_long_ms": null,
+    "reported_cached_ttft_long_ms": 1008.4,
+    "peak_engine_rss_mb": 9084.5,
+    "wired_before_gb": 4.85,
+    "wired_peak_gb": 21.88,
+    "wired_after_gb": 21.69,
+    "rss_samples": 187,
+    "invalid_cases": [
+      "cached_ttft_long"
+    ],
+    "valid_cases": [
+      "decode_short",
+      "prefill_cold_long"
+    ],
+    "model": "Qwen3.8-27B-4bit",
+    "context": 262144,
+    "context_source": "api"
+  },
+  "validation": {
+    "decode_short": {
+      "valid": true,
+      "reasons": []
+    },
+    "prefill_cold_long": {
+      "valid": true,
+      "reasons": []
+    },
+    "cached_ttft_long": {
+      "valid": false,
+      "reasons": [
+        "cached TTFT (1008 ms) is not meaningfully lower than cold TTFT (1306 ms)"
+      ]
+    }
+  },
+  "runs": [
+    {
+      "ttft_ms": 363.8,
+      "ttft_content_ms": 363.8,
+      "total_ms": 23429.4,
+      "prompt_tokens": 47,
+      "completion_tokens": 219,
+      "completion_tokens_source": "usage",
+      "content_chunks": 110,
+      "reasoning_chunks": 0,
+      "decode_tps": 9.5,
+      "prefill_tps": 129.17,
+      "finish_reason": "stop",
+      "answer_preview": "```python def merge_intervals(intervals):     \"\"\"Merge overlapping closed intervals and return them sorted.      >>> merge_intervals([(1, 3), (2, 6), (8, 10), (",
+      "answer_chars": 668,
+      "answer_sha256": "e4b957acc98d7cd219e867795d3f7d95954f3852e54d226e18c2722f9c4daf3b",
+      "case": "decode_short",
+      "rep": 1
+    },
+    {
+      "ttft_ms": 340.7,
+      "ttft_content_ms": 340.7,
+      "total_ms": 23106.0,
+      "prompt_tokens": 47,
+      "completion_tokens": 219,
+      "completion_tokens_source": "usage",
+      "content_chunks": 110,
+      "reasoning_chunks": 0,
+      "decode_tps": 9.62,
+      "prefill_tps": 137.95,
+      "finish_reason": "stop",
+      "answer_preview": "```python def merge_intervals(intervals):     \"\"\"Merge overlapping closed intervals and return them sorted.      >>> merge_intervals([(1, 3), (2, 6), (8, 10), (",
+      "answer_chars": 668,
+      "answer_sha256": "e4b957acc98d7cd219e867795d3f7d95954f3852e54d226e18c2722f9c4daf3b",
+      "case": "decode_short",
+      "rep": 2
+    },
+    {
+      "ttft_ms": 343.6,
+      "ttft_content_ms": 343.6,
+      "total_ms": 23962.6,
+      "prompt_tokens": 47,
+      "completion_tokens": 219,
+      "completion_tokens_source": "usage",
+      "content_chunks": 110,
+      "reasoning_chunks": 0,
+      "decode_tps": 9.27,
+      "prefill_tps": 136.78,
+      "finish_reason": "stop",
+      "answer_preview": "```python def merge_intervals(intervals):     \"\"\"Merge overlapping closed intervals and return them sorted.      >>> merge_intervals([(1, 3), (2, 6), (8, 10), (",
+      "answer_chars": 668,
+      "answer_sha256": "e4b957acc98d7cd219e867795d3f7d95954f3852e54d226e18c2722f9c4daf3b",
+      "case": "decode_short",
+      "rep": 3
+    },
+    {
+      "ttft_ms": 1306.4,
+      "ttft_content_ms": 1306.4,
+      "total_ms": 1446.0,
+      "prompt_tokens": 18091,
+      "completion_tokens": 1,
+      "completion_tokens_source": "usage",
+      "content_chunks": 1,
+      "reasoning_chunks": 0,
+      "decode_tps": null,
+      "prefill_tps": 13847.83,
+      "finish_reason": "stop",
+      "answer_preview": "READY",
+      "answer_chars": 5,
+      "answer_sha256": "c2e3ac47f4a325469c1a2d5f117e463ec943c721986d5d9f09ac4540b7d80526",
+      "case": "prefill_cold_long",
+      "rep": 1
+    },
+    {
+      "ttft_ms": 1008.4,
+      "ttft_content_ms": 1008.4,
+      "total_ms": 16241.0,
+      "prompt_tokens": 18153,
+      "completion_tokens": 128,
+      "completion_tokens_source": "usage",
+      "content_chunks": 65,
+      "reasoning_chunks": 0,
+      "decode_tps": 8.34,
+      "prefill_tps": 18001.18,
+      "finish_reason": "length",
+      "answer_preview": "```python \"\"\" LRU Cache Implementation  This module provides a Least Recently Used (LRU) cache implementation using a doubly linked list and a hash map for O(1)",
+      "answer_chars": 525,
+      "answer_sha256": "7d3a4b47f3b2ccf62d6a61e401420e209fb6cbca06eb9b8d46eb5a0e3fb80b91",
+      "case": "cached_ttft_long",
+      "rep": 1
+    }
+  ]
+}
