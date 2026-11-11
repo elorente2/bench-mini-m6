@@ -3,17 +3,21 @@
 # limit, an item's order or a grader changes, and never edit old eval results.
 
 [eval]
-revision = 3
+revision = 5
 # Ceiling for one answer. Code items raise it per task in bench/eval/tasks.py.
 max_tokens = 640
 # Extra budget added to every item. Revision 2 introduced it because a thinking
 # model spent the whole per-item budget on reasoning and never reached an
-# answer. Revision 3 raised it to 4096 after one item needed 1169 tokens.
+# answer. Revision 3 raised it to 4096 after one item needed 1169 tokens, and
+# revision 5 to 8192 after a code item spent 4796 reasoning inside content
+# without reaching the code.
 # Setting it to 0 reproduces the revision-1 limits exactly.
-reasoning_headroom = 4096
+reasoning_headroom = 8192
 code_timeout_s = 5
 seed = 0
-# Characters of deterministic filler around the needle. The result records the
-# real prompt_tokens, so the report quotes tokens, not characters.
+# Characters of deterministic filler around the needle. ~2.6 characters per
+# token in Spanish, so 170000 characters is roughly 64K tokens and the second
+# needle item exercises about a quarter of the declared window. The result
+# records the real prompt_tokens, so the report quotes tokens, not characters.
 needle_chars = 24000
-needle_long_chars = 64000
+needle_long_chars = 170000

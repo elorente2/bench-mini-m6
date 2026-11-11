@@ -27,7 +27,7 @@ interchangeable documents.
 | Revision | `[eval].revision` in `config/eval.toml` |
 | Sampling | `temperature: 0`, `seed: 0` |
 | Thinking | Off by default; the run records how it was disabled |
-| Items | 21, fixed order, 8 categories |
+| Items | 20, fixed order, 9 categories |
 | Output limit | Per item in `bench/eval/tasks.py`, plus `[eval].reasoning_headroom` |
 | Grading | Code only. No LLM judge, no human rubric |
 | Retries | None. One request per item |
@@ -54,14 +54,20 @@ finding about the model.
 
 | Category | Items | What it checks |
 |---|---:|---|
-| `instrucciones` | 3 | Bullet count and prefix, word limit, forbidden word, date format |
-| `json` | 3 | Flat schema, enum + boolean classification, ordered array |
+| `instrucciones` | 2 | Exact bullet format; 25-word summary with a required opening and two forbidden words |
+| `json` | 2 | Flat schema; nested schema with enum, ordered lines and a conditional field |
 | `herramientas` | 2 | One tool call, and search-before-write in a two-tool turn |
-| `calculo` | 3 | Percentage, date arithmetic, multi-step word problem |
-| `codigo` | 3 | Two functions and one bug fix, graded by running unit tests |
-| `contexto_largo` | 2 | A code buried in ~24K and ~64K characters of filler |
-| `abstencion` | 2 | Say `NO CONSTA` instead of inventing a missing datum |
-| `extraccion` | 3 | Invoice fields, agenda line, action-item owner |
+| `arquitectura` | 3 | Pick a design under three constraints; spot the two contradictory lines; four-section ADR |
+| `calculo` | 2 | Percentage with rounding; date arithmetic |
+| `codigo` | 3 | JS accent-insensitive filter; Python permission rule with a hardening order; SQLite `GROUP BY`/`HAVING` |
+| `contexto_largo` | 2 | A code buried in ~9K and ~65K tokens of filler |
+| `abstencion` | 2 | Say `NO CONSTA` instead of inventing a phone number or a version |
+| `extraccion` | 2 | Invoice fields; exception, function and HTTP status from a trace |
+
+Revision 4 replaced the twelve items every model passed. The new ones come from
+the work this benchmark is actually for: code review, refactors, API contracts
+and architecture decisions. Revision 5 only raised the reasoning headroom, after
+a code item ran out of budget while thinking.
 
 The long-context items record the real `prompt_tokens` from the engine, so the
 report quotes tokens rather than the character count used to build the filler.
@@ -76,8 +82,10 @@ All graders are pure functions in `bench/eval/graders.py`:
 - `json` with a small schema subset (`type`, `required`, `properties`, `items`,
   `enum`, `additionalProperties`, `minItems`, `maxItems`) plus expected values,
 - `tool` over the real `tool_calls` returned by the engine,
-- `bullets`, `constraints`, `kv`, `parts` for format-following tasks,
-- `code`, which extracts the fenced block and runs it.
+- `bullets`, `constraints`, `sections`, `kv`, `parts` for format-following tasks
+  (`sections` requires given line prefixes in order and a word budget),
+- `code`, which extracts the fenced block and runs it with Python or, for
+  `lang = "js"`, Node.
 
 A grader never receives the model name, the engine or the other answers, so an
 item cannot be graded differently because of who answered it.
@@ -93,6 +101,12 @@ item cannot be graded differently because of who answered it.
 - `socket.socket.connect`, `connect_ex` and `create_connection` replaced with
   a function that raises, so casual network use fails,
 - a minimal environment with `HOME` and `TMPDIR` pointing at the temp dir.
+
+The JavaScript items use `node --permission --allow-fs-read=<tmp>`, which
+denies writes and reads outside the temp directory. Node's permission model
+does not cover the network, so a preloaded guard patches `net.Socket.connect`,
+`net.connect` and `dns.lookup` to throw. Same caveat as Python: a guard, not a
+container.
 
 This is a guard against broken or runaway code, **not a hostile-code sandbox**.
 It does not use a container, a separate user or a network namespace. Do not
@@ -187,7 +201,40 @@ After a trial round:
 The point is not to accumulate benchmarks. It is to keep the smallest set of
 models and items that answers "which model for this task".
 
-## What the pilot showed
+## What revision 5 showed
+
+Twenty items, four runs, same two weight sets. Every run passes the gates
+(`errors: 0`, no leaked reasoning) and the four are one revision.
+
+| Run | Accuracy | Fails | Thinking |
+|---|---:|---|---|
+| Q3_K_XL · Splash | 17/20 | nested JSON, design choice, IVA | off |
+| Q3_K_XL · Splash | 19/20 | permission item, truncated at 8,892 tokens | on |
+| 4-bit MLX · oMLX | 17/20 | nested JSON, design choice, IVA | off |
+| 4-bit MLX · oMLX | 19/20 | permission item, truncated at 8,892 tokens | on |
+
+1. **Thinking decides four categories, not the engine.** `json`, `arquitectura`
+   and `calculo` go from 1/2, 2/3 and 1/2 with thinking off to full marks with
+   it on, in both weight sets. `codigo` is the reverse: 3/3 off, 2/3 on.
+2. **The code failure with thinking on is the model, not the server.** Both
+   engines truncate the same item at the same 8,892 tokens: with thinking on the
+   model keeps reasoning and never emits the function. It is a thinking-mode
+   ceiling, documented, not a budget bug — the headroom is 8,192 and the model
+   spent all of it.
+3. **Quantization and engine still change nothing.** Both weight sets fail
+   exactly the same items with the same answers, down to `1499,60 €` and 63 vs 64
+   words.
+4. **The suite now discriminates.** 15 of 20 items still pass for everyone, but
+   four separate the two modes, against one at revision 3.
+
+Practical reading for a daily driver: thinking off for code, thinking on for
+JSON contracts, arithmetic and anything with a hard limit.
+
+## What the pilot showed (revision 3, superseded)
+
+Revision 4 replaced the items below, so these numbers are history. They are
+kept because they explain why the suite changed: two weight sets, two engines
+and nineteen items that nobody failed.
 
 Revision 3 was measured against two sets of Qwen3.8-27B weights: UD-Q3_K_XL on
 Splash and 4-bit MLX on oMLX, each with thinking off and on.
@@ -227,7 +274,9 @@ must beat.
 - The long-context items measure retrieval at the prompt sizes recorded in the
   result, not the advertised context window. The report compares the longest
   prompt with the declared maximum: at revision 3 that is 24.6K tokens against
-  217K (Splash) and 262K (oMLX), so **9–11 % of the window is exercised**. A low
+  217K (Splash) and 262K (oMLX), so **9–11 % of the window is exercised**. Since
+  revision 4 the second needle is ~65K tokens, which is **30 %** of the Splash
+  window. A low
   coverage is not a failure, it is an untested region. A near-max item costs
   10–17 minutes of prefill per run on this machine.
 - No vision, PDF or OCR item yet. Splash and Ollama native advertise those

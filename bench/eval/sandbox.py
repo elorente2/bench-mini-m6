@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import shutil
 import signal
 import subprocess
 import sys
@@ -46,6 +47,28 @@ _spec.loader.exec_module(solution)
 
 MARKER = "__BENCH_TESTS_OK__"
 
+JS_GUARD = """\
+import dns from "node:dns";
+import net from "node:net";
+
+const deny = () => {
+  throw new Error("network access is disabled in the sandbox");
+};
+
+net.Socket.prototype.connect = deny;
+net.connect = deny;
+net.createConnection = deny;
+dns.lookup = deny;
+dns.promises.lookup = deny;
+"""
+
+JS_RUNNER = """\
+import * as solution from "./solution.mjs";
+
+{tests}
+console.log({marker});
+"""
+
 
 @dataclass(frozen=True)
 class SandboxResult:
@@ -55,6 +78,86 @@ class SandboxResult:
     duration_ms: float
     stdout: str
     stderr: str
+
+
+def run_js_tests(code: str, tests: str, timeout_s: int = 5) -> SandboxResult:
+    """Run ``tests`` against an ES module in a throwaway directory.
+
+    Node's permission model denies file writes; the import guard patches the
+    socket and DNS entry points because ``--permission`` does not cover the
+    network. Same limits as the Python path: wall clock, a clean environment and
+    a temporary working directory.
+    """
+
+    node = shutil.which("node")
+    if node is None:
+        return SandboxResult(
+            passed=False,
+            returncode=None,
+            timed_out=False,
+            duration_ms=0.0,
+            stdout="",
+            stderr="node is not installed, so this item cannot be graded",
+        )
+
+    runner = JS_RUNNER.format(tests=tests, marker=repr(MARKER))
+    started = time.perf_counter()
+    with tempfile.TemporaryDirectory(prefix="bench-eval-js-") as directory:
+        root = Path(directory)
+        (root / "solution.mjs").write_text(code, encoding="utf-8")
+        (root / "guard.mjs").write_text(JS_GUARD, encoding="utf-8")
+        (root / "run_tests.mjs").write_text(runner, encoding="utf-8")
+        env = {
+            "PATH": "/usr/bin:/bin:/opt/homebrew/bin",
+            "HOME": directory,
+            "TMPDIR": directory,
+            "LANG": "en_US.UTF-8",
+            "NO_PROXY": "*",
+        }
+        try:
+            completed = subprocess.run(
+                [
+                    node,
+                    "--permission",
+                    f"--allow-fs-read={Path(directory).resolve()}",
+                    "--no-warnings",
+                    "--import",
+                    "./guard.mjs",
+                    "run_tests.mjs",
+                ],
+                cwd=directory,
+                env=env,
+                capture_output=True,
+                text=True,
+                timeout=timeout_s + 2,
+                check=False,
+            )
+        except subprocess.TimeoutExpired as exc:
+            duration = (time.perf_counter() - started) * 1000
+            return SandboxResult(
+                passed=False,
+                returncode=None,
+                timed_out=True,
+                duration_ms=round(duration, 1),
+                stdout=(exc.stdout or "") if isinstance(exc.stdout, str) else "",
+                stderr="timeout",
+            )
+    duration = (time.perf_counter() - started) * 1000
+    passed = completed.returncode == 0 and completed.stdout.rstrip().endswith(MARKER)
+    return SandboxResult(
+        passed=passed,
+        returncode=completed.returncode,
+        timed_out=False,
+        duration_ms=round(duration, 1),
+        stdout=completed.stdout[-2000:],
+        stderr=completed.stderr[-2000:],
+    )
+
+
+def run_tests(code: str, tests: str, *, lang: str = "py", timeout_s: int = 5) -> SandboxResult:
+    if lang == "js":
+        return run_js_tests(code, tests, timeout_s=timeout_s)
+    return run_python_tests(code, tests, timeout_s=timeout_s)
 
 
 def run_python_tests(code: str, tests: str, timeout_s: int = 5) -> SandboxResult:

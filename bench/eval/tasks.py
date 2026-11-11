@@ -7,6 +7,7 @@ CATEGORIES = (
     "instrucciones",
     "json",
     "herramientas",
+    "arquitectura",
     "calculo",
     "codigo",
     "contexto_largo",
@@ -49,8 +50,11 @@ class Task:
     numeric_keys: tuple[str, ...] = ()
     separator: str = "|"
     parts: tuple[str, ...] = ()
+    sections: tuple[str, ...] = ()
     tests: str | None = None
     code_timeout_s: int = 5
+    # "py" runs the tests with the stdlib runner; "js" with node --permission.
+    lang: str = "py"
     metadata: dict = field(default_factory=dict)
 
 
@@ -166,6 +170,11 @@ def build_tasks(settings) -> tuple[Task, ...]:
 
     Order is part of the contract: changing prompts, limits, order or graders
     requires bumping ``[eval].revision`` in ``config/eval.toml``.
+
+    Revision 4 replaces the items every model passed. The new ones are built
+    around the work the user actually does — code review and refactors, API
+    contracts, architecture decisions — because arithmetic drills did not
+    separate two 27B checkpoints from each other or from themselves.
     """
 
     tasks: list[Task] = [
@@ -184,133 +193,103 @@ def build_tasks(settings) -> tuple[Task, ...]:
             max_tokens=160,
         ),
         Task(
-            id="es-limite-palabras",
+            id="es-restricciones-triples",
             category="instrucciones",
             prompt=(
-                "Resume qué es una VPN en una sola frase de 20 palabras como máximo. "
-                "No uses la palabra 'túnel' ni sus derivados. Responde solo con la frase."
+                "Resume en 25 palabras o menos qué aporta un índice B-tree en una base "
+                "de datos. La respuesta debe empezar por 'Un índice'. No uses las "
+                "palabras 'árbol' ni 'tree'. Responde solo con la frase."
             ),
             grader="constraints",
-            max_words=20,
+            max_words=25,
             min_words=8,
-            exclude=("túnel", "tunel"),
-            max_tokens=80,
-        ),
-        Task(
-            id="es-fecha-larga",
-            category="instrucciones",
-            prompt=(
-                "Convierte la fecha 2026-03-08 a español, con el formato "
-                "'día de mes de año' y sin ceros a la izquierda. Responde solo con la "
-                "fecha, sin punto final."
-            ),
-            grader="regex",
-            pattern=r"^\s*8 de marzo de 2026\.?\s*$",
-            max_tokens=40,
+            include=("un índice",),
+            exclude=("árbol", "arbol", "tree"),
+            max_tokens=200,
         ),
         Task(
             id="json-pedido",
             category="json",
             prompt=(
-                "Extrae los datos de este pedido y responde solo con un objeto JSON, sin "
-                "explicación y con exactamente estas claves: order_id (entero), "
-                "customer (texto), total_eur (número), status (texto).\n\n"
-                "Pedido 4471 del 12/03/2026. Cliente: Marta Ruiz. "
-                "Total: 89,50 EUR. Estado: enviado."
+                "Devuelve solo un objeto JSON, sin texto alrededor, con estos campos "
+                "exactos: customer (texto), urgent (booleano), total (número) y "
+                "items (entero). Datos: el cliente es 'Talleres Ríos', el pedido es "
+                "urgente y son 3 artículos por 149,90 euros."
             ),
             grader="json",
             schema={
                 "type": "object",
-                "required": ["order_id", "customer", "total_eur", "status"],
+                "required": ["customer", "urgent", "total", "items"],
                 "properties": {
-                    "order_id": {"type": "integer"},
                     "customer": {"type": "string"},
-                    "total_eur": {"type": "number"},
-                    "status": {"type": "string"},
+                    "urgent": {"type": "boolean"},
+                    "total": {"type": "number"},
+                    "items": {"type": "integer"},
                 },
                 "additionalProperties": False,
             },
-            expect_json={
-                "order_id": 4471,
-                "customer": "Marta Ruiz",
-                "total_eur": 89.5,
-                "status": "enviado",
-            },
-            max_tokens=160,
+            expect_json={"customer": "Talleres Ríos", "urgent": True, "total": 149.9, "items": 3},
+            max_tokens=200,
         ),
         Task(
-            id="json-clasificacion",
+            id="json-api-anidado",
             category="json",
             prompt=(
-                "Clasifica este mensaje de soporte. Responde solo con JSON con las claves "
-                "category (una de: facturacion, tecnico, otro), urgent (booleano) y summary "
-                "(texto de 12 palabras como máximo). Marca urgent=true solo si el mensaje "
-                "pide una acción con fecha límite.\n\n"
-                "Mensaje: 'Me habéis cobrado dos veces la cuota de octubre. Necesito la "
-                "devolución antes del viernes.'"
+                "Extrae este pedido a un objeto JSON con esta forma exacta y sin campos "
+                "de más:\n"
+                '- "pedido": texto\n'
+                '- "prioridad": uno de "alta", "media" o "baja"\n'
+                '- "lineas": lista con al menos 2 objetos, cada uno con "sku" (texto) y '
+                '"qty" (entero); si una línea lleva la nota frágil, añade "nota" con el '
+                'texto exacto "frágil"\n'
+                '- "aviso": solo si alguna línea es frágil, con el texto exacto '
+                '"manipular con cuidado"\n\n'
+                "Texto: «Pedido P-1042, prioridad alta. Tres teclados TEC-01 y un "
+                "soporte SOP-07 marcado como frágil.»\n"
+                "Responde solo con el JSON."
             ),
             grader="json",
             schema={
                 "type": "object",
-                "required": ["category", "urgent", "summary"],
+                "required": ["pedido", "prioridad", "lineas", "aviso"],
                 "properties": {
-                    "category": {
-                        "type": "string",
-                        "enum": ["facturacion", "tecnico", "otro"],
-                    },
-                    "urgent": {"type": "boolean"},
-                    "summary": {"type": "string"},
-                },
-            },
-            expect_json={"category": "facturacion", "urgent": True},
-            max_tokens=160,
-        ),
-        Task(
-            id="json-articulos",
-            category="json",
-            prompt=(
-                "Del texto, extrae los artículos. Responde solo con JSON con la forma "
-                '{"items": [{"sku": texto, "qty": entero}]} en el orden en que aparecen '
-                "y sin claves extra.\n\n"
-                "Pedido: 2 unidades de SKU-11 y 1 unidad de SKU-42; además 5 unidades "
-                "de SKU-07."
-            ),
-            grader="json",
-            schema={
-                "type": "object",
-                "required": ["items"],
-                "properties": {
-                    "items": {
+                    "pedido": {"type": "string"},
+                    "prioridad": {"type": "string", "enum": ["alta", "media", "baja"]},
+                    "lineas": {
                         "type": "array",
-                        "minItems": 3,
-                        "maxItems": 3,
+                        "minItems": 2,
                         "items": {
                             "type": "object",
                             "required": ["sku", "qty"],
                             "properties": {
                                 "sku": {"type": "string"},
                                 "qty": {"type": "integer"},
+                                "nota": {"type": "string"},
                             },
                             "additionalProperties": False,
                         },
-                    }
+                    },
+                    "aviso": {"type": "string"},
                 },
+                "additionalProperties": False,
             },
             expect_json={
-                "items": [
-                    {"sku": "SKU-11", "qty": 2},
-                    {"sku": "SKU-42", "qty": 1},
-                    {"sku": "SKU-07", "qty": 5},
-                ]
+                "pedido": "P-1042",
+                "prioridad": "alta",
+                "lineas": [
+                    {"sku": "TEC-01", "qty": 3},
+                    {"sku": "SOP-07", "qty": 1, "nota": "frágil"},
+                ],
+                "aviso": "manipular con cuidado",
             },
-            max_tokens=220,
+            max_tokens=400,
         ),
         Task(
             id="tool-tiempo",
             category="herramientas",
             prompt=(
-                "¿Qué tiempo hace ahora en Valencia? Usa la herramienta disponible y pide "
-                "la temperatura en grados centígrados. No respondas con texto."
+                "¿Qué tiempo hace ahora en Valencia? Usa la herramienta disponible y "
+                "pide la temperatura en grados celsius."
             ),
             grader="tool",
             tools=(WEATHER_TOOL,),
@@ -324,13 +303,77 @@ def build_tasks(settings) -> tuple[Task, ...]:
             id="tool-orden",
             category="herramientas",
             prompt=(
-                "Primero busca en mis notas la frase 'presupuesto 2027'. Después crea una "
-                "tarea para revisarla el 2026-11-20. Usa las herramientas; no respondas con texto."
+                "Antes de crear la tarea 'revisar contrato', busca en las notas si ya "
+                "hablamos de ese contrato. Después crea la tarea con fecha límite "
+                "2026-12-01. Usa las herramientas en ese orden."
             ),
             grader="tool",
             tools=NOTES_TOOLS,
-            tool_expect={"name": "search_notes", "arguments": {"query": "presupuesto 2027"}},
-            max_tokens=160,
+            tool_expect={
+                "name": "search_notes",
+                "arguments": {},
+                "then": "create_task",
+            },
+            max_tokens=220,
+        ),
+        Task(
+            id="arch-tradeoff",
+            category="arquitectura",
+            prompt=(
+                "Tienes un portátil con 32 GB de memoria compartida, sin acceso a "
+                "internet y con la regla de que solo puede haber un motor de modelos "
+                "cargado a la vez. Dos diseños:\n"
+                "A) Un único modelo de 27B siempre cargado: 16 GB de pesos, buena "
+                "calidad, sin recargas.\n"
+                "B) Dos modelos de 8B que se cargan y descargan según la tarea: 10 "
+                "segundos de recarga cada cambio, más variedad.\n"
+                "Elige uno. Responde en 60 palabras o menos, en español, diciendo qué "
+                "opción descartas y por qué, y menciona el límite de 32 GB. No uses la "
+                "palabra 'depende'."
+            ),
+            grader="constraints",
+            max_words=60,
+            min_words=15,
+            include=("32 gb", "descart"),
+            exclude=("depende",),
+            max_tokens=400,
+        ),
+        Task(
+            id="arch-contradiccion",
+            category="arquitectura",
+            prompt=(
+                "Estas frases describen el mismo servicio. Exactamente dos se "
+                "contradicen entre sí:\n"
+                "1. El servicio escucha solo en 127.0.0.1:18090.\n"
+                "2. Los ficheros viven en el volumen Docker curso-data.\n"
+                "3. El contenedor monta curso-data en /usr/share/nginx/html en solo "
+                "lectura.\n"
+                "4. El puerto 2222 es Forgejo, no SSH.\n"
+                "5. Al arrancar, el servicio regenera el índice y lo escribe en "
+                "/usr/share/nginx/html/index.html.\n"
+                "6. nginx:alpine sirve el contenido.\n"
+                "Responde solo con los dos números que se contradicen, el menor "
+                "primero y separados por un guion (por ejemplo 2-4)."
+            ),
+            grader="exact",
+            compare="alnum",
+            expect=("3-5",),
+            max_tokens=40,
+        ),
+        Task(
+            id="arch-adr",
+            category="arquitectura",
+            prompt=(
+                "Escribe un ADR de exactamente 4 líneas sobre usar SQLite en lugar de "
+                "ficheros JSON para el catálogo. Cada línea debe empezar por una de "
+                "estas etiquetas, en este orden: 'Contexto:', 'Decisión:', "
+                "'Alternativa descartada:' y 'Consecuencia:'. Máximo 60 palabras en "
+                "total. No añadas nada más."
+            ),
+            grader="sections",
+            sections=("Contexto:", "Decisión:", "Alternativa descartada:", "Consecuencia:"),
+            max_words=60,
+            max_tokens=400,
         ),
         Task(
             id="math-iva",
@@ -356,123 +399,125 @@ def build_tasks(settings) -> tuple[Task, ...]:
             max_tokens=40,
         ),
         Task(
-            id="math-tornillos",
-            category="calculo",
-            prompt=(
-                "Una caja trae 12 filas de 8 tornillos. Se han usado 37 tornillos. "
-                "¿Cuántos quedan? Responde solo con el número."
-            ),
-            grader="regex",
-            pattern=r"^\s*59\s*\.?\s*$",
-            max_tokens=24,
-        ),
-        Task(
-            id="code-merge-intervals",
+            id="code-js-normaliza",
             category="codigo",
             prompt=(
-                "Escribe una función merge_intervals(intervals) que reciba una lista de "
-                "intervalos cerrados [inicio, fin], fusione los que se solapan o se tocan y "
-                "devuelva la lista ordenada. Devuelve solo el código de la función, sin "
-                "explicación."
+                "Escribe un módulo ES de JavaScript sin dependencias que exporte dos "
+                "funciones:\n"
+                "- `normalize(text)`: pasa a minúsculas, quita los diacríticos y deja "
+                "un solo espacio entre palabras, sin espacios al principio ni al final.\n"
+                "- `matches(dish, query)`: devuelve true si `dish.name` normalizado "
+                "contiene `query` normalizado, y true también cuando `query` está vacío.\n"
+                "Devuelve solo el código, sin explicación."
             ),
             grader="code",
+            lang="js",
+            tests=(
+                "const eq = (got, want, what) => {\n"
+                "  if (JSON.stringify(got) !== JSON.stringify(want)) {\n"
+                "    throw new Error(`${what}: expected ${JSON.stringify(want)}, got ${JSON.stringify(got)}`);\n"
+                "  }\n"
+                "};\n"
+                'eq(solution.normalize("Arròs Negre"), "arros negre", "acentos");\n'
+                'eq(solution.normalize("  Sopa   de  peix "), "sopa de peix", "espacios");\n'
+                'eq(solution.matches({ name: "Arròs Negre" }, "arros"), true, "consulta sin acentos");\n'
+                'eq(solution.matches({ name: "Sopa" }, "ARRÒS"), false, "no debe coincidir");\n'
+                'eq(solution.matches({ name: "Truita" }, ""), true, "consulta vacía");\n'
+                'eq(solution.matches({ name: "  Truita  " }, "truit"), true, "coincidencia parcial");\n'
+            ),
+            max_tokens=900,
+        ),
+        Task(
+            id="code-py-permisos",
+            category="codigo",
+            prompt=(
+                "Implementa `effective(path, declared)` en Python. `path` es la ruta de "
+                "una nota y `declared` es el permiso del frontmatter o None si no lo "
+                "declara. Cada carpeta tiene un permiso por defecto:\n"
+                "'40 Archivo/' y 'Sistema/' -> 'nadie'; '10 Proyectos/', '20 Áreas/', "
+                "'30 Recursos/' y 'Plantillas/' -> 'humano'; '_Agentes/' -> 'agente'; "
+                "'00 Inbox/' -> 'ambos'.\n"
+                "Regla: el permiso declarado solo puede endurecer, nunca relajar. Orden "
+                "de dureza, de más a menos: 'nadie', 'humano', 'agente', 'ambos'. La "
+                "función devuelve el permiso efectivo como texto. Devuelve solo el "
+                "código, sin explicación."
+            ),
+            grader="code",
+            tests=(
+                'assert solution.effective("40 Archivo/nota.md", "ambos") == "nadie"\n'
+                'assert solution.effective("40 Archivo/nota.md", "humano") == "nadie"\n'
+                'assert solution.effective("_Agentes/nota.md", "humano") == "humano"\n'
+                'assert solution.effective("_Agentes/nota.md", "ambos") == "agente"\n'
+                'assert solution.effective("10 Proyectos/x.md", None) == "humano"\n'
+                'assert solution.effective("10 Proyectos/x.md", "agente") == "humano"\n'
+                'assert solution.effective("00 Inbox/x.md", None) == "ambos"\n'
+                'assert solution.effective("00 Inbox/x.md", "agente") == "agente"\n'
+                'assert solution.effective("Sistema/x.md", "ambos") == "nadie"\n'
+            ),
             max_tokens=700,
-            code_timeout_s=settings.code_timeout_s,
-            tests=(
-                "assert solution.merge_intervals([[1,3],[2,6],[8,10],[15,18]]) "
-                "== [[1,6],[8,10],[15,18]]\n"
-                "assert solution.merge_intervals([[1,4],[4,5]]) == [[1,5]]\n"
-                "assert solution.merge_intervals([]) == []\n"
-                "assert solution.merge_intervals([[5,6],[1,2]]) == [[1,2],[5,6]]\n"
-                "assert solution.merge_intervals([[1,10],[2,3]]) == [[1,10]]\n"
-            ),
         ),
         Task(
-            id="code-wordcount",
+            id="code-py-sqlite",
             category="codigo",
             prompt=(
-                "Escribe una función count_words(text) que devuelva un diccionario con la "
-                "frecuencia de cada palabra en minúsculas, ignorando la puntuación y los "
-                "espacios múltiples. Devuelve solo el código de la función."
+                "Implementa `top_clientes(conn, minimo)` en Python. `conn` es una "
+                "conexión sqlite3 con las tablas clientes(id, nombre) y "
+                "pedidos(id, cliente_id, total). Devuelve una lista de tuplas "
+                "(nombre, total) con los clientes que tienen al menos `minimo` pedidos, "
+                "ordenada por total descendente y, en empate, por nombre ascendente. "
+                "Devuelve solo el código, sin explicación."
             ),
             grader="code",
-            max_tokens=500,
-            code_timeout_s=settings.code_timeout_s,
             tests=(
-                "r = solution.count_words('Hola, mundo. Hola otra vez!')\n"
-                "assert r == {'hola': 2, 'mundo': 1, 'otra': 1, 'vez': 1}, r\n"
-                "assert solution.count_words('') == {}\n"
-                "assert solution.count_words('Uno uno UNO') == {'uno': 3}\n"
+                "import sqlite3\n"
+                'conn = sqlite3.connect(":memory:")\n'
+                'conn.executescript("create table clientes(id integer primary key, nombre text);"\n'
+                '                   "create table pedidos(id integer primary key, cliente_id integer, total real);")\n'
+                'conn.executemany("insert into clientes values (?, ?)",\n'
+                '                 [(1, "Ana"), (2, "Luis"), (3, "Marta"), (4, "Pablo")])\n'
+                'conn.executemany("insert into pedidos values (?, ?, ?)",\n'
+                "                 [(1, 1, 100.0), (2, 1, 50.0), (3, 2, 30.0),\n"
+                "                  (4, 3, 70.0), (5, 3, 20.0), (6, 4, 500.0)])\n"
+                'assert solution.top_clientes(conn, 2) == [("Ana", 150.0), ("Marta", 90.0)]\n'
+                'assert solution.top_clientes(conn, 1) == [("Pablo", 500.0), ("Ana", 150.0), ("Marta", 90.0), ("Luis", 30.0)]\n'
+                "assert solution.top_clientes(conn, 3) == []\n"
             ),
-        ),
-        Task(
-            id="code-bugfix",
-            category="codigo",
-            prompt=(
-                "Esta función debería devolver la longitud de la racha más larga de valores "
-                "iguales consecutivos, y devolver 0 para una lista vacía, pero está mal. "
-                "Corrígela y devuelve solo el código completo de la función con el mismo "
-                "nombre.\n\n"
-                "```python\n"
-                "def longest_run(xs):\n"
-                "    best = 1\n"
-                "    current = 1\n"
-                "    for index in range(len(xs)):\n"
-                "        if xs[index] == xs[index - 1]:\n"
-                "            current += 1\n"
-                "        else:\n"
-                "            current = 1\n"
-                "        best = max(best, current)\n"
-                "    return best\n"
-                "```"
-            ),
-            grader="code",
-            max_tokens=400,
-            code_timeout_s=settings.code_timeout_s,
-            tests=(
-                "assert solution.longest_run([]) == 0\n"
-                "assert solution.longest_run([7]) == 1\n"
-                "assert solution.longest_run([1,1,2,2,2,1]) == 3\n"
-                "assert solution.longest_run([1,2,3]) == 1\n"
-                "assert solution.longest_run([4,4,4,4]) == 4\n"
-            ),
+            max_tokens=700,
         ),
         _needle_task(
             "needle-24k",
             settings,
             chars=settings.needle_chars,
             code="ZAFIRO-4821",
-            depth=0.42,
+            depth=0.5,
         ),
         _needle_task(
-            "needle-64k",
+            "needle-64k-tokens",
             settings,
             chars=settings.needle_long_chars,
             code="CUARZO-7390",
-            depth=0.77,
+            depth=0.62,
         ),
         Task(
             id="abstain-telefono",
             category="abstencion",
             prompt=(
-                "Texto: 'La jornada de puertas abiertas será el 14 de noviembre a las 18:00 "
-                "en el salón de actos. La entrada es libre hasta completar aforo y no hace "
-                "falta inscripción.'\n\n"
-                "Pregunta: ¿cuál es el teléfono de contacto de la jornada? Si el dato no "
-                "aparece en el texto, responde exactamente NO CONSTA."
+                "Contacto: Marta Ruiz, responsable de compras, correo marta@ejemplo.es. "
+                "¿Cuál es su número de teléfono? Si el dato no aparece, responde "
+                "exactamente 'NO CONSTA'."
             ),
             grader="regex",
             pattern=r"^\s*no consta\.?\s*$",
             max_tokens=24,
         ),
         Task(
-            id="abstain-empleados",
+            id="abstain-version",
             category="abstencion",
             prompt=(
-                "Texto: 'La empresa abrió tres oficinas en 2024 y facturó 2,1 millones de "
-                "euros. Su plantilla creció durante el año.'\n\n"
-                "Pregunta: según el texto, ¿cuántos empleados tiene la empresa? Si el dato "
-                "no aparece, responde exactamente NO CONSTA."
+                "Notas de publicación: «Publicado el 3 de noviembre. Se corrige el "
+                "filtro de acentos, se añade exportación a CSV y baja el tiempo de "
+                "arranque un 20 %.» ¿Qué número de versión se publicó? Si el dato no "
+                "aparece, responde exactamente 'NO CONSTA'."
             ),
             grader="regex",
             pattern=r"^\s*no consta\.?\s*$",
@@ -482,44 +527,33 @@ def build_tasks(settings) -> tuple[Task, ...]:
             id="extract-factura",
             category="extraccion",
             prompt=(
-                "Factura F-2026-118. Emisor: Talleres Ribera, S.L. NIF: B-12345678. "
-                "Base imponible: 1.250,00 €. IVA (21 %): 262,50 €. Total: 1.512,50 €.\n\n"
-                "Extrae NIF, base imponible e IVA. Responde solo con tres líneas con el "
-                "formato 'NIF: valor', 'Base: valor' e 'IVA: valor', sin el símbolo € y sin "
-                "separador de miles."
+                "Factura de Servicios Roca SL, NIF B-12345678. Base imponible 1.250,00 "
+                "euros, IVA 21 % (262,50 euros), total 1.512,50 euros. Extrae el NIF, la "
+                "base y el IVA en tres líneas con el formato 'clave: valor' y nada más."
             ),
             grader="kv",
             expect_kv={"nif": "B-12345678", "base": "1250.00", "iva": "262.50"},
             numeric_keys=("base", "iva"),
-            max_tokens=100,
+            max_tokens=160,
         ),
         Task(
-            id="extract-agenda",
+            id="extract-traza",
             category="extraccion",
             prompt=(
-                "Reunión de equipo: jueves 13 de noviembre a las 17:30 en la sala Magnolia. "
-                "Asistentes: Ana, Luis, Marta y Pablo.\n\n"
-                "Responde solo con una línea en el formato 'hora | lugar | asistentes'. Usa "
-                "24 horas, el nombre de la sala tal cual y separa los asistentes con comas, "
-                "en el orden del texto y sin la conjunción 'y'."
+                "Traza de error:\n"
+                "Traceback (most recent call last):\n"
+                '  File "app/facturas.py", line 42, in calcular_total\n'
+                "    return sum(linea.importe for linea in factura.lineas)\n"
+                "TypeError: unsupported operand type(s) for +: 'NoneType' and 'float'\n"
+                "POST /api/facturas/9 -> 500\n"
+                "Responde en una sola línea con tres campos separados por '|': el tipo "
+                "de excepción, la función donde falla y el código HTTP. Sin espacios "
+                "alrededor de las barras."
             ),
             grader="parts",
             separator="|",
-            parts=("17:30", "sala Magnolia", "Ana, Luis, Marta, Pablo"),
-            max_tokens=100,
-        ),
-        Task(
-            id="extract-responsable",
-            category="extraccion",
-            prompt=(
-                "Acta de la reunión del 4 de noviembre. Asistentes: Paula, Diego y Rosa. "
-                "Acuerdos: Diego revisará el contrato antes del 12 de noviembre; Paula "
-                "enviará el informe final. Próxima reunión: 2 de diciembre.\n\n"
-                "Pregunta: ¿quién revisará el contrato? Responde solo con el nombre."
-            ),
-            grader="exact",
-            expect=("Diego",),
-            max_tokens=24,
+            parts=("TypeError", "calcular_total", "500"),
+            max_tokens=160,
         ),
     ]
 

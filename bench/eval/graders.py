@@ -6,7 +6,7 @@ import unicodedata
 from dataclasses import dataclass, field
 from typing import Any
 
-FENCED_CODE = re.compile(r"```(?:python|py)?[ \t]*\n(.*?)```", re.DOTALL)
+FENCED_CODE = re.compile(r"```(?:python|py|javascript|js|mjs)?[ \t]*\n(.*?)```", re.DOTALL)
 JSON_FENCE = re.compile(r"```(?:json)?[ \t]*\n(.*?)```", re.DOTALL)
 
 
@@ -273,6 +273,38 @@ def _grade_constraints(task, answer: str) -> Grade:
     return Grade(True, f"{len(words)} words, constraints met", answer[:160])
 
 
+def _grade_sections(task, answer: str) -> Grade:
+    """Each required section must start its own line, in the given order."""
+
+    prefixes = getattr(task, "sections", ())
+    if not prefixes:
+        raise ValueError(f"task {task.id} has no sections")
+    lines = [line.strip() for line in answer.splitlines() if line.strip()]
+    problems: list[str] = []
+    positions: list[int] = []
+    for prefix in prefixes:
+        index = next(
+            (
+                position
+                for position, line in enumerate(lines)
+                if line.casefold().startswith(prefix.casefold())
+            ),
+            None,
+        )
+        if index is None:
+            problems.append(f"missing section {prefix!r}")
+        else:
+            positions.append(index)
+    if len(positions) == len(prefixes) and positions != sorted(positions):
+        problems.append("sections are out of order")
+    words = len(normalize(answer).split())
+    if task.max_words is not None and words > task.max_words:
+        problems.append(f"{words} words, maximum {task.max_words}")
+    if problems:
+        return Grade(False, "; ".join(problems), answer[:160])
+    return Grade(True, f"{len(prefixes)} sections in order, {words} words", answer[:160])
+
+
 def parse_number(text: str) -> float:
     """Parse ``1.250,00`` and ``1250.00`` without guessing the decimal separator."""
 
@@ -336,7 +368,7 @@ def _grade_parts(task, answer: str) -> Grade:
 
 
 def _grade_code(task, answer: str) -> Grade:
-    from .sandbox import run_python_tests
+    from .sandbox import run_tests
 
     tests = getattr(task, "tests", None)
     if not tests:
@@ -344,7 +376,12 @@ def _grade_code(task, answer: str) -> Grade:
     code = extract_code(answer)
     if not code.strip():
         return Grade(False, "empty answer", None)
-    result = run_python_tests(code, tests, timeout_s=task.code_timeout_s)
+    result = run_tests(
+        code,
+        tests,
+        lang=getattr(task, "lang", "py"),
+        timeout_s=task.code_timeout_s,
+    )
     if result.passed:
         return Grade(True, f"tests passed in {result.duration_ms:.0f} ms", code[:160])
     if result.timed_out:
@@ -359,6 +396,11 @@ def clear_failure(stderr: str) -> str:
     lines = [line.strip() for line in stderr.splitlines() if line.strip()]
     if not lines:
         return "no stderr output"
+    # The useful line is the exception, not the interpreter's last frames: node
+    # ends with loader internals and Python with the traceback tail.
+    for index, line in enumerate(lines):
+        if re.match(r"^(?:[A-Za-z_.]*Error|Exception)\b", line) or "Error:" in line:
+            return " | ".join(lines[max(0, index - 1) : index + 1])[:200]
     return " | ".join(lines[-3:])
 
 
@@ -382,6 +424,8 @@ def grade(task, answer: str, *, tool_calls=()) -> Grade:
         return _grade_kv(task, answer)
     if kind == "parts":
         return _grade_parts(task, answer)
+    if kind == "sections":
+        return _grade_sections(task, answer)
     if kind == "code":
         return _grade_code(task, answer)
     raise ValueError(f"unknown grader {kind!r} on task {task.id}")

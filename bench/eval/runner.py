@@ -167,12 +167,17 @@ def run_eval(
         consecutive_errors = 0
         graded = grade(task, result.answer, tool_calls=result.tool_calls or ())
         leaked = result.reasoning_chunks > 0 and not thinking_expected
+        detail = graded.detail
+        if result.finish_reason == "length":
+            # A truncated answer measures the budget, not the model; say so in
+            # the row instead of letting it look like a wrong answer.
+            detail = f"{detail} (truncated at {result.completion_tokens} tokens)"
         records.append(
             {
                 "id": task.id,
                 "category": task.category,
                 "passed": graded.passed,
-                "detail": graded.detail,
+                "detail": detail,
                 "extracted": graded.extracted,
                 "answer_preview": result.answer_preview,
                 "answer_chars": result.answer_chars,

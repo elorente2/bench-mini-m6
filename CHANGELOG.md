@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+- Eval revision 4: twelve items that every run passed are gone and twenty
+  harder ones take their place, built around code review, API contracts and
+  architecture decisions (a JS accent-insensitive filter, a Python permission
+  rule with a hardening order, SQLite `GROUP BY`/`HAVING`, a design choice under
+  three constraints, a contradiction hunt, a four-section ADR, a nested JSON
+  contract, an exception trace and a ~65K-token needle). Category
+  `arquitectura` is new; the second needle covers 30 % of the declared window
+  instead of 9–11 %.
+- JavaScript code items: the sandbox runs `node --permission` with a preloaded
+  guard that patches the socket and DNS entry points, because Node's permission
+  model does not cover the network.
+- New `sections` grader: given line prefixes in order plus a word budget.
+- A truncated answer now says so in its row (`(truncated at N tokens)`), and the
+  reasoning headroom went to 8192 in revision 5 after a code item spent its
+  budget thinking without reaching the code.
 - oMLX measured for speed (suite 5, 4-bit MLX): 9.2 tok/s short decode, 8.1 at
   18K, 200.4 tok/s prefill, 90.3 s cold TTFT, 1.5 s cached, 23.62 GB wired and
   9,500 MB RSS. The 6× gap to Splash and Mirai is speculative decoding: oMLX

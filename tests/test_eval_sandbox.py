@@ -54,7 +54,7 @@ def test_needle_context_is_deterministic_and_contains_the_needle() -> None:
     assert "ZAFIRO-4821" not in first.splitlines()[0]
 
 
-def _code_task(tests: str, timeout_s: int = 5):
+def _code_task(tests: str, timeout_s: int = 5, lang: str = "py"):
     from bench.eval.tasks import Task
 
     return Task(
@@ -64,5 +64,34 @@ def _code_task(tests: str, timeout_s: int = 5):
         grader="code",
         max_tokens=100,
         tests=tests,
+        lang=lang,
         code_timeout_s=timeout_s,
     )
+
+
+def test_javascript_that_passes() -> None:
+    task = _code_task(
+        "if (solution.add(1, 2) !== 3) throw new Error('sum');",
+        lang="js",
+    )
+    result = grade(task, "```js\nexport const add = (a, b) => a + b;\n```")
+    assert result.passed, result.detail
+
+
+def test_javascript_that_fails_reports_the_assertion() -> None:
+    task = _code_task("if (solution.add(1, 2) !== 3) throw new Error('sum');", lang="js")
+    result = grade(task, "export const add = (a, b) => a - b;")
+    assert result.passed is False
+    assert "sum" in result.detail
+
+
+def test_javascript_cannot_open_a_socket() -> None:
+    task = _code_task(
+        "const net = await import('node:net');\n"
+        "let blocked = false;\n"
+        "try { net.connect(80, '1.1.1.1'); } catch (error) { blocked = true; }\n"
+        "if (!blocked) throw new Error('network was allowed');",
+        lang="js",
+    )
+    result = grade(task, "export const ready = () => 1;")
+    assert result.passed, result.detail

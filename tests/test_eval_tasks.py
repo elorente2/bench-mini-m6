@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parent.parent
 
 def test_eval_config_is_loadable() -> None:
     settings = load_eval_settings(ROOT / "config" / "eval.toml")
-    assert settings.revision == 3
+    assert settings.revision == 5
     assert settings.reasoning_headroom > 0
     assert settings.needle_long_chars > settings.needle_chars
     assert settings.code_timeout_s > 0
@@ -37,7 +37,7 @@ def test_eval_config_rejects_a_short_long_needle(tmp_path: Path) -> None:
 def test_the_pilot_has_the_planned_items() -> None:
     settings = load_eval_settings(ROOT / "config" / "eval.toml")
     tasks = build_tasks(settings)
-    assert len(tasks) == 21
+    assert len(tasks) == 20
     assert len({task.id for task in tasks}) == len(tasks)
     assert {task.category for task in tasks} == set(CATEGORIES)
     assert all(task.prompt.strip() for task in tasks)
@@ -61,6 +61,8 @@ def test_every_grader_has_what_it_needs() -> None:
             assert task.expect_kv, task.id
         elif task.grader == "parts":
             assert task.parts, task.id
+        elif task.grader == "sections":
+            assert task.sections, task.id
 
 
 def test_needle_items_bury_their_code() -> None:

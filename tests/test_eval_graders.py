@@ -158,3 +158,18 @@ def test_grade_is_a_pure_function_of_task_and_answer() -> None:
     second: Grade = grade(make(expect=("x",)), "x")
     assert first == second
     assert normalize("  Hola\nMundo ") == "hola mundo"
+
+
+def test_sections_grader_checks_prefixes_and_order() -> None:
+    task = make(
+        grader="sections",
+        sections=("Contexto:", "Decisión:", "Consecuencia:"),
+        max_words=40,
+    )
+    good = "Contexto: falta un catálogo\nDecisión: usar SQLite\nConsecuencia: hay migración"
+    assert grade(task, good).passed
+    assert grade(task, "Decisión: usar SQLite\nContexto: falta\nConsecuencia: x").passed is False
+    missing = "Contexto: falta un catálogo\nDecisión: usar SQLite"
+    result = grade(task, missing)
+    assert result.passed is False
+    assert "missing section" in result.detail

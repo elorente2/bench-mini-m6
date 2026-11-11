@@ -1,0 +1,613 @@
+{
+  "schema_version": 1,
+  "kind": "eval",
+  "label": "qwen3.8-4bit-omlx-r5-thinkon",
+  "timestamp": "2026-11-11T13:34:30.130743+00:00",
+  "finished_at": "2026-11-11T14:21:14.350099+00:00",
+  "source": "bench-eval",
+  "engine": {
+    "label": "omlx",
+    "name": "oMLX",
+    "version": "0.7.3",
+    "base_url": "http://127.0.0.1:8000/v1",
+    "port": 8000,
+    "reasoning_effort": null,
+    "chat_template_kwargs": {
+      "enable_thinking": true
+    },
+    "start_command": [
+      "omlx",
+      "serve",
+      "--port",
+      "8000",
+      "--headless",
+      "--memory-guard",
+      "off"
+    ],
+    "persistent": false
+  },
+  "model": {
+    "id": "Qwen3.8-27B-4bit",
+    "configured_id": "Qwen3.8-27B-4bit",
+    "quantization": "4-bit MLX",
+    "context": 262144,
+    "context_source": "api"
+  },
+  "eval": {
+    "revision": 5,
+    "max_tokens": 640,
+    "seed": 0,
+    "code_timeout_s": 5,
+    "needle_chars": 24000,
+    "needle_long_chars": 170000,
+    "thinking_expected": true,
+    "categories": [
+      "instrucciones",
+      "json",
+      "herramientas",
+      "arquitectura",
+      "calculo",
+      "codigo",
+      "contexto_largo",
+      "abstencion",
+      "extraccion"
+    ],
+    "items": [
+      {
+        "id": "es-formato-vinetas",
+        "category": "instrucciones",
+        "grader": "bullets",
+        "max_tokens": 8352
+      },
+      {
+        "id": "es-restricciones-triples",
+        "category": "instrucciones",
+        "grader": "constraints",
+        "max_tokens": 8392
+      },
+      {
+        "id": "json-pedido",
+        "category": "json",
+        "grader": "json",
+        "max_tokens": 8392
+      },
+      {
+        "id": "json-api-anidado",
+        "category": "json",
+        "grader": "json",
+        "max_tokens": 8592
+      },
+      {
+        "id": "tool-tiempo",
+        "category": "herramientas",
+        "grader": "tool",
+        "max_tokens": 8352
+      },
+      {
+        "id": "tool-orden",
+        "category": "herramientas",
+        "grader": "tool",
+        "max_tokens": 8412
+      },
+      {
+        "id": "arch-tradeoff",
+        "category": "arquitectura",
+        "grader": "constraints",
+        "max_tokens": 8592
+      },
+      {
+        "id": "arch-contradiccion",
+        "category": "arquitectura",
+        "grader": "exact",
+        "max_tokens": 8232
+      },
+      {
+        "id": "arch-adr",
+        "category": "arquitectura",
+        "grader": "sections",
+        "max_tokens": 8592
+      },
+      {
+        "id": "math-iva",
+        "category": "calculo",
+        "grader": "regex",
+        "max_tokens": 8232
+      },
+      {
+        "id": "math-fecha",
+        "category": "calculo",
+        "grader": "regex",
+        "max_tokens": 8232
+      },
+      {
+        "id": "code-js-normaliza",
+        "category": "codigo",
+        "grader": "code",
+        "max_tokens": 9092
+      },
+      {
+        "id": "code-py-permisos",
+        "category": "codigo",
+        "grader": "code",
+        "max_tokens": 8892
+      },
+      {
+        "id": "code-py-sqlite",
+        "category": "codigo",
+        "grader": "code",
+        "max_tokens": 8892
+      },
+      {
+        "id": "needle-24k",
+        "category": "contexto_largo",
+        "grader": "exact",
+        "max_tokens": 8224
+      },
+      {
+        "id": "needle-64k-tokens",
+        "category": "contexto_largo",
+        "grader": "exact",
+        "max_tokens": 8224
+      },
+      {
+        "id": "abstain-telefono",
+        "category": "abstencion",
+        "grader": "regex",
+        "max_tokens": 8216
+      },
+      {
+        "id": "abstain-version",
+        "category": "abstencion",
+        "grader": "regex",
+        "max_tokens": 8216
+      },
+      {
+        "id": "extract-factura",
+        "category": "extraccion",
+        "grader": "kv",
+        "max_tokens": 8352
+      },
+      {
+        "id": "extract-traza",
+        "category": "extraccion",
+        "grader": "parts",
+        "max_tokens": 8352
+      }
+    ]
+  },
+  "machine": {
+    "host": "Macmini-de-Emilio.local",
+    "os": "Darwin 27.2.0",
+    "macos": "27.2",
+    "model": "Mac18,5",
+    "chip": "Apple M6",
+    "memory_gb": 34.4,
+    "python": "3.15.2"
+  },
+  "summary": {
+    "items": 20,
+    "passed": 19,
+    "accuracy": 0.95,
+    "errors": 0,
+    "by_category": {
+      "instrucciones": {
+        "items": 2,
+        "passed": 2,
+        "accuracy": 1.0
+      },
+      "json": {
+        "items": 2,
+        "passed": 2,
+        "accuracy": 1.0
+      },
+      "herramientas": {
+        "items": 2,
+        "passed": 2,
+        "accuracy": 1.0
+      },
+      "arquitectura": {
+        "items": 3,
+        "passed": 3,
+        "accuracy": 1.0
+      },
+      "calculo": {
+        "items": 2,
+        "passed": 2,
+        "accuracy": 1.0
+      },
+      "codigo": {
+        "items": 3,
+        "passed": 2,
+        "accuracy": 0.6667
+      },
+      "contexto_largo": {
+        "items": 2,
+        "passed": 2,
+        "accuracy": 1.0
+      },
+      "abstencion": {
+        "items": 2,
+        "passed": 2,
+        "accuracy": 1.0
+      },
+      "extraccion": {
+        "items": 2,
+        "passed": 2,
+        "accuracy": 1.0
+      }
+    },
+    "truncated": 1,
+    "reasoning_chunks": 10906,
+    "thinking_expected": true,
+    "thinking_leaked_items": [],
+    "total_ms": 2802529.7,
+    "slowest_ms": 934058.3,
+    "prompt_tokens_max": 65164
+  },
+  "items": [
+    {
+      "id": "es-formato-vinetas",
+      "category": "instrucciones",
+      "passed": true,
+      "detail": "3 lines with the requested format",
+      "extracted": "\n- Si un atacante accede al archivo o base de datos, obtiene las contraseñas directamente y puede suplantar a los usuarios.\n- Las contraseñas reutilizadas en ot",
+      "answer_preview": " - Si un atacante accede al archivo o base de datos, obtiene las contraseñas directamente y puede suplantar a los usuarios. - Las contraseñas reutilizadas en ot",
+      "answer_chars": 377,
+      "prompt_tokens": 94,
+      "completion_tokens": 256,
+      "ttft_ms": 685.8,
+      "total_ms": 26956.9,
+      "decode_tps": 9.71,
+      "finish_reason": "stop",
+      "reasoning_chunks": 85,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "es-restricciones-triples",
+      "category": "instrucciones",
+      "passed": true,
+      "detail": "16 words, constraints met",
+      "extracted": "\n\nUn índice acelera búsquedas, consultas por rangos y ordenamiento, reduciendo lecturas de disco y mejorando rendimiento.",
+      "answer_preview": "  Un índice acelera búsquedas, consultas por rangos y ordenamiento, reduciendo lecturas de disco y mejorando rendimiento.",
+      "answer_chars": 121,
+      "prompt_tokens": 101,
+      "completion_tokens": 440,
+      "ttft_ms": 678.6,
+      "total_ms": 46000.7,
+      "decode_tps": 9.71,
+      "finish_reason": "stop",
+      "reasoning_chunks": 206,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "json-pedido",
+      "category": "json",
+      "passed": true,
+      "detail": "schema and values valid",
+      "extracted": "{\"customer\":\"Talleres Ríos\",\"urgent\":true,\"total\":149.90,\"items\":3}",
+      "answer_preview": "  {\"customer\":\"Talleres Ríos\",\"urgent\":true,\"total\":149.90,\"items\":3}",
+      "answer_chars": 69,
+      "prompt_tokens": 120,
+      "completion_tokens": 196,
+      "ttft_ms": 765.4,
+      "total_ms": 21937.0,
+      "decode_tps": 9.21,
+      "finish_reason": "stop",
+      "reasoning_chunks": 85,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "json-api-anidado",
+      "category": "json",
+      "passed": true,
+      "detail": "schema and values valid",
+      "extracted": "{\n  \"pedido\": \"P-1042\",\n  \"prioridad\": \"alta\",\n  \"lineas\": [\n    {\n      \"sku\": \"TEC-01\",\n      \"qty\": 3\n    },\n    {\n      \"sku\": \"SOP-07\",\n      \"qty\": 1,\n   ",
+      "answer_preview": "  {   \"pedido\": \"P-1042\",   \"prioridad\": \"alta\",   \"lineas\": [     {       \"sku\": \"TEC-01\",       \"qty\": 3     },     {       \"sku\": \"SOP-07\",       \"qty\": 1,  ",
+      "answer_chars": 229,
+      "prompt_tokens": 222,
+      "completion_tokens": 320,
+      "ttft_ms": 1069.0,
+      "total_ms": 34863.2,
+      "decode_tps": 9.44,
+      "finish_reason": "stop",
+      "reasoning_chunks": 105,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "tool-tiempo",
+      "category": "herramientas",
+      "passed": true,
+      "detail": "get_weather with the expected arguments",
+      "extracted": "{\"city\": \"Valencia\", \"unit\": \"celsius\"}",
+      "answer_preview": "  ",
+      "answer_chars": 2,
+      "prompt_tokens": 370,
+      "completion_tokens": 75,
+      "ttft_ms": 1482.7,
+      "total_ms": 9271.2,
+      "decode_tps": 9.5,
+      "finish_reason": "tool_calls",
+      "reasoning_chunks": 18,
+      "thinking_leaked": false,
+      "tool_calls": [
+        "get_weather"
+      ]
+    },
+    {
+      "id": "tool-orden",
+      "category": "herramientas",
+      "passed": true,
+      "detail": "search_notes with the expected arguments",
+      "extracted": "{\"query\": \"contrato\"}",
+      "answer_preview": "  ",
+      "answer_chars": 2,
+      "prompt_tokens": 453,
+      "completion_tokens": 175,
+      "ttft_ms": 1671.6,
+      "total_ms": 19971.2,
+      "decode_tps": 9.51,
+      "finish_reason": "tool_calls",
+      "reasoning_chunks": 75,
+      "thinking_leaked": false,
+      "tool_calls": [
+        "search_notes"
+      ]
+    },
+    {
+      "id": "arch-tradeoff",
+      "category": "arquitectura",
+      "passed": true,
+      "detail": "46 words, constraints met",
+      "extracted": "\n\nDescarto B. Con 32 GB compartidos, cargar y descargar dos modelos de 8B añade 10 segundos por cambio y riesgo de colisiones de memoria. Prefiero A: un modelo ",
+      "answer_preview": "  Descarto B. Con 32 GB compartidos, cargar y descargar dos modelos de 8B añade 10 segundos por cambio y riesgo de colisiones de memoria. Prefiero A: un modelo ",
+      "answer_chars": 259,
+      "prompt_tokens": 201,
+      "completion_tokens": 609,
+      "ttft_ms": 1043.2,
+      "total_ms": 64048.3,
+      "decode_tps": 9.68,
+      "finish_reason": "stop",
+      "reasoning_chunks": 269,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "arch-contradiccion",
+      "category": "arquitectura",
+      "passed": true,
+      "detail": "matched '3-5'",
+      "extracted": "\n\n3-5",
+      "answer_preview": "  3-5",
+      "answer_chars": 5,
+      "prompt_tokens": 213,
+      "completion_tokens": 6830,
+      "ttft_ms": 1054.1,
+      "total_ms": 719286.3,
+      "decode_tps": 9.51,
+      "finish_reason": "stop",
+      "reasoning_chunks": 3413,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "arch-adr",
+      "category": "arquitectura",
+      "passed": true,
+      "detail": "4 sections in order, 41 words",
+      "extracted": "\n\nContexto: El catálogo crece y las lecturas concurrentes de JSON son lentas.\nDecisión: Usar SQLite como base de datos local para el catálogo.\nAlternativa desca",
+      "answer_preview": "  Contexto: El catálogo crece y las lecturas concurrentes de JSON son lentas. Decisión: Usar SQLite como base de datos local para el catálogo. Alternativa desca",
+      "answer_chars": 290,
+      "prompt_tokens": 125,
+      "completion_tokens": 647,
+      "ttft_ms": 836.0,
+      "total_ms": 67533.4,
+      "decode_tps": 9.71,
+      "finish_reason": "stop",
+      "reasoning_chunks": 288,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "math-iva",
+      "category": "calculo",
+      "passed": true,
+      "detail": "matched /^\\s*1[.,]?500[.,]40\\s*€\\s*$/",
+      "extracted": "\n\n1500,40 €",
+      "answer_preview": "  1500,40 €",
+      "answer_chars": 11,
+      "prompt_tokens": 98,
+      "completion_tokens": 371,
+      "ttft_ms": 707.0,
+      "total_ms": 38901.4,
+      "decode_tps": 9.73,
+      "finish_reason": "stop",
+      "reasoning_chunks": 180,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "math-fecha",
+      "category": "calculo",
+      "passed": true,
+      "detail": "matched /^\\s*2026-12-12\\s*$/",
+      "extracted": "\n\n2026-12-12",
+      "answer_preview": "  2026-12-12",
+      "answer_chars": 12,
+      "prompt_tokens": 91,
+      "completion_tokens": 755,
+      "ttft_ms": 709.5,
+      "total_ms": 79080.0,
+      "decode_tps": 9.64,
+      "finish_reason": "stop",
+      "reasoning_chunks": 372,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "code-js-normaliza",
+      "category": "codigo",
+      "passed": true,
+      "detail": "tests passed in 198 ms",
+      "extracted": "export function normalize(text) {\n  if (text == null) return \"\";\n\n  return String(text)\n    .toLowerCase()\n    .normalize(\"NFD\")\n    .replace(/[\\u0300-\\u036f]/g",
+      "answer_preview": "  export function normalize(text) {   if (text == null) return \"\";    return String(text)     .toLowerCase()     .normalize(\"NFD\")     .replace(/[\\u0300-\\u036f]",
+      "answer_chars": 430,
+      "prompt_tokens": 151,
+      "completion_tokens": 1061,
+      "ttft_ms": 903.8,
+      "total_ms": 110560.1,
+      "decode_tps": 9.68,
+      "finish_reason": "stop",
+      "reasoning_chunks": 465,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "code-py-permisos",
+      "category": "codigo",
+      "passed": false,
+      "detail": "tests failed: ^ | SyntaxError: unterminated string literal (detected at line 13) (truncated at 8892 tokens)",
+      "extracted": "We need answer in Spanish? User asks: Implementa effective(path, declared) en Python. ... Devuelve solo el código, sin explicación. Need output only code. Need ",
+      "answer_preview": " We need answer in Spanish? User asks: Implementa effective(path, declared) en Python. ... Devuelve solo el código, sin explicación. Need output only code. Need",
+      "answer_chars": 35175,
+      "prompt_tokens": 222,
+      "completion_tokens": 8892,
+      "ttft_ms": 1082.8,
+      "total_ms": 934058.3,
+      "decode_tps": 9.53,
+      "finish_reason": "length",
+      "reasoning_chunks": 4446,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "code-py-sqlite",
+      "category": "codigo",
+      "passed": true,
+      "detail": "tests passed in 36 ms",
+      "extracted": "def top_clientes(conn, minimo):\n    cursor = conn.execute(\n        \"\"\"\n        SELECT c.nombre, COALESCE(SUM(p.total), 0) AS total\n        FROM clientes AS c\n  ",
+      "answer_preview": "  def top_clientes(conn, minimo):     cursor = conn.execute(         \"\"\"         SELECT c.nombre, COALESCE(SUM(p.total), 0) AS total         FROM clientes AS c ",
+      "answer_chars": 386,
+      "prompt_tokens": 142,
+      "completion_tokens": 1066,
+      "ttft_ms": 954.1,
+      "total_ms": 110794.9,
+      "decode_tps": 9.7,
+      "finish_reason": "stop",
+      "reasoning_chunks": 478,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "needle-24k",
+      "category": "contexto_largo",
+      "passed": true,
+      "detail": "matched 'ZAFIRO-4821'",
+      "extracted": "\n\nZAFIRO-4821",
+      "answer_preview": "  ZAFIRO-4821",
+      "answer_chars": 13,
+      "prompt_tokens": 9302,
+      "completion_tokens": 104,
+      "ttft_ms": 44147.8,
+      "total_ms": 55225.8,
+      "decode_tps": 9.3,
+      "finish_reason": "stop",
+      "reasoning_chunks": 48,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "needle-64k-tokens",
+      "category": "contexto_largo",
+      "passed": true,
+      "detail": "matched 'CUARZO-7390'",
+      "extracted": "\n\nCUARZO-7390",
+      "answer_preview": "  CUARZO-7390",
+      "answer_chars": 13,
+      "prompt_tokens": 65164,
+      "completion_tokens": 105,
+      "ttft_ms": 354347.4,
+      "total_ms": 372044.0,
+      "decode_tps": 6.0,
+      "finish_reason": "stop",
+      "reasoning_chunks": 48,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "abstain-telefono",
+      "category": "abstencion",
+      "passed": true,
+      "detail": "matched /^\\s*no consta\\.?\\s*$/",
+      "extracted": "\n\nNO CONSTA",
+      "answer_preview": "  NO CONSTA",
+      "answer_chars": 11,
+      "prompt_tokens": 91,
+      "completion_tokens": 102,
+      "ttft_ms": 15362.4,
+      "total_ms": 26578.2,
+      "decode_tps": 9.03,
+      "finish_reason": "stop",
+      "reasoning_chunks": 49,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "abstain-version",
+      "category": "abstencion",
+      "passed": true,
+      "detail": "matched /^\\s*no consta\\.?\\s*$/",
+      "extracted": "\n\nNO CONSTA",
+      "answer_preview": "  NO CONSTA",
+      "answer_chars": 11,
+      "prompt_tokens": 116,
+      "completion_tokens": 135,
+      "ttft_ms": 860.1,
+      "total_ms": 14981.1,
+      "decode_tps": 9.57,
+      "finish_reason": "stop",
+      "reasoning_chunks": 66,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "extract-factura",
+      "category": "extraccion",
+      "passed": true,
+      "detail": "all fields extracted",
+      "extracted": "\n\nNIF: B-12345678\nbase: 1.250,00 euros\nIVA: 262,50 euros",
+      "answer_preview": "  NIF: B-12345678 base: 1.250,00 euros IVA: 262,50 euros",
+      "answer_chars": 56,
+      "prompt_tokens": 139,
+      "completion_tokens": 363,
+      "ttft_ms": 849.2,
+      "total_ms": 38403.5,
+      "decode_tps": 9.64,
+      "finish_reason": "stop",
+      "reasoning_chunks": 161,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "extract-traza",
+      "category": "extraccion",
+      "passed": true,
+      "detail": "all parts matched",
+      "extracted": "\n\nTypeError|calcular_total|500",
+      "answer_preview": "  TypeError|calcular_total|500",
+      "answer_chars": 30,
+      "prompt_tokens": 168,
+      "completion_tokens": 109,
+      "ttft_ms": 907.5,
+      "total_ms": 12034.2,
+      "decode_tps": 9.81,
+      "finish_reason": "stop",
+      "reasoning_chunks": 49,
+      "thinking_leaked": false,
+      "tool_calls": []
+    }
+  ]
+}

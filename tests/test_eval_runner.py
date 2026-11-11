@@ -87,7 +87,7 @@ def test_run_eval_writes_a_schema_one_eval_document(tmp_path: Path) -> None:
             label="fake-eval",
             out=out,
             safety=False,
-            items=("math-tornillos",),
+            items=("math-fecha",),
         )
     finally:
         server.shutdown()
@@ -100,15 +100,15 @@ def test_run_eval_writes_a_schema_one_eval_document(tmp_path: Path) -> None:
     assert document["summary"]["items"] == 1
     assert document["summary"]["passed"] == 0
     assert document["summary"]["errors"] == 0
-    assert document["items"][0]["id"] == "math-tornillos"
+    assert document["items"][0]["id"] == "math-fecha"
     assert document["items"][0]["finish_reason"] == "stop"
-    assert document["eval"]["revision"] == 3
+    assert document["eval"]["revision"] == 5
 
 
 def test_summary_flags_leaked_reasoning_when_thinking_is_off() -> None:
     records = [
         {
-            "id": "math-tornillos",
+            "id": "math-fecha",
             "category": "calculo",
             "passed": True,
             "total_ms": 1000.0,
@@ -118,7 +118,7 @@ def test_summary_flags_leaked_reasoning_when_thinking_is_off() -> None:
         }
     ]
     summary = summarize_eval(records, thinking_expected=False)
-    assert summary["thinking_leaked_items"] == ["math-tornillos"]
+    assert summary["thinking_leaked_items"] == ["math-fecha"]
     assert summary["reasoning_chunks"] == 4
     assert summary["truncated"] == 1
 
@@ -126,7 +126,7 @@ def test_summary_flags_leaked_reasoning_when_thinking_is_off() -> None:
 def test_summary_does_not_flag_deliberate_thinking() -> None:
     records = [
         {
-            "id": "math-tornillos",
+            "id": "math-fecha",
             "category": "calculo",
             "passed": True,
             "total_ms": 1000.0,
@@ -150,7 +150,7 @@ def test_run_eval_can_declare_that_thinking_is_on(tmp_path: Path) -> None:
             label="fake-thinking",
             out=tmp_path / "thinking.json",
             safety=False,
-            items=("math-tornillos",),
+            items=("math-fecha",),
             thinking_expected=True,
         )
     finally:

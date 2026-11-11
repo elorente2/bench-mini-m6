@@ -9,6 +9,7 @@ CATEGORY_LABELS = {
     "instrucciones": "Instrucciones",
     "json": "JSON",
     "herramientas": "Herramientas",
+    "arquitectura": "Arquitectura",
     "calculo": "Cálculo",
     "codigo": "Código",
     "contexto_largo": "Contexto largo",
