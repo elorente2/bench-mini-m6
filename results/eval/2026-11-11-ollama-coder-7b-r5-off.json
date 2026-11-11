@@ -1,0 +1,549 @@
+{
+  "schema_version": 1,
+  "kind": "eval",
+  "label": "ollama-coder-7b-r5-off",
+  "timestamp": "2026-11-11T15:28:44.122168+00:00",
+  "finished_at": "2026-11-11T15:29:31.551634+00:00",
+  "source": "bench-eval",
+  "engine": {
+    "label": "ollama-default",
+    "name": "Ollama (native tag)",
+    "version": "ollama version is 0.40.14",
+    "base_url": "http://127.0.0.1:11434/v1",
+    "port": 11434,
+    "reasoning_effort": "none",
+    "chat_template_kwargs": null,
+    "start_command": [
+      "ollama",
+      "serve"
+    ],
+    "persistent": true
+  },
+  "model": {
+    "id": "qwen2.5-coder:7b",
+    "configured_id": "qwen3.8:27b",
+    "quantization": "Ollama native (nvfp4)",
+    "context": 32768,
+    "context_source": "config"
+  },
+  "eval": {
+    "revision": 5,
+    "max_tokens": 640,
+    "seed": 0,
+    "code_timeout_s": 5,
+    "needle_chars": 24000,
+    "needle_long_chars": 170000,
+    "thinking_expected": false,
+    "categories": [
+      "instrucciones",
+      "json",
+      "herramientas",
+      "arquitectura",
+      "calculo",
+      "codigo",
+      "contexto_largo",
+      "abstencion",
+      "extraccion"
+    ],
+    "items": [
+      {
+        "id": "es-formato-vinetas",
+        "category": "instrucciones",
+        "grader": "bullets",
+        "max_tokens": 8352
+      },
+      {
+        "id": "es-restricciones-triples",
+        "category": "instrucciones",
+        "grader": "constraints",
+        "max_tokens": 8392
+      },
+      {
+        "id": "json-pedido",
+        "category": "json",
+        "grader": "json",
+        "max_tokens": 8392
+      },
+      {
+        "id": "json-api-anidado",
+        "category": "json",
+        "grader": "json",
+        "max_tokens": 8592
+      },
+      {
+        "id": "tool-tiempo",
+        "category": "herramientas",
+        "grader": "tool",
+        "max_tokens": 8352
+      },
+      {
+        "id": "tool-orden",
+        "category": "herramientas",
+        "grader": "tool",
+        "max_tokens": 8412
+      },
+      {
+        "id": "arch-tradeoff",
+        "category": "arquitectura",
+        "grader": "constraints",
+        "max_tokens": 8592
+      },
+      {
+        "id": "arch-contradiccion",
+        "category": "arquitectura",
+        "grader": "exact",
+        "max_tokens": 8232
+      },
+      {
+        "id": "arch-adr",
+        "category": "arquitectura",
+        "grader": "sections",
+        "max_tokens": 8592
+      },
+      {
+        "id": "math-iva",
+        "category": "calculo",
+        "grader": "regex",
+        "max_tokens": 8232
+      },
+      {
+        "id": "math-fecha",
+        "category": "calculo",
+        "grader": "regex",
+        "max_tokens": 8232
+      },
+      {
+        "id": "code-js-normaliza",
+        "category": "codigo",
+        "grader": "code",
+        "max_tokens": 9092
+      },
+      {
+        "id": "code-py-permisos",
+        "category": "codigo",
+        "grader": "code",
+        "max_tokens": 8892
+      },
+      {
+        "id": "code-py-sqlite",
+        "category": "codigo",
+        "grader": "code",
+        "max_tokens": 8892
+      },
+      {
+        "id": "abstain-telefono",
+        "category": "abstencion",
+        "grader": "regex",
+        "max_tokens": 8216
+      },
+      {
+        "id": "abstain-version",
+        "category": "abstencion",
+        "grader": "regex",
+        "max_tokens": 8216
+      },
+      {
+        "id": "extract-factura",
+        "category": "extraccion",
+        "grader": "kv",
+        "max_tokens": 8352
+      },
+      {
+        "id": "extract-traza",
+        "category": "extraccion",
+        "grader": "parts",
+        "max_tokens": 8352
+      }
+    ]
+  },
+  "machine": {
+    "host": "Macmini-de-Emilio.local",
+    "os": "Darwin 27.2.0",
+    "macos": "27.2",
+    "model": "Mac18,5",
+    "chip": "Apple M6",
+    "memory_gb": 34.4,
+    "python": "3.15.2"
+  },
+  "summary": {
+    "items": 18,
+    "passed": 7,
+    "accuracy": 0.3889,
+    "errors": 0,
+    "by_category": {
+      "instrucciones": {
+        "items": 2,
+        "passed": 1,
+        "accuracy": 0.5
+      },
+      "json": {
+        "items": 2,
+        "passed": 1,
+        "accuracy": 0.5
+      },
+      "herramientas": {
+        "items": 2,
+        "passed": 0,
+        "accuracy": 0.0
+      },
+      "arquitectura": {
+        "items": 3,
+        "passed": 0,
+        "accuracy": 0.0
+      },
+      "calculo": {
+        "items": 2,
+        "passed": 1,
+        "accuracy": 0.5
+      },
+      "codigo": {
+        "items": 3,
+        "passed": 1,
+        "accuracy": 0.3333
+      },
+      "abstencion": {
+        "items": 2,
+        "passed": 2,
+        "accuracy": 1.0
+      },
+      "extraccion": {
+        "items": 2,
+        "passed": 1,
+        "accuracy": 0.5
+      }
+    },
+    "truncated": 0,
+    "reasoning_chunks": 0,
+    "thinking_expected": false,
+    "thinking_leaked_items": [],
+    "total_ms": 39278.5,
+    "slowest_ms": 7018.7,
+    "prompt_tokens_max": null
+  },
+  "items": [
+    {
+      "id": "es-formato-vinetas",
+      "category": "instrucciones",
+      "passed": true,
+      "detail": "3 lines with the requested format",
+      "extracted": "- **Riesgo de revelación:** Al guardar contraseñas en texto plano, hay un alto riesgo de que sean descubiertas por terceros. Esto puede ocurrir si el dispositiv",
+      "answer_preview": "- **Riesgo de revelación:** Al guardar contraseñas en texto plano, hay un alto riesgo de que sean descubiertas por terceros. Esto puede ocurrir si el dispositiv",
+      "answer_chars": 898,
+      "prompt_tokens": 78,
+      "completion_tokens": 219,
+      "ttft_ms": 123.3,
+      "total_ms": 7018.7,
+      "decode_tps": 31.76,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "es-restricciones-triples",
+      "category": "instrucciones",
+      "passed": false,
+      "detail": "contains forbidden term 'árbol'; contains forbidden term 'tree'",
+      "extracted": "Un índice B-tree mejora la velocidad de búsqueda, inserción y eliminación en tablas de base de datos mediante una estructura de árbol equilibrado.",
+      "answer_preview": "Un índice B-tree mejora la velocidad de búsqueda, inserción y eliminación en tablas de base de datos mediante una estructura de árbol equilibrado.",
+      "answer_chars": 146,
+      "prompt_tokens": 81,
+      "completion_tokens": 37,
+      "ttft_ms": 126.2,
+      "total_ms": 1267.1,
+      "decode_tps": 32.46,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "json-pedido",
+      "category": "json",
+      "passed": false,
+      "detail": "values differ from {\"customer\": \"Talleres Ríos\", \"urgent\": true, \"total\": 149.9, \"items\": 3}",
+      "extracted": "{\n  \"customer\": \"Talleres Ríos\",\n  \"urgent\": true,\n  \"total\": 449.7,\n  \"items\": 3\n}",
+      "answer_preview": "```json {   \"customer\": \"Talleres Ríos\",   \"urgent\": true,   \"total\": 449.7,   \"items\": 3 } ```",
+      "answer_chars": 95,
+      "prompt_tokens": 102,
+      "completion_tokens": 43,
+      "ttft_ms": 219.8,
+      "total_ms": 1553.2,
+      "decode_tps": 32.27,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "json-api-anidado",
+      "category": "json",
+      "passed": true,
+      "detail": "schema and values valid",
+      "extracted": "{\n  \"pedido\": \"P-1042\",\n  \"prioridad\": \"alta\",\n  \"lineas\": [\n    {\n      \"sku\": \"TEC-01\",\n      \"qty\": 3\n    },\n    {\n      \"sku\": \"SOP-07\",\n      \"qty\": 1,\n   ",
+      "answer_preview": "```json {   \"pedido\": \"P-1042\",   \"prioridad\": \"alta\",   \"lineas\": [     {       \"sku\": \"TEC-01\",       \"qty\": 3     },     {       \"sku\": \"SOP-07\",       \"qty\"",
+      "answer_chars": 239,
+      "prompt_tokens": 204,
+      "completion_tokens": 101,
+      "ttft_ms": 261.4,
+      "total_ms": 3427.7,
+      "decode_tps": 31.9,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "tool-tiempo",
+      "category": "herramientas",
+      "passed": false,
+      "detail": "answered in text instead of calling a tool",
+      "extracted": "{\"name\": \"get_weather\", \"arguments\": {\"city\": \"Valencia\", \"unit\": \"celsius\"}}",
+      "answer_preview": "{\"name\": \"get_weather\", \"arguments\": {\"city\": \"Valencia\", \"unit\": \"celsius\"}}",
+      "answer_chars": 77,
+      "prompt_tokens": 212,
+      "completion_tokens": 25,
+      "ttft_ms": 272.1,
+      "total_ms": 1032.9,
+      "decode_tps": 32.92,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "tool-orden",
+      "category": "herramientas",
+      "passed": false,
+      "detail": "answered in text instead of calling a tool",
+      "extracted": "{\"name\": \"search_notes\", \"arguments\": {\"query\": \"revisar contrato\"}}\n{\"name\": \"create_task\", \"arguments\": {\"title\": \"rev",
+      "answer_preview": "{\"name\": \"search_notes\", \"arguments\": {\"query\": \"revisar contrato\"}} {\"name\": \"create_task\", \"arguments\": {\"title\": \"revisar contrato\", \"due\": \"2026-12-01\"}}",
+      "answer_chars": 157,
+      "prompt_tokens": 278,
+      "completion_tokens": 54,
+      "ttft_ms": 276.9,
+      "total_ms": 1957.8,
+      "decode_tps": 32.14,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "arch-tradeoff",
+      "category": "arquitectura",
+      "passed": false,
+      "detail": "70 words, maximum 60; missing required term '32 gb'",
+      "extracted": "Descarto la opción A) ya que ocupa 16 GB de memoria compartida, lo que deja solo 16 GB para otros procesos o modelos, limitando la flexibilidad y la capacidad d",
+      "answer_preview": "Descarto la opción A) ya que ocupa 16 GB de memoria compartida, lo que deja solo 16 GB para otros procesos o modelos, limitando la flexibilidad y la capacidad d",
+      "answer_chars": 375,
+      "prompt_tokens": 183,
+      "completion_tokens": 101,
+      "ttft_ms": 257.0,
+      "total_ms": 3449.7,
+      "decode_tps": 31.64,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "arch-contradiccion",
+      "category": "arquitectura",
+      "passed": false,
+      "detail": "answer '3-4' did not match any accepted value",
+      "extracted": "3-4",
+      "answer_preview": "3-4",
+      "answer_chars": 3,
+      "prompt_tokens": 194,
+      "completion_tokens": 4,
+      "ttft_ms": 259.3,
+      "total_ms": 355.2,
+      "decode_tps": 46.83,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "arch-adr",
+      "category": "arquitectura",
+      "passed": false,
+      "detail": "missing section 'Decisión:'; missing section 'Alternativa descartada:'; missing section 'Consecuencia:'",
+      "extracted": "Contexto: Necesitamos una solución rápida y eficiente para almacenar y recuperar datos del catálogo. Decisión: Usaremos SQLite en lugar de ficheros JSON. Altern",
+      "answer_preview": "Contexto: Necesitamos una solución rápida y eficiente para almacenar y recuperar datos del catálogo. Decisión: Usaremos SQLite en lugar de ficheros JSON. Altern",
+      "answer_chars": 311,
+      "prompt_tokens": 110,
+      "completion_tokens": 78,
+      "ttft_ms": 129.4,
+      "total_ms": 2568.6,
+      "decode_tps": 31.99,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "math-iva",
+      "category": "calculo",
+      "passed": false,
+      "detail": "answer '1,49 €' did not match /^\\s*1[.,]?500[.,]40\\s*€\\s*$/",
+      "extracted": "1,49 €",
+      "answer_preview": "1,49 €",
+      "answer_chars": 6,
+      "prompt_tokens": 85,
+      "completion_tokens": 6,
+      "ttft_ms": 125.7,
+      "total_ms": 284.6,
+      "decode_tps": 39.3,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "math-fecha",
+      "category": "calculo",
+      "passed": true,
+      "detail": "matched /^\\s*2026-12-12\\s*$/",
+      "extracted": "2026-12-12",
+      "answer_preview": "2026-12-12",
+      "answer_chars": 10,
+      "prompt_tokens": 68,
+      "completion_tokens": 11,
+      "ttft_ms": 119.5,
+      "total_ms": 435.9,
+      "decode_tps": 35.13,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "code-js-normaliza",
+      "category": "codigo",
+      "passed": false,
+      "detail": "tests failed: ^ | ReferenceError: module is not defined in ES module scope",
+      "extracted": "function normalize(text) {\n  return text.toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').replace(/\\s+/g, ' ').trim();\n}\n\nfunction matches(dish, q",
+      "answer_preview": "```javascript function normalize(text) {   return text.toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g, '').replace(/\\s+/g, ' ').trim(); }  function m",
+      "answer_chars": 406,
+      "prompt_tokens": 130,
+      "completion_tokens": 105,
+      "ttft_ms": 140.7,
+      "total_ms": 3437.8,
+      "decode_tps": 31.85,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "code-py-permisos",
+      "category": "codigo",
+      "passed": false,
+      "detail": "tests failed: ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ | AssertionError",
+      "extracted": "def effective(path, declared):\n    default_permissions = {\n        '40 Archivo/': 'nadie',\n        'Sistema/': 'nadie',\n        '10 Proyectos/': 'humano',\n     ",
+      "answer_preview": "```python def effective(path, declared):     default_permissions = {         '40 Archivo/': 'nadie',         'Sistema/': 'nadie',         '10 Proyectos/': 'huma",
+      "answer_chars": 774,
+      "prompt_tokens": 209,
+      "completion_tokens": 211,
+      "ttft_ms": 285.1,
+      "total_ms": 6952.8,
+      "decode_tps": 31.65,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "code-py-sqlite",
+      "category": "codigo",
+      "passed": true,
+      "detail": "tests passed in 54 ms",
+      "extracted": "import sqlite3\n\ndef top_clientes(conn, minimo):\n    cursor = conn.cursor()\n    query = \"\"\"\n    SELECT c.nombre, SUM(p.total) as total\n    FROM clientes c\n    JO",
+      "answer_preview": "```python import sqlite3  def top_clientes(conn, minimo):     cursor = conn.cursor()     query = \"\"\"     SELECT c.nombre, SUM(p.total) as total     FROM cliente",
+      "answer_chars": 367,
+      "prompt_tokens": 123,
+      "completion_tokens": 100,
+      "ttft_ms": 144.0,
+      "total_ms": 3283.6,
+      "decode_tps": 31.85,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "abstain-telefono",
+      "category": "abstencion",
+      "passed": true,
+      "detail": "matched /^\\s*no consta\\.?\\s*$/",
+      "extracted": "NO CONSTA",
+      "answer_preview": "NO CONSTA",
+      "answer_chars": 9,
+      "prompt_tokens": 74,
+      "completion_tokens": 4,
+      "ttft_ms": 132.8,
+      "total_ms": 228.1,
+      "decode_tps": 47.05,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "abstain-version",
+      "category": "abstencion",
+      "passed": true,
+      "detail": "matched /^\\s*no consta\\.?\\s*$/",
+      "extracted": "NO CONSTA",
+      "answer_preview": "NO CONSTA",
+      "answer_chars": 9,
+      "prompt_tokens": 101,
+      "completion_tokens": 4,
+      "ttft_ms": 126.4,
+      "total_ms": 223.4,
+      "decode_tps": 46.13,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "extract-factura",
+      "category": "extraccion",
+      "passed": false,
+      "detail": "missing key 'base'; unexpected keys ['base_imponible']",
+      "extracted": "NIF: B-12345678  \nBase imponible: 1.250,00 euros  \nIVA: 262,50 euros",
+      "answer_preview": "NIF: B-12345678   Base imponible: 1.250,00 euros   IVA: 262,50 euros",
+      "answer_chars": 68,
+      "prompt_tokens": 120,
+      "completion_tokens": 40,
+      "ttft_ms": 132.0,
+      "total_ms": 1364.6,
+      "decode_tps": 32.48,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    },
+    {
+      "id": "extract-traza",
+      "category": "extraccion",
+      "passed": true,
+      "detail": "all parts matched",
+      "extracted": "TypeError|calcular_total|500",
+      "answer_preview": "TypeError|calcular_total|500",
+      "answer_chars": 28,
+      "prompt_tokens": 147,
+      "completion_tokens": 10,
+      "ttft_ms": 151.8,
+      "total_ms": 436.8,
+      "decode_tps": 35.55,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "thinking_leaked": false,
+      "tool_calls": []
+    }
+  ]
+}
