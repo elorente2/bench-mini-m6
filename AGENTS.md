@@ -46,6 +46,8 @@ more than a nice-looking table.
 - Use `bench eval <engine>` for accuracy and `make eval-report` to regenerate
   the decision table. Run `make check` and `bench eval-validate --strict` on a
   new eval result before handoff.
+- Use `bench vision <engine>` for images and `make vision-report` for its own
+  table. Never mix vision, text accuracy and speed in one verdict.
 - Regenerate the report with `make report`.
 - If you touch the cache case, run the validation command and include the
   result in the handoff:
@@ -61,6 +63,7 @@ more than a nice-looking table.
 | `bench/client.py` | OpenAI-compatible streaming and compatibility fallbacks |
 | `bench/runner.py` | One pass: warmup, cases, sampling, JSON output |
 | `bench/eval/` | Accuracy suite: items, graders, sandbox, runner, report |
+| `bench/vision/` | Vision suite: PNG builder, items, runner, report |
 | `bench/validation.py` | Cache validation and summary aggregation |
 | `bench/report.py` | Markdown table and verdict |
 | `bench/engine.py` | Start/stop/status and safety checks |
@@ -68,8 +71,10 @@ more than a nice-looking table.
 | `config/` | Engines, models, speed suite and eval suite |
 | `docs/` | Methodology, rules, setup and results |
 | `docs/eval.md` | Accuracy suite contract and decision table rules |
+| `docs/vision.md` | Vision suite: generated fixtures, items, limits |
 | `results/` | Committed measurements |
 | `results/eval/` | Committed accuracy results (never mixed with speed runs) |
+| `results/vision/` | Committed vision results (never mixed with text accuracy) |
 | `reports/` | Generated Markdown |
 
 ## Known pending work
@@ -92,5 +97,6 @@ Do not claim these are done in the README until a result file exists.
 - [ ] New eval JSON is in `results/eval/` and `bench eval-validate --strict` passes.
 - [ ] `reports/latest.md` regenerated.
 - [ ] `reports/eval-latest.md` regenerated if there is a new eval result.
+- [ ] `reports/vision-latest.md` regenerated if there is a new vision result.
 - [ ] Docs updated if behaviour or verdict changed.
 - [ ] No model weights, logs or `.venv` staged.

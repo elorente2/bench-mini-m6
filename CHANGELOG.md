@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- Vision suite (`bench vision`): eight items with images generated in code
+  (PNG written with `zlib` and `struct`, no dependency) and answers graded by
+  code: counting, majority colour, relative position, a seven-segment digit,
+  an occluded centre, nine scattered circles and a three-digit display. It has
+  its own revision in `config/vision.toml`, its own results in
+  `results/vision/` and its own table in `reports/vision-latest.md`.
+  Both measured models score 8/8, so the honest finding is that synthetic
+  shapes are too easy, not that they see equally well. Limits and the case
+  for real fixtures are in `docs/vision.md`.
+- `ollama create` with two `FROM` lines (model plus `mmproj`) gives Qwen3.5-9B
+  vision without a download, using the projector already on disk.
+
 - Eval revision 4: twelve items that every run passed are gone and twenty
   harder ones take their place, built around code review, API contracts and
   architecture decisions (a JS accent-insensitive filter, a Python permission

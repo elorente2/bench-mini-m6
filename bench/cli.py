@@ -14,6 +14,9 @@ from .eval.settings import load_eval_settings
 from .legacy import load_legacy
 from .report import load_doc, render
 from .runner import RESULTS_DIR, UNSET, run_pass
+from .vision.report import load_vision_doc, render_vision_report
+from .vision.runner import run_vision
+from .vision.settings import load_vision_settings
 
 
 def _write_report(paths: list[Path], out: Path, title: str) -> Path:
@@ -179,6 +182,34 @@ def cmd_eval_validate(args: argparse.Namespace) -> int:
     return 1 if (args.strict and problems) else 0
 
 
+def cmd_vision(args: argparse.Namespace) -> int:
+    config = load_config(args.config_dir)
+    engine = config.engine(args.engine)
+    settings = load_vision_settings(Path(args.config_dir) / "vision.toml")
+    path = run_vision(
+        engine,
+        settings,
+        label=args.label,
+        model=args.model,
+        reasoning_effort=args.reasoning_effort,
+        out=args.out,
+        timeout=args.timeout,
+        safety=not args.no_safety,
+        items=tuple(args.item),
+    )
+    print(path)
+    return 0
+
+
+def cmd_vision_report(args: argparse.Namespace) -> int:
+    docs = [load_vision_doc(path) for path in args.files]
+    out = Path(args.out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(render_vision_report(docs, title=args.title), encoding="utf-8")
+    print(out)
+    return 0
+
+
 def cmd_engines(args: argparse.Namespace) -> int:
     config = load_config(args.config_dir)
     print("| Label | Engine | Port | Model | Quantization | Persistent |")
@@ -327,6 +358,23 @@ def build_parser() -> argparse.ArgumentParser:
     eval_validate.add_argument("file")
     eval_validate.add_argument("--strict", action="store_true")
     eval_validate.set_defaults(func=cmd_eval_validate)
+
+    vision = sub.add_parser("vision", help="run the vision suite against one engine")
+    vision.add_argument("engine")
+    vision.add_argument("--label")
+    vision.add_argument("--model")
+    vision.add_argument("--reasoning-effort", default=UNSET)
+    vision.add_argument("--item", action="append", default=[], help="run only this item id")
+    vision.add_argument("--out")
+    vision.add_argument("--timeout", type=int, default=900)
+    vision.add_argument("--no-safety", action="store_true")
+    vision.set_defaults(func=cmd_vision)
+
+    vision_report = sub.add_parser("vision-report", help="write a Markdown vision report")
+    vision_report.add_argument("files", nargs="+")
+    vision_report.add_argument("--out", default=str(REPO_ROOT / "reports" / "vision-latest.md"))
+    vision_report.add_argument("--title", default="Visión por modelo")
+    vision_report.set_defaults(func=cmd_vision_report)
 
     return parser
 

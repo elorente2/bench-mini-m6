@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "kind": "vision",
+  "label": "ollama-qwen35-9b-vision",
+  "timestamp": "2026-11-11T18:57:39.531190+00:00",
+  "finished_at": "2026-11-11T18:57:44.089010+00:00",
+  "source": "bench-vision",
+  "engine": {
+    "label": "ollama-default",
+    "name": "Ollama (native tag)",
+    "version": "ollama version is 0.40.14",
+    "base_url": "http://127.0.0.1:11434/v1",
+    "port": 11434,
+    "reasoning_effort": "none",
+    "start_command": [
+      "ollama",
+      "serve"
+    ]
+  },
+  "model": {
+    "id": "qwen3.5-9b-vision:latest",
+    "configured_id": "qwen3.8:27b",
+    "quantization": "Ollama native (nvfp4)"
+  },
+  "vision": {
+    "revision": 1,
+    "image_size": 320,
+    "max_tokens": 32,
+    "seed": 0,
+    "items": [
+      {
+        "id": "vision-conteo",
+        "image_sha256": "55c8f06fd49b7d469d46571a7ca8947dbaa4ae4580bd37d43ff0a5d90fac5635"
+      },
+      {
+        "id": "vision-color",
+        "image_sha256": "96e2da8517ef1a5d8b5c49bf54f04e28ed521253b78fd018dceec06745116748"
+      },
+      {
+        "id": "vision-posicion",
+        "image_sha256": "98ebe40101e6a838ae125ebfe1836a5b9e22a00d173e9a83ad0fb79ecc713d84"
+      },
+      {
+        "id": "vision-total",
+        "image_sha256": "31a4ec0f63a9aab4903317df268ff1da2452bed9c7a271fc7d9845df39e84619"
+      }
+    ]
+  },
+  "machine": {
+    "host": "Macmini-de-Emilio.local",
+    "os": "Darwin 27.2.0",
+    "macos": "27.2",
+    "model": "Mac18,5",
+    "chip": "Apple M6",
+    "memory_gb": 34.4,
+    "python": "3.15.2"
+  },
+  "summary": {
+    "items": 4,
+    "passed": 4,
+    "accuracy": 1.0,
+    "errors": 0,
+    "total_ms": 4556.7
+  },
+  "items": [
+    {
+      "id": "vision-conteo",
+      "passed": true,
+      "detail": "accepted answer",
+      "extracted": "3",
+      "answer_preview": "3",
+      "prompt_tokens": 149,
+      "completion_tokens": 2,
+      "ttft_ms": 2899.2,
+      "total_ms": 2939.5,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "image_sha256": "55c8f06fd49b7d469d46571a7ca8947dbaa4ae4580bd37d43ff0a5d90fac5635"
+    },
+    {
+      "id": "vision-color",
+      "passed": true,
+      "detail": "accepted answer",
+      "extracted": "Verde",
+      "answer_preview": "Verde",
+      "prompt_tokens": 152,
+      "completion_tokens": 3,
+      "ttft_ms": 473.2,
+      "total_ms": 552.5,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "image_sha256": "96e2da8517ef1a5d8b5c49bf54f04e28ed521253b78fd018dceec06745116748"
+    },
+    {
+      "id": "vision-posicion",
+      "passed": true,
+      "detail": "accepted answer",
+      "extracted": "derecha",
+      "answer_preview": "derecha",
+      "prompt_tokens": 159,
+      "completion_tokens": 3,
+      "ttft_ms": 474.1,
+      "total_ms": 552.9,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "image_sha256": "98ebe40101e6a838ae125ebfe1836a5b9e22a00d173e9a83ad0fb79ecc713d84"
+    },
+    {
+      "id": "vision-total",
+      "passed": true,
+      "detail": "accepted answer",
+      "extracted": "4",
+      "answer_preview": "4",
+      "prompt_tokens": 141,
+      "completion_tokens": 2,
+      "ttft_ms": 471.7,
+      "total_ms": 511.8,
+      "finish_reason": "stop",
+      "reasoning_chunks": 0,
+      "image_sha256": "31a4ec0f63a9aab4903317df268ff1da2452bed9c7a271fc7d9845df39e84619"
+    }
+  ]
+}

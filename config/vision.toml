@@ -1,0 +1,12 @@
+# Vision suite. Separate contract from both the speed suite and the text
+# accuracy suite: it measures whether a model can see, with images generated in
+# code and answers graded by code. Bump [vision].revision when a fixture, a
+# prompt or a limit changes.
+
+[vision]
+revision = 3
+# Square canvas in pixels. The fixtures are drawn for this size.
+image_size = 320
+# Vision answers are short by nature; the item may ask for less.
+max_tokens = 32
+seed = 0
