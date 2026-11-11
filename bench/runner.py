@@ -86,7 +86,13 @@ def run_pass(
         unload_other_ollama_models(model_id)
 
     version = capture_version(engine.version_cmd)
-    client = ChatClient(base_url, model_id, effort, timeout=timeout)
+    client = ChatClient(
+        base_url,
+        model_id,
+        effort,
+        timeout=timeout,
+        chat_template_kwargs=engine.template_kwargs,
+    )
 
     wired_before = read_wired_bytes()
     sampler: MemSampler | None = None
@@ -166,6 +172,7 @@ def run_pass(
             "base_url": base_url,
             "port": port,
             "reasoning_effort": effort,
+            "chat_template_kwargs": engine.template_kwargs or None,
             "proc_pattern": pattern,
             "persistent": engine.persistent,
         },

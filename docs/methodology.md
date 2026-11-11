@@ -5,10 +5,15 @@
 Which local engine is the best fit for this Mac mini for agent-style work, and
 where does each engine trade speed for memory, context or multimodal input?
 
-This benchmark measures **engine speed and memory**, not model quality. The
-contenders do not run identical weights: Splash runs a GGUF Q3_K_XL and Mirai
-runs a 4-bit M model. A quality comparison would need the same weights and a
-separate evaluation set.
+This benchmark measures **engine speed and memory**. The contenders do not run
+identical weights: Splash runs a GGUF Q3_K_XL and Mirai runs a 4-bit M model,
+so a speed result is not a quality result.
+
+Model accuracy is a second, separate axis. `bench eval` measures one model at a
+time with a fixed engine, `temperature: 0`, 21 auto-graded items and its own
+revision in `config/eval.toml`. The contract, the sandbox and the rules for the
+decision table are in [`docs/eval.md`](eval.md). Speed and accuracy are never
+mixed into the same verdict.
 
 ## Test machine
 

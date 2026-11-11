@@ -11,6 +11,10 @@ November 2026 result set.
 | `mirai` | Mirai/uzu 0.6.17 | 8000 | `mirai server --model qwen3.8:27b --port 8000` |
 | `ollama-q3kxl` | Ollama 0.40.14 | 11434 | `ollama serve` + imported GGUF |
 | `ollama-default` | Ollama 0.40.14 | 11434 | `ollama serve` + native tag |
+| `omlx` | oMLX 0.7.3 | 8000 | `omlx serve --port 8000 --headless` |
+
+`omlx` is configured but has **no committed result yet**. Do not quote numbers
+for it until a file exists in `results/`.
 
 ## Splash 1.5.0
 
@@ -155,13 +159,113 @@ ollama ps
 ollama stop <model>
 ```
 
+## oMLX 0.7.3
+
+oMLX is an MLX inference server with continuous batching and a two-tier KV
+cache (RAM plus SSD). It is the only contender that runs MLX safetensors
+natively instead of GGUF, so it enters the comparison as a **speed and memory**
+contender with its own weights, exactly like Mirai does.
+
+Install the CLI so the server is owned by the harness. The macOS app manages
+its own server, which the harness cannot stop deterministically.
+
+```bash
+brew tap jundot/omlx https://github.com/jundot/omlx
+brew install jundot/omlx/omlx --with-custom-kernel   # needs full Xcode
+omlx --version
+omlx serve --port 8000 --headless
+```
+
+Models are discovered from subdirectories of `--model-dir` (default
+`~/.omlx/models`). The served id is the directory name, so the configured id
+`Qwen3.8-27B-4bit` must match a directory with that exact name:
+
+```bash
+hf download mlx-community/Qwen3.8-27B-4bit \
+  --local-dir ~/.omlx/models/Qwen3.8-27B-4bit
+```
+
+```
+~/.omlx/models/Qwen3.8-27B-4bit/{config.json,*.safetensors,tokenizer*}
+```
+
+That checkpoint is a 4-bit affine (group 64) build, 16.1 GB in three shards,
+with no MTP draft — Splash and Mirai both run a draft or speculator, so decode
+for oMLX starts from a different baseline. Its `model_type` is `qwen3_5`, which
+means the `qwen35_*` kernel patches are the ones that apply to it.
+
+- Context: oMLX reports the model's real context window through `/v1/models`,
+  so the result records `context_source: "api"` rather than a config value.
+- Weights: 16.1 GB of safetensors, confirmed with `du -sh` on the downloaded
+  directory before the result is committed. Do not compare this run against
+  Q3_K_XL as a quality result (fairness rule 15).
+- Reasoning: **use `chat_template_kwargs`.** oMLX forwards `reasoning_effort`
+  into the model chat template and its compatibility layer can downgrade
+  `none` to a lower level that still emits `reasoning_content`. The configured
+  engine therefore sends `chat_template_kwargs = { enable_thinking = false }`,
+  and the client never strips that field on rejection: if oMLX refuses it the
+  pass fails instead of silently benchmarking a thinking model.
+- Gate: every run in the result must report `reasoning_chunks: 0`. A run with
+  reasoning tokens is invalid under fairness rule 6, not a slow outlier.
+- Startup flags that change the measurement (`--memory-guard`,
+  `--memory-guard-gb`, `--hot-cache-max-size`, `--paged-ssd-cache-dir`,
+  `--max-concurrent-requests`) must be recorded in the result notes if used.
+  The defaults are the comparison.
+- Cache case: the SSD tier is off unless `--paged-ssd-cache-dir` is set. Leave
+  it off for the first pass; a pass with the SSD tier on is a different
+  contender and needs its own label and result file.
+
+### Native kernels: use the official wheel
+
+This machine has no full Xcode (`xcrun --find metal` fails), so
+`brew install jundot/omlx/omlx --with-custom-kernel` cannot build the native
+kernels here. That is not a footnote: the 4-bit checkpoint above reports
+`model_type: qwen3_5`, and the patches that touch native kernels for that
+architecture are `qwen35_fa256_attention`, `qwen35_gdn_chunked`,
+`qwen35_q4_mlp`, `qwen35_oq_a8` and `qwen35_verify_qmm`. Each one checks
+`has_symbol(...)` and silently falls back to stock MLX when the build is
+missing, which upstream describes as "much slower and more memory" — exactly
+the prefill and long-context decode cases this repository measures.
+
+The release publishes wheels with the kernels **already compiled**:
+
+```bash
+python3.11 -m venv ~/.venvs/omlx
+~/.venvs/omlx/bin/pip install \
+  https://github.com/jundot/omlx/releases/download/v0.7.3/omlx-0.7.3-cp311-cp311-macosx_15_0_universal2.whl
+~/.venvs/omlx/bin/python -c "from omlx.custom_kernels import native_kernel_status; print(native_kernel_status())"
+```
+
+All four packages must report `available: true` (`attention`, `lowbit`,
+`quant_matmul`, `sparse_index`). If any is false, the pass is the generic MLX
+path: record that in the result notes and do not compare it to Splash as if the
+kernels were present.
+
+The Homebrew formula installs **without** kernels and is only useful as an `hf`
+CLI. Point `~/.local/bin/omlx` at the venv that has the wheel, so `PATH`
+resolves to the kernel build:
+
+```bash
+ln -sf ~/.venvs/omlx/bin/omlx ~/.local/bin/omlx
+omlx --version
+```
+
+### Do not benchmark a GGUF through oMLX
+
+oMLX lists `.gguf` files but runs them on Splash's engine as an external
+process ([docs/Splash.md](https://github.com/jundot/omlx/blob/main/docs/Splash.md)).
+A pass that reports a `.gguf` model id measured Splash with a different HTTP
+layer, not oMLX. Keep the GGUF out of `--model-dir`, or label the result as a
+Splash run.
+
 ## One engine at a time
 
 | Measuring | Must be stopped |
 |---|---|
-| `splash` | Mirai, any loaded Ollama model |
-| `mirai` | Splash, any loaded Ollama model |
-| `ollama-*` | Splash and Mirai |
+| `splash` | Mirai, oMLX, any loaded Ollama model |
+| `mirai` | Splash, oMLX, any loaded Ollama model |
+| `omlx` | Splash, Mirai, any loaded Ollama model |
+| `ollama-*` | Splash, Mirai, oMLX |
 
 The harness checks process patterns, the port listener and (for Splash/Mirai)
 `ollama ps`. See `docs/fairness-rules.md`.

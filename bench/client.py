@@ -25,9 +25,11 @@ class ChatResult:
     answer_preview: str
     answer_chars: int
     answer_sha256: str
+    answer: str = ""
+    tool_calls: list[dict] | None = None
 
     def as_dict(self) -> dict:
-        return {
+        data = {
             "ttft_ms": self.ttft_ms,
             "ttft_content_ms": self.ttft_content_ms,
             "total_ms": self.total_ms,
@@ -43,6 +45,9 @@ class ChatResult:
             "answer_chars": self.answer_chars,
             "answer_sha256": self.answer_sha256,
         }
+        if self.tool_calls:
+            data["tool_calls"] = self.tool_calls
+        return data
 
 
 class ChatClient:
@@ -51,7 +56,9 @@ class ChatClient:
     The client only needs the standard library so the benchmark can run on a
     fresh macOS install. It degrades gracefully when an engine rejects optional
     fields such as ``reasoning_effort``, ``seed``, ``stream_options`` or
-    ``max_tokens``.
+    ``max_tokens``. ``chat_template_kwargs`` is deliberately not dropped on
+    rejection: silently ignoring it could leave reasoning enabled and make the
+    comparison unfair.
     """
 
     def __init__(
@@ -62,12 +69,14 @@ class ChatClient:
         *,
         timeout: int = 1200,
         seed: int | None = 0,
+        chat_template_kwargs: dict | None = None,
     ):
         self.base_url = base_url.rstrip("/")
         self.model = model
         self.reasoning_effort = reasoning_effort
         self.timeout = timeout
         self.seed = seed
+        self.chat_template_kwargs = dict(chat_template_kwargs or {})
 
     def _post(self, payload: dict):
         request = urllib.request.Request(
@@ -113,7 +122,12 @@ class ChatClient:
     def stream_chat(self, prompt: str, max_tokens: int) -> ChatResult:
         return self.stream_messages([{"role": "user", "content": prompt}], max_tokens)
 
-    def stream_messages(self, messages: list[dict], max_tokens: int) -> ChatResult:
+    def stream_messages(
+        self,
+        messages: list[dict],
+        max_tokens: int,
+        tools: list[dict] | None = None,
+    ) -> ChatResult:
         payload: dict = {
             "model": self.model,
             "messages": messages,
@@ -122,8 +136,13 @@ class ChatClient:
             "stream": True,
             "stream_options": {"include_usage": True},
         }
+        if tools:
+            payload["tools"] = tools
+            payload["tool_choice"] = "auto"
         if self.reasoning_effort:
             payload["reasoning_effort"] = self.reasoning_effort
+        if self.chat_template_kwargs:
+            payload["chat_template_kwargs"] = dict(self.chat_template_kwargs)
         if self.seed is not None:
             payload["seed"] = self.seed
 
@@ -138,6 +157,7 @@ class ChatClient:
         finish_reason: str | None = None
         content: list[str] = []
         reasoning: list[str] = []
+        tool_calls: dict[int, dict] = {}
         usage: dict = {}
 
         with response:
@@ -172,6 +192,26 @@ class ChatClient:
                             first_any = now
                         if first_content is None:
                             first_content = now
+                        last_any = now
+                    for call in delta.get("tool_calls") or []:
+                        index = int(call.get("index", len(tool_calls)))
+                        slot = tool_calls.setdefault(
+                            index,
+                            {
+                                "id": None,
+                                "type": "function",
+                                "function": {"name": "", "arguments": ""},
+                            },
+                        )
+                        if call.get("id"):
+                            slot["id"] = call["id"]
+                        function = call.get("function") or {}
+                        if function.get("name"):
+                            slot["function"]["name"] = function["name"]
+                        if function.get("arguments"):
+                            slot["function"]["arguments"] += function["arguments"]
+                        if first_any is None:
+                            first_any = now
                         last_any = now
                     if choice.get("finish_reason"):
                         finish_reason = choice["finish_reason"]
@@ -212,6 +252,8 @@ class ChatClient:
             answer_preview=answer[:160].replace("\n", " "),
             answer_chars=len(answer),
             answer_sha256=digest,
+            answer=answer,
+            tool_calls=[tool_calls[index] for index in sorted(tool_calls)] or None,
         )
 
 

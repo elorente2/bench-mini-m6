@@ -1,6 +1,6 @@
 PYTHON := $(shell test -x .venv/bin/python && echo .venv/bin/python || echo python3)
 
-.PHONY: help bootstrap test lint fmt check report engines run-splash run-mirai run-ollama run-all clean
+.PHONY: help bootstrap test lint fmt check report engines run-splash run-mirai run-ollama run-all eval eval-report clean
 
 help:
 	@echo "make bootstrap   create .venv and install dev dependencies"
@@ -13,6 +13,8 @@ help:
 	@echo "make run-mirai   measure Mirai/uzu (engine must already be running)"
 	@echo "make run-all     start, measure and stop every engine, then report"
 	@echo "make report      regenerate reports/latest.md from results/*.json"
+	@echo "make eval        run the accuracy suite: make eval ENGINE=<label>"
+	@echo "make eval-report regenerate reports/eval-latest.md from results/eval/*.json"
 
 bootstrap:
 	./scripts/bootstrap.sh
@@ -47,6 +49,12 @@ run-ollama:
 
 run-all:
 	$(PYTHON) -m bench.cli run-all --report
+
+eval:
+	$(PYTHON) -m bench.cli eval $(ENGINE)
+
+eval-report:
+	$(PYTHON) -m bench.cli eval-report results/eval/*.json --out reports/eval-latest.md
 
 clean:
 	rm -rf .pytest_cache .ruff_cache logs .run

@@ -1,0 +1,14 @@
+# Accuracy suite. This is a separate contract from config/suite.toml: it
+# measures the model, not the engine. Bump [eval].revision when a prompt, a
+# limit, an item's order or a grader changes, and never edit old eval results.
+
+[eval]
+revision = 1
+# Ceiling for one answer. Code items raise it per task in bench/eval/tasks.py.
+max_tokens = 640
+code_timeout_s = 5
+seed = 0
+# Characters of deterministic filler around the needle. The result records the
+# real prompt_tokens, so the report quotes tokens, not characters.
+needle_chars = 24000
+needle_long_chars = 64000

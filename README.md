@@ -55,7 +55,10 @@ All four cache cases validate.
 
 These results compare **engine speed and memory**, not output quality. Splash
 runs a GGUF Q3_K_XL while Mirai runs a 4-bit M model, so the weights are not
-identical. See `docs/methodology.md` and `docs/fairness-rules.md`.
+identical. Accuracy is a separate axis: `bench eval` measures each model with
+its own weights, temperature 0 and code-only graders, and writes the decision
+table to [`reports/eval-latest.md`](reports/eval-latest.md). See
+`docs/methodology.md`, `docs/fairness-rules.md` and `docs/eval.md`.
 
 The generated report is in [`reports/latest.md`](reports/latest.md) and the
 detailed analysis in [`docs/results/2026-11-m6.md`](docs/results/2026-11-m6.md).

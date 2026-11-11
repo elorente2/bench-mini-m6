@@ -29,6 +29,7 @@ class Engine:
     version_cmd: tuple[str, ...]
     persistent: bool = False
     reasoning_effort: str | None = None
+    chat_template_kwargs: tuple[tuple[str, Any], ...] = ()
     notes: str = ""
 
     @property
@@ -38,6 +39,10 @@ class Engine:
     @property
     def root_url(self) -> str:
         return self.base_url.rstrip("/").removesuffix("/v1")
+
+    @property
+    def template_kwargs(self) -> dict[str, Any]:
+        return dict(self.chat_template_kwargs)
 
 
 @dataclass(frozen=True)
@@ -106,6 +111,23 @@ def _int(raw: dict[str, Any], key: str, *, label: str, required: bool = True) ->
     return value
 
 
+def _mapping(raw: dict[str, Any], key: str, *, label: str) -> tuple[tuple[str, Any], ...]:
+    """Parse a flat TOML table of chat-template arguments."""
+
+    value = raw.get(key, {})
+    if not isinstance(value, dict):
+        raise ConfigError(f"[engines.{label}].{key} must be a table")
+    items: list[tuple[str, Any]] = []
+    for name in sorted(value):
+        item = value[name]
+        if not isinstance(name, str):
+            raise ConfigError(f"[engines.{label}].{key} keys must be strings")
+        if not isinstance(item, (str, bool, int, float)):
+            raise ConfigError(f"[engines.{label}].{key}.{name} must be a string, boolean or number")
+        items.append((name, item))
+    return tuple(items)
+
+
 def load_engines(path: Path) -> dict[str, Engine]:
     with path.open("rb") as fh:
         data = tomllib.load(fh)
@@ -133,6 +155,7 @@ def load_engines(path: Path) -> dict[str, Engine]:
             version_cmd=_string_tuple(raw, "version_cmd", label=label),
             persistent=bool(raw.get("persistent", False)),
             reasoning_effort=_string(raw, "reasoning_effort", label=label, required=False),
+            chat_template_kwargs=_mapping(raw, "chat_template_kwargs", label=label),
             notes=_string(raw, "notes", label=label, required=False) or "",
         )
         if engines[label].port <= 0:

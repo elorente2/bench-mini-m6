@@ -8,6 +8,9 @@ from pathlib import Path
 
 from .config import DEFAULT_CONFIG_DIR, REPO_ROOT, load_config
 from .engine import SafetyError, listeners, start, status, stop
+from .eval.report import gate_problems, load_eval_doc, render_eval_report
+from .eval.runner import parse_template_kwarg, run_eval
+from .eval.settings import load_eval_settings
 from .legacy import load_legacy
 from .report import load_doc, render
 from .runner import RESULTS_DIR, UNSET, run_pass
@@ -119,6 +122,61 @@ def cmd_validate(args: argparse.Namespace) -> int:
     return 1 if (args.strict and invalid) else 0
 
 
+def cmd_eval(args: argparse.Namespace) -> int:
+    config = load_config(args.config_dir)
+    engine = config.engine(args.engine)
+    settings = load_eval_settings(Path(args.config_dir) / "eval.toml")
+    kwargs = dict(parse_template_kwarg(item) for item in args.template_kwarg)
+    only = tuple(item.strip() for item in args.only.split(",") if item.strip()) if args.only else ()
+    path = run_eval(
+        engine,
+        settings,
+        label=args.label,
+        base_url=args.base_url,
+        model=args.model,
+        reasoning_effort=args.reasoning_effort,
+        template_kwargs=kwargs,
+        out=args.out,
+        timeout=args.timeout,
+        safety=not args.no_safety,
+        only=only,
+        items=tuple(args.item),
+    )
+    print(path)
+    return 0
+
+
+def cmd_eval_report(args: argparse.Namespace) -> int:
+    docs = [load_eval_doc(path) for path in args.files]
+    out = Path(args.out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(render_eval_report(docs, title=args.title), encoding="utf-8")
+    print(out)
+    return 0
+
+
+def cmd_eval_validate(args: argparse.Namespace) -> int:
+    doc = load_eval_doc(args.file)
+    problems = gate_problems(doc)
+    summary = doc.get("summary") or {}
+    print(
+        json.dumps(
+            {
+                "label": doc.get("label"),
+                "schema_version": doc.get("schema_version"),
+                "revision": (doc.get("eval") or {}).get("revision"),
+                "accuracy": summary.get("accuracy"),
+                "items": summary.get("items"),
+                "errors": summary.get("errors"),
+                "thinking_leaked_items": summary.get("thinking_leaked_items"),
+                "gate_problems": problems,
+            },
+            indent=2,
+        )
+    )
+    return 1 if (args.strict and problems) else 0
+
+
 def cmd_engines(args: argparse.Namespace) -> int:
     config = load_config(args.config_dir)
     print("| Label | Engine | Port | Model | Quantization | Persistent |")
@@ -224,6 +282,42 @@ def build_parser() -> argparse.ArgumentParser:
     legacy.add_argument("--source", help="provenance string written into the result")
     legacy.set_defaults(func=cmd_import_legacy)
 
+    eval_parser = sub.add_parser("eval", help="run the accuracy suite against one engine")
+    eval_parser.add_argument("engine")
+    eval_parser.add_argument("--label", help="label used in the eval result file")
+    eval_parser.add_argument("--base-url")
+    eval_parser.add_argument("--model")
+    eval_parser.add_argument("--reasoning-effort", default=UNSET)
+    eval_parser.add_argument(
+        "--template-kwarg",
+        action="append",
+        default=[],
+        metavar="KEY=VALUE",
+        help="override a chat-template argument, e.g. enable_thinking=true",
+    )
+    eval_parser.add_argument("--only", help="comma-separated categories to run")
+    eval_parser.add_argument(
+        "--item",
+        action="append",
+        default=[],
+        help="run only this item id (repeatable)",
+    )
+    eval_parser.add_argument("--out")
+    eval_parser.add_argument("--timeout", type=int, default=1800)
+    eval_parser.add_argument("--no-safety", action="store_true")
+    eval_parser.set_defaults(func=cmd_eval)
+
+    eval_report = sub.add_parser("eval-report", help="write a Markdown accuracy report")
+    eval_report.add_argument("files", nargs="+")
+    eval_report.add_argument("--out", default=str(REPO_ROOT / "reports" / "eval-latest.md"))
+    eval_report.add_argument("--title", default="Precisión por modelo")
+    eval_report.set_defaults(func=cmd_eval_report)
+
+    eval_validate = sub.add_parser("eval-validate", help="check the gates of one eval result")
+    eval_validate.add_argument("file")
+    eval_validate.add_argument("--strict", action="store_true")
+    eval_validate.set_defaults(func=cmd_eval_validate)
+
     return parser
 
 
@@ -233,6 +327,9 @@ def main(argv: list[str] | None = None) -> int:
     try:
         return args.func(args)
     except SafetyError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
+    except ValueError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
     except KeyboardInterrupt:

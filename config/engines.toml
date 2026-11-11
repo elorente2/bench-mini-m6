@@ -15,7 +15,7 @@ quantization = "Q3_K_XL (~3-bit)"
 context_tokens = 217081
 reasoning_effort = "none"
 proc_pattern = 'splash serve-native|server\.server'
-conflicts = ['(^|/)mirai (--model|server)']
+conflicts = ['(^|/)mirai (--model|server)', 'omlx serve']
 start = [
   "splash",
   "serve",
@@ -37,7 +37,7 @@ api_model = "alibaba:qwen3.8:27b:mirai:mirai-m:4"
 quantization = "4-bit (Mirai M)"
 reasoning_effort = "disabled"
 proc_pattern = '(^|/)mirai (--model|server)|cli server'
-conflicts = ['splash serve-native|server\.server']
+conflicts = ['splash serve-native|server\.server', 'omlx serve']
 start = ["mirai", "server", "--model", "qwen3.8:27b", "--port", "8000"]
 version_cmd = ["mirai", "--version"]
 persistent = false
@@ -53,7 +53,7 @@ quantization = "Q3_K_XL (~3-bit; Ollama reports Q3_K_L)"
 context_tokens = 32768
 reasoning_effort = "none"
 proc_pattern = '(^|/)ollama serve|ollama runner|llama-server|ollama_llama_server'
-conflicts = ['splash serve-native|server\.server', '(^|/)mirai (--model|server)']
+conflicts = ['splash serve-native|server\.server', '(^|/)mirai (--model|server)', 'omlx serve']
 start = ["ollama", "serve"]
 version_cmd = ["ollama", "--version"]
 persistent = true
@@ -69,8 +69,26 @@ quantization = "Ollama native (nvfp4)"
 context_tokens = 32768
 reasoning_effort = "none"
 proc_pattern = '(^|/)ollama serve|ollama runner|llama-server|ollama_llama_server'
-conflicts = ['splash serve-native|server\.server', '(^|/)mirai (--model|server)']
+conflicts = ['splash serve-native|server\.server', '(^|/)mirai (--model|server)', 'omlx serve']
 start = ["ollama", "serve"]
 version_cmd = ["ollama", "--version"]
 persistent = true
 notes = "Out-of-the-box native tag; 32K context and thinking disabled with reasoning_effort: none."
+
+[engines.omlx]
+name = "oMLX"
+base_url = "http://127.0.0.1:8000/v1"
+port = 8000
+model = "Qwen3.8-27B-4bit"
+api_model = "Qwen3.8-27B-4bit"
+quantization = "4-bit MLX"
+reasoning_effort = "none"
+proc_pattern = 'omlx serve'
+conflicts = ['splash serve-native|server\.server', '(^|/)mirai (--model|server)']
+# oMLX forwards reasoning_effort into the model chat template and may downgrade
+# "none" to a lower level that still thinks, so thinking is disabled explicitly.
+chat_template_kwargs = { enable_thinking = false }
+start = ["omlx", "serve", "--port", "8000", "--headless"]
+version_cmd = ["omlx", "--version"]
+persistent = false
+notes = "MLX server on MLX weights, not the Q3_K_XL GGUF. A .gguf in the model dir runs on Splash's engine through oMLX and is not an oMLX measurement."

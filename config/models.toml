@@ -40,3 +40,14 @@ format = "Ollama native"
 quantization = "nvfp4"
 weights_gb = 18.0
 context_tokens = 32768
+
+# Configured but not measured yet: do not quote these numbers in a result until
+# a file exists in results/. The model id is the directory name oMLX serves.
+[models.qwen3.8-27b.variants.omlx]
+engine = "omlx"
+id = "Qwen3.8-27B-4bit"
+source = "mlx-community/Qwen3.8-27B-4bit"
+format = "MLX safetensors"
+quantization = "4-bit affine (group 64)"
+weights_gb = 16.1
+notes = "No MTP draft or speculator, unlike Splash and Mirai. Loads through mlx-vlm's qwen3_5 architecture."
