@@ -67,6 +67,10 @@ and the benchmark sends `reasoning_effort: disabled`.
   (`finish=stop`); a turn truncated by `max_tokens` leaves the cache
   non-extensible. The suite's cold task answers `READY` so the extension can
   hit.
+- Eval revision 5 (2026-11-16): **18/20 (90%) with thinking off, 20/20 (100%)
+  with thinking on**. Tools 2/2, code 3/3, 65K needle 2/2, no truncation. This is
+  the strongest text result in the repository.
+- Vision: not applicable. Mirai's M model is text-only.
 
 ## Ollama 0.40.14
 

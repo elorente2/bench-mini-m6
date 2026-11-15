@@ -1,6 +1,6 @@
 # Accuracy by model
 
-Apple M6 (Mac18,5) · 34.4 GB · suite revision 1, 2, 3, 4, 5 · 16 runs · temperature 0
+Apple M6 (Mac18,5) · 34.4 GB · suite revision 1, 2, 3, 4, 5 · 18 runs · temperature 0
 
 > Warning: these results span more than one revision. They are not compared with each other, and only the newest revision decides.
 
@@ -8,6 +8,8 @@ Apple M6 (Mac18,5) · 34.4 GB · suite revision 1, 2, 3, 4, 5 · 16 runs · temp
 
 | Model / engine | Instructions | JSON | Tools | Architecture | Calculation | Code | Long context | Abstention | Extraction | Total |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `mirai-qwen3.8-27b-r5-off` | 2/2 (100 %) | 1/2 (50 %) | 2/2 (100 %) | 3/3 (100 %) | 1/2 (50 %) | 3/3 (100 %) | 2/2 (100 %) | 2/2 (100 %) | 2/2 (100 %) | 18/20 (90 %) |
+| `mirai-qwen3.8-27b-r5-thinkon` | 2/2 (100 %) | 2/2 (100 %) | 2/2 (100 %) | 3/3 (100 %) | 2/2 (100 %) | 3/3 (100 %) | 2/2 (100 %) | 2/2 (100 %) | 2/2 (100 %) | 20/20 (100 %) |
 | `ollama-coder-7b-r5-off` | 1/2 (50 %) | 1/2 (50 %) | 0/2 (0 %) | 0/3 (0 %) | 1/2 (50 %) | 1/3 (33 %) | — | 2/2 (100 %) | 1/2 (50 %) | 7/18 (39 %) |
 | `ollama-qwen35-9b-r5-off` | 2/2 (100 %) | 2/2 (100 %) | 2/2 (100 %) | 2/3 (67 %) | 1/2 (50 %) | 1/3 (33 %) | — | 2/2 (100 %) | 2/2 (100 %) | 14/18 (78 %) |
 | `ollama-qwen35-9b-r5-thinkon` | 2/2 (100 %) | 1/2 (50 %) | 2/2 (100 %) | 3/3 (100 %) | 1/2 (50 %) | 2/3 (67 %) | — | 2/2 (100 %) | 2/2 (100 %) | 15/18 (83 %) |
@@ -31,6 +33,8 @@ Apple M6 (Mac18,5) · 34.4 GB · suite revision 1, 2, 3, 4, 5 · 16 runs · temp
 
 | Run | Model | Engine | Thinking | Quantization | Max context |
 |---|---|---|---|---|---:|
+| `mirai-qwen3.8-27b-r5-off` | `alibaba:qwen3.8:27b:mirai:mirai-m:4` | Mirai / uzu cli 0.6.17 | off | 4-bit (Mirai M) | — |
+| `mirai-qwen3.8-27b-r5-thinkon` | `alibaba:qwen3.8:27b:mirai:mirai-m:4` | Mirai / uzu cli 0.6.17 | on | 4-bit (Mirai M) | — |
 | `ollama-coder-7b-r5-off` | `qwen2.5-coder:7b` | Ollama (native tag) ollama version is 0.40.14 | off | Ollama native (nvfp4) | 32,768* |
 | `ollama-qwen35-9b-r5-off` | `qwen3.5-9b-q4:latest` | Ollama (native tag) ollama version is 0.40.14 | off | Ollama native (nvfp4) | 32,768* |
 | `ollama-qwen35-9b-r5-thinkon` | `qwen3.5-9b-q4:latest` | Ollama (native tag) ollama version is 0.40.14 | on | Ollama native (nvfp4) | 32,768* |
@@ -54,6 +58,8 @@ Max context is what the engine's API declares; `*` marks the value taken from th
 
 | Run | Items | Minutes | Truncated | Max prompt (tokens) | Context coverage | Slowest item |
 |---|---:|---:|---:|---:|---:|---:|
+| `mirai-qwen3.8-27b-r5-off` | 20 | 3.2 | 0 | 65124 | — | 143.0 s |
+| `mirai-qwen3.8-27b-r5-thinkon` | 20 | 8.2 | 0 | 65164 | — | 147.6 s |
 | `ollama-coder-7b-r5-off` | 18 | 0.7 | 0 | — | — | 7.0 s |
 | `ollama-qwen35-9b-r5-off` | 18 | 0.9 | 0 | — | — | 14.9 s |
 | `ollama-qwen35-9b-r5-thinkon` | 18 | 38.7 | 3 | — | — | 379.8 s |
@@ -77,15 +83,15 @@ Coverage is the share of the declared window the suite actually exercises: the l
 
 | Task | Best | Accuracy | Tied for first |
 |---|---|---:|---|
-| Instructions | tie (6) | 100 % | `ollama-qwen35-9b-r5-off`, `ollama-qwen35-9b-r5-thinkon`, `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkon` |
-| JSON | tie (3) | 100 % | `ollama-qwen35-9b-r5-off`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkon` |
-| Tools | tie (6) | 100 % | `ollama-qwen35-9b-r5-off`, `ollama-qwen35-9b-r5-thinkon`, `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkon` |
-| Architecture | tie (3) | 100 % | `ollama-qwen35-9b-r5-thinkon`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkon` |
-| Calculation | tie (2) | 100 % | `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkon` |
-| Code | tie (2) | 100 % | `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkoff` |
-| Long context | tie (4) | 100 % | `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkon` |
-| Abstention | tie (7) | 100 % | `ollama-coder-7b-r5-off`, `ollama-qwen35-9b-r5-off`, `ollama-qwen35-9b-r5-thinkon`, `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkon` |
-| Extraction | tie (6) | 100 % | `ollama-qwen35-9b-r5-off`, `ollama-qwen35-9b-r5-thinkon`, `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkon` |
+| Instructions | tie (8) | 100 % | `mirai-qwen3.8-27b-r5-off`, `mirai-qwen3.8-27b-r5-thinkon`, `ollama-qwen35-9b-r5-off`, `ollama-qwen35-9b-r5-thinkon`, `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkon` |
+| JSON | tie (4) | 100 % | `mirai-qwen3.8-27b-r5-thinkon`, `ollama-qwen35-9b-r5-off`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkon` |
+| Tools | tie (8) | 100 % | `mirai-qwen3.8-27b-r5-off`, `mirai-qwen3.8-27b-r5-thinkon`, `ollama-qwen35-9b-r5-off`, `ollama-qwen35-9b-r5-thinkon`, `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkon` |
+| Architecture | tie (5) | 100 % | `mirai-qwen3.8-27b-r5-off`, `mirai-qwen3.8-27b-r5-thinkon`, `ollama-qwen35-9b-r5-thinkon`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkon` |
+| Calculation | tie (3) | 100 % | `mirai-qwen3.8-27b-r5-thinkon`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkon` |
+| Code | tie (4) | 100 % | `mirai-qwen3.8-27b-r5-off`, `mirai-qwen3.8-27b-r5-thinkon`, `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkoff` |
+| Long context | tie (6) | 100 % | `mirai-qwen3.8-27b-r5-off`, `mirai-qwen3.8-27b-r5-thinkon`, `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkon` |
+| Abstention | tie (9) | 100 % | `mirai-qwen3.8-27b-r5-off`, `mirai-qwen3.8-27b-r5-thinkon`, `ollama-coder-7b-r5-off`, `ollama-qwen35-9b-r5-off`, `ollama-qwen35-9b-r5-thinkon`, `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkon` |
+| Extraction | tie (8) | 100 % | `mirai-qwen3.8-27b-r5-off`, `mirai-qwen3.8-27b-r5-thinkon`, `ollama-qwen35-9b-r5-off`, `ollama-qwen35-9b-r5-thinkon`, `qwen3.8-4bit-omlx-r5-thinkoff`, `qwen3.8-4bit-omlx-r5-thinkon`, `qwen3.8-q3kxl-splash-r5-thinkoff`, `qwen3.8-q3kxl-splash-r5-thinkon` |
 
 The decision compares only runs of the newest revision without infrastructure failures. When several tie for first, the row says so and names them: a tie is never broken by speed.
 

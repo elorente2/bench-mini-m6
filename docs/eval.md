@@ -203,8 +203,8 @@ models and items that answers "which model for this task".
 
 ## What revision 5 showed
 
-Twenty items, four runs, same two weight sets. Every run passes the gates
-(`errors: 0`, no leaked reasoning) and the four are one revision.
+Twenty items, six runs, three weight sets. Every run passes the gates
+(`errors: 0`, no leaked reasoning) and all six are one revision.
 
 | Run | Accuracy | Fails | Thinking |
 |---|---:|---|---|
@@ -212,23 +212,31 @@ Twenty items, four runs, same two weight sets. Every run passes the gates
 | Q3_K_XL · Splash | 19/20 | permission item, truncated at 8,892 tokens | on |
 | 4-bit MLX · oMLX | 17/20 | nested JSON, design choice, IVA | off |
 | 4-bit MLX · oMLX | 19/20 | permission item, truncated at 8,892 tokens | on |
+| 4-bit M · Mirai/uzu | 18/20 | nested JSON, IVA | off |
+| 4-bit M · Mirai/uzu | **20/20** | none | on |
 
-1. **Thinking decides four categories, not the engine.** `json`, `arquitectura`
-   and `calculo` go from 1/2, 2/3 and 1/2 with thinking off to full marks with
-   it on, in both weight sets. `codigo` is the reverse: 3/3 off, 2/3 on.
-2. **The code failure with thinking on is the model, not the server.** Both
-   engines truncate the same item at the same 8,892 tokens: with thinking on the
-   model keeps reasoning and never emits the function. It is a thinking-mode
-   ceiling, documented, not a budget bug — the headroom is 8,192 and the model
-   spent all of it.
-3. **Quantization and engine still change nothing.** Both weight sets fail
-   exactly the same items with the same answers, down to `1499,60 €` and 63 vs 64
-   words.
-4. **The suite now discriminates.** 15 of 20 items still pass for everyone, but
-   four separate the two modes, against one at revision 3.
+1. **Thinking fixes the same categories, but the code penalty is not
+   universal.** For Splash and oMLX, thinking on fixes `json`, `arquitectura`
+   and `calculo`, but costs one code item: the model reasons past the 8,192-token
+   headroom and never emits the function. Mirai M also fixes those categories
+   with thinking on, but it passes code 3/3 both with thinking off and on, with
+   no truncation.
+2. **The code truncation is weight/engine-specific.** Splash and oMLX share the
+   same 8,892-token truncation; Mirai M does not. It is a thinking-mode ceiling
+   for those two combinations, not a property of Qwen3.8-27B.
+3. **The off-mode ceiling is shared.** Splash, oMLX and Mirai all miss nested
+   JSON and the IVA calculation with thinking off. Mirai additionally passes the
+   architecture design choice that the other two miss, which is the one-item
+   difference between 17/20 and 18/20.
+4. **The suite is saturated for Mirai with thinking on.** Mirai reaches 20/20,
+   and five of the 20 items pass for every revision-5 run. The next revision
+   needs harder variants, not another 27B checkpoint.
 
-Practical reading for a daily driver: thinking off for code, thinking on for
-JSON contracts, arithmetic and anything with a hard limit.
+Practical reading for a daily driver: **Mirai M is the strongest text model on
+this suite** (18/20 off, 20/20 on). Use thinking off for speed and code, and
+thinking on for JSON contracts, arithmetic and architecture. Splash remains the
+choice for vision/PDF and the verified long-context path; its text accuracy is
+17/20 off and 19/20 on.
 
 ## What the pilot showed (revision 3, superseded)
 
@@ -267,18 +275,17 @@ must beat.
 
 ## Limits
 
-- The pilot has 21 items; a single item is worth 4.8 points. Treat differences
+- The suite has 20 items; a single item is worth 5 points. Treat differences
   under two items as noise until a second repetition exists.
 - One repetition per item. `temperature: 0` and a fixed seed reduce variance on
   the server side, not on the tokenizer or the sampler.
 - The long-context items measure retrieval at the prompt sizes recorded in the
-  result, not the advertised context window. The report compares the longest
-  prompt with the declared maximum: at revision 3 that is 24.6K tokens against
-  217K (Splash) and 262K (oMLX), so **9–11 % of the window is exercised**. Since
-  revision 4 the second needle is ~65K tokens, which is **30 %** of the Splash
-  window. A low
-  coverage is not a failure, it is an untested region. A near-max item costs
-  10–17 minutes of prefill per run on this machine.
-- No vision, PDF or OCR item yet. Splash and Ollama native advertise those
-  capabilities; they are not measured here.
+  result, not the advertised context window. At revision 5 the longest needle is
+  ~65K tokens. Against Splash's declared 217K that is **30 %** of the window;
+  Mirai reports no declared window, so its coverage is blank even though it
+  passed the 65K item. A low coverage is not a failure, it is an untested
+  region. A near-max item costs 10–17 minutes of prefill per run on this machine.
+- Vision is a separate suite (`bench vision`); this text suite does not mix
+  vision, PDF or OCR into the accuracy table. The vision fixtures are generated
+  in code and graded by code.
 - The sandbox is best effort, as described above.

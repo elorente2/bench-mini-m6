@@ -79,9 +79,8 @@ more than a nice-looking table.
 
 ## Known pending work
 
-- Eval revision 4: 19 of 21 items pass for every run at revision 3, so the
-  suite is saturated for 27B-class weights. Harden the saturated categories
-  before adding another model.
+- Eval revision 5 is saturated for Mirai M with thinking on (20/20). Harden the
+  saturated categories before adding another 27B-class model.
 - A second model that differs from Qwen3.8-27B in a way this machine can hold.
   Another 27B quantization ties on the current items.
 - Optional second repetition of the long-context decode case to check variance.
