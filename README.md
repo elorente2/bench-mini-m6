@@ -63,6 +63,34 @@ difference and everything else is stock.
 - **Ollama integration:** use the native tag if you need Ollama specifically.
   Do not use the imported Q3_K_XL label for speed on this hardware.
 
+### 2026-11-16 update — Splash V3.1
+
+Unsloth moved Qwen3.8-27B-GGUF to revision `4af51b3` (Dynamic V3.1). The new
+Q3_K_XL was re-measured with the same speed suite and eval revision 5:
+
+| Metric | Splash V3.1 | Mirai/uzu |
+|---|---:|---:|
+| Short decode | 55.8 tok/s | **60.8 tok/s** |
+| Decode @ 18K | **41.1 tok/s** | 39.6 tok/s |
+| Prefill @ 18K | 447.8 tok/s | **530.7 tok/s** |
+| Cold TTFT @ 18K | 40.4 s | **34.1 s** |
+| Cached TTFT | 443 ms | **250 ms** |
+| Peak wired memory | 21.69 GB | **19.63 GB** |
+| Accuracy, thinking off | 18/20 (90%) | 18/20 (90%) |
+| Accuracy, thinking on | 20/20 (100%) | 20/20 (100%) |
+| Vision | **8/8** | text-only |
+| Context | **217,081** | not reported |
+
+The accuracy gap is closed: **Mirai and Splash V3.1 tie** on the eval suite.
+Choose **Mirai** for daily text/code (faster, 2 GB lighter) and **Splash V3.1**
+for vision/PDF, 217K context, or a single all-rounder. See
+[`reports/2026-11-16-eval-splash-v31-vs-mirai.md`](reports/2026-11-16-eval-splash-v31-vs-mirai.md)
+and [`reports/2026-11-16-splash-v31-vs-mirai.md`](reports/2026-11-16-splash-v31-vs-mirai.md).
+
+**Qwen4:** there are no open weights to run locally. `qwen4-max-preview` is a
+cloud-only preview (until 2026-11-25); Qwen4-27B has no Hugging Face repository
+or release date. See [`docs/qwen4.md`](docs/qwen4.md).
+
 These results compare **engine speed and memory**, not output quality. Splash
 runs a GGUF Q3_K_XL while Mirai runs a 4-bit M model, so the weights are not
 identical. Accuracy is a separate axis: `bench eval` measures each model with

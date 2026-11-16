@@ -25,18 +25,25 @@ installation method differs, use the upstream installer and keep the command in
 
 ```bash
 splash --version
-splash serve --model unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL --port 8000
+splash serve --model unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL \
+  --revision 4af51b3542f775b0a8e4b310bfb3f17e01c306c9 \
+  --port 8000
 ```
 
 The first launch downloads the GGUF and the DFlash2 draft. The model is
 reported as `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL`; the weights are Q3_K_XL
-(~3-bit, about 13.1 GB) plus a draft of about 3.8 GB.
+Dynamic V3.1 (~3-bit, about 13.15 GB) plus a draft of about 3.8 GB. Pinning the
+revision keeps the benchmark reproducible; the pre-V3.1 results used `ce331ef`.
 
 - Context: 217,081 tokens reported by `/v1/models`.
 - Multimodal: accepts images and PDFs. Do not pass `--language-only` if you
   want to keep that capability.
 - Reasoning: the benchmark sends `reasoning_effort: none`.
 - API: `http://127.0.0.1:8000/v1`.
+- Eval revision 5 (2026-11-16, model revision `4af51b3`, Dynamic V3.1):
+  **18/20 (90%) with thinking off, 20/20 (100%) with thinking on**, and
+  **8/8 on the vision suite**. This ties Mirai on text accuracy; Splash adds
+  vision/PDF and 217K context at about 2 GB more wired memory.
 
 Useful flags if memory is tight: `--max-memory 28G`, `--max-context 100K`.
 Changing them changes the comparison; record it if you do.

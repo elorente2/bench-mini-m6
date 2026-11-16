@@ -1,6 +1,6 @@
 # Vision by model
 
-Apple M6 · 34.4 GB · vision suite revision 3 · 2 runs · temperature 0
+Apple M6 · 34.4 GB · vision suite revision 3 · 3 runs · temperature 0
 
 > 3 runs from older revisions are left out of the table: the vision suite changes its items, and revisions are never compared.
 
@@ -10,6 +10,7 @@ Apple M6 · 34.4 GB · vision suite revision 3 · 2 runs · temperature 0
 |---|---|---|---|---|---|---|---|---:|
 | `ollama-qwen35-9b-vision` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | 8/8 (100 %) |
 | `qwen3.8-q3kxl-splash-vision` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | 8/8 (100 %) |
+| `qwen3.8-q3kxl-v31-vision` | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | 8/8 (100 %) |
 
 ## Runs
 
@@ -17,6 +18,7 @@ Apple M6 · 34.4 GB · vision suite revision 3 · 2 runs · temperature 0
 |---|---|---|---:|
 | `ollama-qwen35-9b-vision` | `qwen3.5-9b-vision:latest` | Ollama (native tag) ollama version is 0.40.14 | 320 px |
 | `qwen3.8-q3kxl-splash-vision` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | 320 px |
+| `qwen3.8-q3kxl-v31-vision` | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` | Splash 1.5.0 | 320 px |
 
 ## Answers
 
@@ -38,5 +40,13 @@ Apple M6 · 34.4 GB · vision suite revision 3 · 2 runs · temperature 0
 | `qwen3.8-q3kxl-splash-vision` | `vision-solape` | ✓ | rojo |
 | `qwen3.8-q3kxl-splash-vision` | `vision-cuentanueve` | ✓ | 9 |
 | `qwen3.8-q3kxl-splash-vision` | `vision-digitos` | ✓ | 417 |
+| `qwen3.8-q3kxl-v31-vision` | `vision-conteo` | ✓ | 3 |
+| `qwen3.8-q3kxl-v31-vision` | `vision-color` | ✓ | Verde |
+| `qwen3.8-q3kxl-v31-vision` | `vision-posicion` | ✓ | derecha |
+| `qwen3.8-q3kxl-v31-vision` | `vision-total` | ✓ | 4 |
+| `qwen3.8-q3kxl-v31-vision` | `vision-digito` | ✓ | 6 |
+| `qwen3.8-q3kxl-v31-vision` | `vision-solape` | ✓ | rojo |
+| `qwen3.8-q3kxl-v31-vision` | `vision-cuentanueve` | ✓ | 9 |
+| `qwen3.8-q3kxl-v31-vision` | `vision-digitos` | ✓ | 417 |
 
 Images are generated in code and their hash is stored in the result, so a wrong grade is a model or generator bug, never a file somebody replaced.

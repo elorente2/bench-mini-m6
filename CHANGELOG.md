@@ -94,5 +94,9 @@
   both at 32K context with thinking disabled.
 - Mirai/uzu validated on eval revision 5: 18/20 with thinking off, 20/20 with
   thinking on, including tools, code and the 65K long-context item.
+- Splash V3.1 (revision `4af51b3`) validated: 18/20 off, 20/20 on, vision 8/8;
+  it ties Mirai on text accuracy and keeps vision/PDF/217K context.
+- Qwen4 status documented: no open weights; only the cloud-only
+  `qwen4-max-preview` exists, and Qwen4-27B is unreleased.
 - Schema-1 results, validation, Markdown report and legacy import.
 - MIT license.

@@ -21,6 +21,8 @@ start = [
   "serve",
   "--model",
   "unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL",
+  "--revision",
+  "4af51b3542f775b0a8e4b310bfb3f17e01c306c9",
   "--port",
   "8000",
 ]

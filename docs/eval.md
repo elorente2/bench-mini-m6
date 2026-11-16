@@ -203,40 +203,41 @@ models and items that answers "which model for this task".
 
 ## What revision 5 showed
 
-Twenty items, six runs, three weight sets. Every run passes the gates
-(`errors: 0`, no leaked reasoning) and all six are one revision.
+Twenty items, eight runs, four weight sets. Every run passes the gates
+(`errors: 0`, no leaked reasoning) and all eight are one revision.
 
 | Run | Accuracy | Fails | Thinking |
 |---|---:|---|---|
-| Q3_K_XL · Splash | 17/20 | nested JSON, design choice, IVA | off |
-| Q3_K_XL · Splash | 19/20 | permission item, truncated at 8,892 tokens | on |
+| Q3_K_XL · Splash (pre-V3.1) | 17/20 | nested JSON, design choice, IVA | off |
+| Q3_K_XL · Splash (pre-V3.1) | 19/20 | permission item, truncated at 8,892 tokens | on |
 | 4-bit MLX · oMLX | 17/20 | nested JSON, design choice, IVA | off |
 | 4-bit MLX · oMLX | 19/20 | permission item, truncated at 8,892 tokens | on |
 | 4-bit M · Mirai/uzu | 18/20 | nested JSON, IVA | off |
 | 4-bit M · Mirai/uzu | **20/20** | none | on |
+| Q3_K_XL · Splash V3.1 | 18/20 | nested JSON, IVA | off |
+| Q3_K_XL · Splash V3.1 | **20/20** | none | on |
 
-1. **Thinking fixes the same categories, but the code penalty is not
-   universal.** For Splash and oMLX, thinking on fixes `json`, `arquitectura`
-   and `calculo`, but costs one code item: the model reasons past the 8,192-token
-   headroom and never emits the function. Mirai M also fixes those categories
-   with thinking on, but it passes code 3/3 both with thinking off and on, with
-   no truncation.
-2. **The code truncation is weight/engine-specific.** Splash and oMLX share the
-   same 8,892-token truncation; Mirai M does not. It is a thinking-mode ceiling
-   for those two combinations, not a property of Qwen3.8-27B.
-3. **The off-mode ceiling is shared.** Splash, oMLX and Mirai all miss nested
-   JSON and the IVA calculation with thinking off. Mirai additionally passes the
-   architecture design choice that the other two miss, which is the one-item
-   difference between 17/20 and 18/20.
-4. **The suite is saturated for Mirai with thinking on.** Mirai reaches 20/20,
-   and five of the 20 items pass for every revision-5 run. The next revision
-   needs harder variants, not another 27B checkpoint.
+1. **Thinking fixes JSON, architecture and calculation; V3.1 also removes the
+   code penalty.** With thinking on, Mirai and Splash V3.1 reach 20/20. The old
+   Splash and oMLX runs reached 19/20 because the model reasoned past the
+   8,192-token headroom and never emitted the function.
+2. **V3.1 closed both old Splash gaps.** Off, it now passes the architecture
+   design choice that the pre-V3.1 weights missed. On, it passes the code item
+   without truncation. The old 8,892-token code ceiling was a weight/engine
+   artifact, not a property of Qwen3.8-27B.
+3. **The off-mode ceiling is shared by Mirai and V3.1.** Both miss nested JSON
+   and the IVA calculation with thinking off. That is the only accuracy
+   difference left between them.
+4. **The suite is saturated for both leaders with thinking on.** Mirai and
+   Splash V3.1 both reach 20/20; in the focused four-run comparison, 18 of the
+   20 items pass for everyone. The next revision needs harder variants, not
+   another 27B checkpoint.
 
-Practical reading for a daily driver: **Mirai M is the strongest text model on
-this suite** (18/20 off, 20/20 on). Use thinking off for speed and code, and
-thinking on for JSON contracts, arithmetic and architecture. Splash remains the
-choice for vision/PDF and the verified long-context path; its text accuracy is
-17/20 off and 19/20 on.
+Practical reading for a daily driver: **accuracy is now a tie between Mirai M
+and Splash V3.1** (18/20 off, 20/20 on). Choose Mirai for text speed and lower
+memory; choose Splash V3.1 for vision/PDF and the 217K context path. Use
+thinking off for speed and code, and thinking on for JSON contracts,
+arithmetic and architecture.
 
 ## What the pilot showed (revision 3, superseded)
 

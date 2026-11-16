@@ -79,10 +79,13 @@ more than a nice-looking table.
 
 ## Known pending work
 
-- Eval revision 5 is saturated for Mirai M with thinking on (20/20). Harden the
-  saturated categories before adding another 27B-class model.
+- Eval revision 5 is saturated for both leaders with thinking on: Mirai M and
+  Splash V3.1 both score 20/20. Harden the saturated categories before adding
+  another 27B-class model.
 - A second model that differs from Qwen3.8-27B in a way this machine can hold.
   Another 27B quantization ties on the current items.
+- Qwen4 open weights: Qwen4-27B is announced but not released as of
+  2026-11-16. The only usable Qwen4 is the cloud-only `qwen4-max-preview`.
 - Optional second repetition of the long-context decode case to check variance.
 - Optional long-context stress test for Splash beyond 18K.
 - Optional image/PDF checks for Splash and Ollama native (not throughput).
