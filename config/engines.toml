@@ -43,7 +43,7 @@ conflicts = ['splash serve-native|server\.server', 'omlx serve']
 start = ["mirai", "server", "--model", "qwen3.8:27b", "--port", "8000"]
 version_cmd = ["mirai", "--version"]
 persistent = false
-notes = "Text only. Ships its own speculator; context window is not reported by the API."
+notes = "Text only. Ships its own speculator. Model config max_sequence_length is 262,144 (256K, hybrid DeltaNet+attention); the API does not report it. OpenCode client context is set to 131,072 (128K)."
 
 [engines.ollama-q3kxl]
 name = "Ollama (imported Q3_K_XL)"

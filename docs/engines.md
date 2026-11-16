@@ -67,7 +67,12 @@ The server reports the model as
 and the benchmark sends `reasoning_effort: disabled`.
 
 - Context: Mirai does not report a context window through `/v1/models`. The
-  benchmark only exercised 18K tokens.
+  model config (`max_sequence_length` on the attention layers' RoPE) is
+  **262,144 tokens (256K)** — the architecture is a hybrid of DeltaNet linear
+  attention and standard attention across 64 layers. The benchmark only
+  exercised 18K tokens. For daily use in OpenCode the client-side context limit
+  is set to **131,072 (128K)** in `~/.config/opencode/opencode.jsonc` to avoid
+  frequent compaction without paying for the full 256K prefill.
 - Multimodal: the M model is text-only.
 - API: `http://127.0.0.1:8000/v1`.
 - Prefix cache: enabled by default; `--no-prefix-cache` is available for
