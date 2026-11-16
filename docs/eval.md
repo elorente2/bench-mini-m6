@@ -27,7 +27,7 @@ interchangeable documents.
 | Revision | `[eval].revision` in `config/eval.toml` |
 | Sampling | `temperature: 0`, `seed: 0` |
 | Thinking | Off by default; the run records how it was disabled |
-| Items | 20, fixed order, 9 categories |
+| Items | 26, fixed order, 9 categories |
 | Output limit | Per item in `bench/eval/tasks.py`, plus `[eval].reasoning_headroom` |
 | Grading | Code only. No LLM judge, no human rubric |
 | Retries | None. One request per item |
@@ -55,19 +55,30 @@ finding about the model.
 | Category | Items | What it checks |
 |---|---:|---|
 | `instrucciones` | 2 | Exact bullet format; 25-word summary with a required opening and two forbidden words |
-| `json` | 2 | Flat schema; nested schema with enum, ordered lines and a conditional field |
-| `herramientas` | 2 | One tool call, and search-before-write in a two-tool turn |
+| `json` | 3 | Flat schema; nested schema with enum, ordered lines and a conditional field; nested budget with computed totals |
+| `herramientas` | 3 | One tool call; search-before-write; search then create with exact second-call arguments |
 | `arquitectura` | 3 | Pick a design under three constraints; spot the two contradictory lines; four-section ADR |
-| `calculo` | 2 | Percentage with rounding; date arithmetic |
-| `codigo` | 3 | JS accent-insensitive filter; Python permission rule with a hardening order; SQLite `GROUP BY`/`HAVING` |
-| `contexto_largo` | 2 | A code buried in ~9K and ~65K tokens of filler |
+| `calculo` | 3 | Percentage with rounding; date arithmetic; multi-step discount, VAT and shipping |
+| `codigo` | 5 | JS accent-insensitive filter; Python permission rule; SQLite `GROUP BY`/`HAVING`; range merge; O(1) LRU |
+| `contexto_largo` | 3 | A code buried in ~9K and ~65K tokens of filler; two needles in order |
 | `abstencion` | 2 | Say `NO CONSTA` instead of inventing a phone number or a version |
 | `extraccion` | 2 | Invoice fields; exception, function and HTTP status from a trace |
 
 Revision 4 replaced the twelve items every model passed. The new ones come from
 the work this benchmark is actually for: code review, refactors, API contracts
-and architecture decisions. Revision 5 only raised the reasoning headroom, after
-a code item ran out of budget while thinking.
+and architecture decisions. Revision 5 raised the reasoning headroom after a
+code item ran out of budget while thinking.
+
+Revision 6 adds six hard items after both 27B leaders reached 20/20 with
+thinking on: a two-call tool agenda, range merge, O(1) LRU, a nested budget
+JSON with computed totals, a multi-step discount/VAT/shipping calculation, and
+a double-needle long-context item. The tool grader now verifies the second call
+and its arguments, not only the first.
+
+The tool items are single-turn: the runner does not execute a tool and feed the
+result back. A sequential item therefore asks the model to emit both calls in
+one response, and a model that waits for the first result will fail it. That is
+a documented ceiling, not a difference between two models that both fail it.
 
 The long-context items record the real `prompt_tokens` from the engine, so the
 report quotes tokens rather than the character count used to build the filler.
@@ -201,7 +212,42 @@ After a trial round:
 The point is not to accumulate benchmarks. It is to keep the smallest set of
 models and items that answers "which model for this task".
 
-## What revision 5 showed
+## What revision 6 showed
+
+Twenty-six items, four runs, two leaders. Every run passes the gates
+(`errors: 0`, no leaked reasoning); all four are revision 6.
+
+| Run | Accuracy | Fails | Thinking |
+|---|---:|---|---|
+| 4-bit M · Mirai/uzu | 20/26 | nested JSON, budget JSON, two tool chains, IVA, discount | off |
+| 4-bit M · Mirai/uzu | **24/26** | two tool chains | on |
+| Q3_K_XL V3.1 · Splash | 20/26 | nested JSON, budget JSON, two tool chains, IVA, discount | off |
+| Q3_K_XL V3.1 · Splash | **24/26** | two tool chains | on |
+
+The hardened items did their job: the suite is no longer saturated at 20/20.
+Both leaders drop to 77% with thinking off and 92% with thinking on.
+
+1. **Thinking fixes the new JSON and calculation items.** The budget JSON and
+   the multi-step discount/VAT/shipping item fail with thinking off and pass
+   with thinking on, for both models. The five code items and the double-needle
+   item pass in every mode.
+2. **Tool chaining is the shared ceiling.** Both models emit only the first
+   call and wait for a result that the single-turn runner never sends. The two
+   sequential tool items fail for both, so they are a ceiling, not a way to
+   choose between Mirai and Splash.
+3. **The models are still tied on accuracy.** Same 20/26 and 24/26, same
+   categories. Mirai remains faster: 3.5 min off / 7.5 min on, versus 4.9 / 11.2
+   for Splash V3.1.
+4. **The next discriminator is not another 27B checkpoint.** It is either a
+   multi-turn tool runner that executes and returns tool results, or harder
+   independent code/architecture items.
+
+Practical reading: keep **Mirai** as the default text/code model. Keep
+**Splash V3.1** for vision/PDF and the 217K path. Use thinking off for speed;
+turn it on for JSON contracts, arithmetic and architecture. The tool-chain
+failure is a runner limitation to fix before treating it as a model verdict.
+
+## What revision 5 showed (superseded)
 
 Twenty items, eight runs, four weight sets. Every run passes the gates
 (`errors: 0`, no leaked reasoning) and all eight are one revision.
@@ -276,8 +322,8 @@ must beat.
 
 ## Limits
 
-- The suite has 20 items; a single item is worth 5 points. Treat differences
-  under two items as noise until a second repetition exists.
+- The suite has 26 items; a single item is worth about 3.8 points. Treat
+  differences under two items as noise until a second repetition exists.
 - One repetition per item. `temperature: 0` and a fixed seed reduce variance on
   the server side, not on the tokenizer or the sampler.
 - The long-context items measure retrieval at the prompt sizes recorded in the

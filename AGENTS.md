@@ -79,9 +79,11 @@ more than a nice-looking table.
 
 ## Known pending work
 
-- Eval revision 5 is saturated for both leaders with thinking on: Mirai M and
-  Splash V3.1 both score 20/20. Harden the saturated categories before adding
-  another 27B-class model.
+- Eval revision 6 is still tied between Mirai M and Splash V3.1: both 20/26
+  with thinking off and 24/26 with thinking on. The shared failure is the
+  single-turn tool-chain items; the next step is either a multi-turn tool
+  runner that executes and returns tool results, or harder independent
+  code/architecture items.
 - A second model that differs from Qwen3.8-27B in a way this machine can hold.
   Another 27B quantization ties on the current items.
 - Qwen4 open weights: Qwen4-27B is announced but not released as of

@@ -40,10 +40,11 @@ revision keeps the benchmark reproducible; the pre-V3.1 results used `ce331ef`.
   want to keep that capability.
 - Reasoning: the benchmark sends `reasoning_effort: none`.
 - API: `http://127.0.0.1:8000/v1`.
-- Eval revision 5 (2026-11-16, model revision `4af51b3`, Dynamic V3.1):
-  **18/20 (90%) with thinking off, 20/20 (100%) with thinking on**, and
-  **8/8 on the vision suite**. This ties Mirai on text accuracy; Splash adds
-  vision/PDF and 217K context at about 2 GB more wired memory.
+- Eval revision 6 (2026-11-16, model revision `4af51b3`, Dynamic V3.1):
+  **20/26 (77%) with thinking off, 24/26 (92%) with thinking on**, and
+  **8/8 on the vision suite**. It ties Mirai on text accuracy; the two
+  sequential tool-chain items fail for both. Splash adds vision/PDF and 217K
+  context at about 2 GB more wired memory.
 
 Useful flags if memory is tight: `--max-memory 28G`, `--max-context 100K`.
 Changing them changes the comparison; record it if you do.
@@ -74,9 +75,11 @@ and the benchmark sends `reasoning_effort: disabled`.
   (`finish=stop`); a turn truncated by `max_tokens` leaves the cache
   non-extensible. The suite's cold task answers `READY` so the extension can
   hit.
-- Eval revision 5 (2026-11-16): **18/20 (90%) with thinking off, 20/20 (100%)
-  with thinking on**. Tools 2/2, code 3/3, 65K needle 2/2, no truncation. This is
-  the strongest text result in the repository.
+- Eval revision 6 (2026-11-16): **20/26 (77%) with thinking off, 24/26 (92%)
+  with thinking on**. The five code items, the three long-context items and the
+  single tool call pass; the two sequential tool-chain items fail for every
+  model because the runner is single-turn. No truncation. This ties Splash V3.1
+  on accuracy and is faster.
 - Vision: not applicable. Mirai's M model is text-only.
 
 ## Ollama 0.40.14

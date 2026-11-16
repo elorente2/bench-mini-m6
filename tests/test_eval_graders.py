@@ -91,6 +91,40 @@ def test_tool_grader_needs_the_expected_call() -> None:
     assert grade(task, "Hace 20 grados").passed is False
 
 
+def test_tool_grader_requires_the_second_call_and_arguments() -> None:
+    task = make(
+        grader="tool",
+        tool_expect={
+            "name": "search_notes",
+            "arguments": {"query": "ACME"},
+            "then": "create_task",
+            "then_arguments": {"title": "renovar contrato ACME", "due": "2026-12-15"},
+        },
+    )
+    first_only = [
+        {"function": {"name": "search_notes", "arguments": '{"query": "ACME"}'}},
+    ]
+    assert grade(task, "", tool_calls=first_only).passed is False
+    both = first_only + [
+        {
+            "function": {
+                "name": "create_task",
+                "arguments": '{"title": "Renovar contrato ACME", "due": "2026-12-15"}',
+            }
+        }
+    ]
+    assert grade(task, "", tool_calls=both).passed
+    wrong_due = first_only + [
+        {
+            "function": {
+                "name": "create_task",
+                "arguments": '{"title": "Renovar contrato ACME", "due": "2027-01-01"}',
+            }
+        }
+    ]
+    assert grade(task, "", tool_calls=wrong_due).passed is False
+
+
 def test_bullets_grader_requires_exact_count_and_prefix() -> None:
     task = make(grader="bullets", count=3, prefix="- ", min_words=2)
     assert grade(task, "- uno dos\n- tres cuatro\n- cinco seis").passed

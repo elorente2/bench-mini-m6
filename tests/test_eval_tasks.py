@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parent.parent
 
 def test_eval_config_is_loadable() -> None:
     settings = load_eval_settings(ROOT / "config" / "eval.toml")
-    assert settings.revision == 5
+    assert settings.revision == 6
     assert settings.reasoning_headroom > 0
     assert settings.needle_long_chars > settings.needle_chars
     assert settings.code_timeout_s > 0
@@ -37,7 +37,7 @@ def test_eval_config_rejects_a_short_long_needle(tmp_path: Path) -> None:
 def test_the_pilot_has_the_planned_items() -> None:
     settings = load_eval_settings(ROOT / "config" / "eval.toml")
     tasks = build_tasks(settings)
-    assert len(tasks) == 20
+    assert len(tasks) == 26
     assert len({task.id for task in tasks}) == len(tasks)
     assert {task.category for task in tasks} == set(CATEGORIES)
     assert all(task.prompt.strip() for task in tasks)
@@ -68,11 +68,11 @@ def test_every_grader_has_what_it_needs() -> None:
 def test_needle_items_bury_their_code() -> None:
     settings = load_eval_settings(ROOT / "config" / "eval.toml")
     needles = [task for task in build_tasks(settings) if task.category == "contexto_largo"]
-    assert len(needles) == 2
+    assert len(needles) == 3
     for task in needles:
-        code = task.expect[0]
-        assert code in task.prompt
-        assert task.prompt.index(code) > 1000
+        for code in task.expect:
+            assert code in task.prompt
+            assert task.prompt.index(code) > 1000
         assert task.metadata["context_chars"] > settings.needle_chars
 
 

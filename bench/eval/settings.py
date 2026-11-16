@@ -9,7 +9,7 @@ from ..config import ConfigError
 
 @dataclass(frozen=True)
 class EvalSettings:
-    revision: int = 5
+    revision: int = 6
     max_tokens: int = 640
     code_timeout_s: int = 5
     seed: int = 0
@@ -30,7 +30,7 @@ def load_eval_settings(path: Path | str) -> EvalSettings:
         raise ConfigError(f"{source} has no [eval] table")
 
     values = {
-        "revision": table.get("revision", 5),
+        "revision": table.get("revision", 6),
         "max_tokens": table.get("max_tokens", 640),
         "code_timeout_s": table.get("code_timeout_s", 5),
         "seed": table.get("seed", 0),

@@ -203,6 +203,21 @@ def json_equal(value: Any, expected: Any) -> bool:
     return value == expected
 
 
+def _argument_problems(arguments: dict, wanted: dict) -> list[str]:
+    problems: list[str] = []
+    for key, expected in wanted.items():
+        if key not in arguments:
+            problems.append(f"missing argument {key!r}")
+            continue
+        got = arguments[key]
+        if isinstance(expected, str) and isinstance(got, str):
+            if normalize(expected) not in normalize(got):
+                problems.append(f"{key}={got!r} does not contain {expected!r}")
+        elif got != expected:
+            problems.append(f"{key}={got!r}, expected {expected!r}")
+    return problems
+
+
 def _grade_tool(task, answer: str, calls=()) -> Grade:
     expected = getattr(task, "tool_expect", None)
     if not expected:
@@ -223,19 +238,45 @@ def _grade_tool(task, answer: str, calls=()) -> Grade:
         )
     if name != expected["name"]:
         return Grade(False, f"first call was {name!r}, expected {expected['name']!r}", name)
-    problems: list[str] = []
-    for key, wanted in (expected.get("arguments") or {}).items():
-        if key not in arguments:
-            problems.append(f"missing argument {key!r}")
-            continue
-        got = arguments[key]
-        if isinstance(wanted, str) and isinstance(got, str):
-            if normalize(wanted) not in normalize(got):
-                problems.append(f"{key}={got!r} does not contain {wanted!r}")
-        elif got != wanted:
-            problems.append(f"{key}={got!r}, expected {wanted!r}")
+    problems = _argument_problems(arguments, expected.get("arguments") or {})
     if problems:
         return Grade(False, "; ".join(problems), json.dumps(arguments)[:160])
+
+    then_name = expected.get("then")
+    if then_name:
+        if len(calls) < 2:
+            return Grade(False, f"missing second call {then_name!r}", json.dumps(arguments)[:160])
+        second = calls[1]
+        second_function = second.get("function") or {}
+        second_call_name = second_function.get("name") or second.get("name") or ""
+        second_raw = second_function.get("arguments") or second.get("arguments") or "{}"
+        if second_call_name != then_name:
+            return Grade(
+                False,
+                f"second call was {second_call_name!r}, expected {then_name!r}",
+                second_call_name,
+            )
+        try:
+            second_arguments = json.loads(second_raw) if isinstance(second_raw, str) else second_raw
+        except json.JSONDecodeError:
+            return Grade(
+                False,
+                f"second tool arguments are not JSON: {second_raw[:80]!r}",
+                second_raw[:160],
+            )
+        second_problems = _argument_problems(second_arguments, expected.get("then_arguments") or {})
+        if second_problems:
+            return Grade(
+                False,
+                "; ".join(second_problems),
+                json.dumps(second_arguments)[:160],
+            )
+        return Grade(
+            True,
+            f"{name} then {then_name} with the expected arguments",
+            json.dumps(second_arguments)[:160],
+        )
+
     return Grade(True, f"{name} with the expected arguments", json.dumps(arguments)[:160])
 
 

@@ -76,15 +76,17 @@ Q3_K_XL was re-measured with the same speed suite and eval revision 5:
 | Cold TTFT @ 18K | 40.4 s | **34.1 s** |
 | Cached TTFT | 443 ms | **250 ms** |
 | Peak wired memory | 21.69 GB | **19.63 GB** |
-| Accuracy, thinking off | 18/20 (90%) | 18/20 (90%) |
-| Accuracy, thinking on | 20/20 (100%) | 20/20 (100%) |
+| Accuracy, thinking off | 20/26 (77%) | 20/26 (77%) |
+| Accuracy, thinking on | 24/26 (92%) | 24/26 (92%) |
 | Vision | **8/8** | text-only |
 | Context | **217,081** | not reported |
 
-The accuracy gap is closed: **Mirai and Splash V3.1 tie** on the eval suite.
+The accuracy gap is closed: **Mirai and Splash V3.1 tie** on the hardened eval
+revision 6. The two sequential tool-chain items fail for both because the
+runner is single-turn; that is a shared ceiling, not a model difference.
 Choose **Mirai** for daily text/code (faster, 2 GB lighter) and **Splash V3.1**
 for vision/PDF, 217K context, or a single all-rounder. See
-[`reports/2026-11-16-eval-splash-v31-vs-mirai.md`](reports/2026-11-16-eval-splash-v31-vs-mirai.md)
+[`reports/2026-11-16-eval-r6-mirai-vs-splash.md`](reports/2026-11-16-eval-r6-mirai-vs-splash.md)
 and [`reports/2026-11-16-splash-v31-vs-mirai.md`](reports/2026-11-16-splash-v31-vs-mirai.md).
 
 **Qwen4:** there are no open weights to run locally. `qwen4-max-preview` is a

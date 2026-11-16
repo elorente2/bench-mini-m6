@@ -102,7 +102,7 @@ def test_run_eval_writes_a_schema_one_eval_document(tmp_path: Path) -> None:
     assert document["summary"]["errors"] == 0
     assert document["items"][0]["id"] == "math-fecha"
     assert document["items"][0]["finish_reason"] == "stop"
-    assert document["eval"]["revision"] == 5
+    assert document["eval"]["revision"] == 6
 
 
 def test_summary_flags_leaked_reasoning_when_thinking_is_off() -> None:

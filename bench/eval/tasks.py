@@ -137,6 +137,36 @@ def build_needle_context(chars: int, needle: str, *, depth: float = 0.5) -> str:
     return "\n".join(lines)
 
 
+def build_multi_needle_context(
+    chars: int,
+    needles: tuple[str, ...],
+    *,
+    depths: tuple[float, ...] | None = None,
+) -> str:
+    """Build deterministic filler with several needles at fixed depths."""
+
+    lines: list[str] = []
+    size = 0
+    index = 0
+    while size < chars:
+        template = _NEEDLE_SENTENCES[index % len(_NEEDLE_SENTENCES)]
+        line = template.format(n=1000 + index, s=1 + (index % 7), d=1 + (index % 28))
+        lines.append(line)
+        size += len(line) + 1
+        index += 1
+    if depths is None:
+        depths = tuple(
+            0.2 + 0.55 * position / max(1, len(needles) - 1) for position in range(len(needles))
+        )
+    positions = sorted(
+        (max(1, min(len(lines) - 1, int(len(lines) * depth))), needle)
+        for depth, needle in zip(depths, needles, strict=True)
+    )
+    for position, needle in reversed(positions):
+        lines.insert(position, needle)
+    return "\n".join(lines)
+
+
 def _needle_task(
     task_id: str,
     settings,
@@ -162,6 +192,36 @@ def _needle_task(
         expect=(code,),
         max_tokens=32,
         metadata={"context_chars": len(prompt), "needle_depth": depth},
+    )
+
+
+def _multi_needle_task(task_id: str, settings) -> Task:
+    first = "ONICE-3141"
+    second = "MAGMA-2718"
+    context = build_multi_needle_context(
+        settings.needle_chars,
+        (
+            f"El código de reserva es {first}.",
+            f"El código de reserva es {second}.",
+        ),
+        depths=(0.28, 0.73),
+    )
+    prompt = (
+        "Lee el siguiente documento y responde a la pregunta.\n\n"
+        f"{context}\n\n"
+        "Pregunta: aparecen dos códigos de reserva. Responde solo con los dos "
+        "códigos separados por una coma y un espacio, en el orden en que aparecen "
+        "en el documento. No expliques nada."
+    )
+    return Task(
+        id=task_id,
+        category="contexto_largo",
+        prompt=prompt,
+        grader="regex",
+        pattern=rf"^\s*{first}\s*,\s*{second}\s*$",
+        expect=(first, second),
+        max_tokens=48,
+        metadata={"context_chars": len(prompt), "needle_depths": (0.28, 0.73)},
     )
 
 
@@ -285,6 +345,76 @@ def build_tasks(settings) -> tuple[Task, ...]:
             max_tokens=400,
         ),
         Task(
+            id="json-presupuesto",
+            category="json",
+            prompt=(
+                "Devuelve solo un objeto JSON, sin texto alrededor, con esta forma "
+                "exacta: cliente (texto), lineas (lista de al menos 2 objetos con sku, "
+                "qty, precio_unitario y subtotal), descuento_porcentaje (número), "
+                "base_con_descuento (número), iva (número) y total (número).\n"
+                "Datos: cliente 'Nortec'; 2 monitores MON-27 a 180 € cada uno; 1 dock "
+                "DOCK-9 a 95 €; descuento del 20 % sobre el subtotal; IVA del 21 % "
+                "sobre la base con descuento. Importes numéricos."
+            ),
+            grader="json",
+            schema={
+                "type": "object",
+                "required": [
+                    "cliente",
+                    "lineas",
+                    "descuento_porcentaje",
+                    "base_con_descuento",
+                    "iva",
+                    "total",
+                ],
+                "properties": {
+                    "cliente": {"type": "string"},
+                    "lineas": {
+                        "type": "array",
+                        "minItems": 2,
+                        "items": {
+                            "type": "object",
+                            "required": ["sku", "qty", "precio_unitario", "subtotal"],
+                            "properties": {
+                                "sku": {"type": "string"},
+                                "qty": {"type": "integer"},
+                                "precio_unitario": {"type": "number"},
+                                "subtotal": {"type": "number"},
+                            },
+                            "additionalProperties": False,
+                        },
+                    },
+                    "descuento_porcentaje": {"type": "number"},
+                    "base_con_descuento": {"type": "number"},
+                    "iva": {"type": "number"},
+                    "total": {"type": "number"},
+                },
+                "additionalProperties": False,
+            },
+            expect_json={
+                "cliente": "Nortec",
+                "lineas": [
+                    {
+                        "sku": "MON-27",
+                        "qty": 2,
+                        "precio_unitario": 180.0,
+                        "subtotal": 360.0,
+                    },
+                    {
+                        "sku": "DOCK-9",
+                        "qty": 1,
+                        "precio_unitario": 95.0,
+                        "subtotal": 95.0,
+                    },
+                ],
+                "descuento_porcentaje": 20,
+                "base_con_descuento": 364.0,
+                "iva": 76.44,
+                "total": 440.44,
+            },
+            max_tokens=500,
+        ),
+        Task(
             id="tool-tiempo",
             category="herramientas",
             prompt=(
@@ -315,6 +445,24 @@ def build_tasks(settings) -> tuple[Task, ...]:
                 "then": "create_task",
             },
             max_tokens=220,
+        ),
+        Task(
+            id="tool-agenda",
+            category="herramientas",
+            prompt=(
+                "Busca en las notas la palabra 'ACME'. Si aparece, crea la tarea "
+                "'renovar contrato ACME' con fecha límite 2026-12-15. Usa "
+                "search_notes primero y create_task después. No respondas con texto."
+            ),
+            grader="tool",
+            tools=NOTES_TOOLS,
+            tool_expect={
+                "name": "search_notes",
+                "arguments": {"query": "ACME"},
+                "then": "create_task",
+                "then_arguments": {"title": "renovar contrato ACME", "due": "2026-12-15"},
+            },
+            max_tokens=240,
         ),
         Task(
             id="arch-tradeoff",
@@ -396,6 +544,20 @@ def build_tasks(settings) -> tuple[Task, ...]:
             ),
             grader="regex",
             pattern=r"^\s*2026-12-12\s*$",
+            max_tokens=40,
+        ),
+        Task(
+            id="math-descuento",
+            category="calculo",
+            prompt=(
+                "Un pedido lleva 3 unidades a 49,90 € cada una. Aplica un descuento "
+                "del 15 % sobre el subtotal y después un IVA del 21 % sobre el importe "
+                "con descuento. Suma 4,95 € de gastos de envío. Redondea solo el "
+                "resultado final a dos decimales. Responde solo con el importe y el "
+                "símbolo €."
+            ),
+            grader="regex",
+            pattern=r"^\s*158[.,]92\s*€\s*$",
             max_tokens=40,
         ),
         Task(
@@ -484,6 +646,69 @@ def build_tasks(settings) -> tuple[Task, ...]:
             ),
             max_tokens=700,
         ),
+        Task(
+            id="code-py-ranges",
+            category="codigo",
+            prompt=(
+                "Implementa `merge_ranges(ranges)` en Python. Cada rango es una tupla "
+                "(inicio, fin) inclusive. Fusiona los rangos que se solapen o sean "
+                "adyacentes (por ejemplo (1, 2) y (3, 4) -> (1, 4)), ordena el "
+                "resultado y devuelve una lista de tuplas. No modifiques la entrada. "
+                "Devuelve solo el código, sin explicación."
+            ),
+            grader="code",
+            tests=(
+                "assert solution.merge_ranges([(1, 3), (2, 6), (8, 10), (15, 18)]) == [(1, 6), (8, 10), (15, 18)]\n"
+                "assert solution.merge_ranges([(5, 7), (1, 2), (3, 4)]) == [(1, 7)]\n"
+                "assert solution.merge_ranges([]) == []\n"
+                "assert solution.merge_ranges([(4, 5), (1, 2)]) == [(1, 2), (4, 5)]\n"
+                "assert solution.merge_ranges([(1, 10), (2, 3), (4, 5)]) == [(1, 10)]\n"
+                "assert solution.merge_ranges([(-5, -1), (-2, 0), (2, 2)]) == [(-5, 0), (2, 2)]\n"
+                "ranges = [(1, 2), (3, 4)]\n"
+                "solution.merge_ranges(ranges)\n"
+                "assert ranges == [(1, 2), (3, 4)]\n"
+            ),
+            max_tokens=900,
+        ),
+        Task(
+            id="code-py-lru",
+            category="codigo",
+            prompt=(
+                "Implementa `LRUCache` en Python con `__init__(capacity)`, `get(key)` "
+                "y `put(key, value)` en O(1). `get` devuelve el valor o -1. `put` "
+                "actualiza si la clave existe, inserta si no, y expulsa la clave menos "
+                "usada recientemente cuando se supera `capacity`. Con capacity 0 no se "
+                "almacena nada. Devuelve solo el código, sin explicación."
+            ),
+            grader="code",
+            tests=(
+                "c = solution.LRUCache(2)\n"
+                "c.put(1, 1)\n"
+                "c.put(2, 2)\n"
+                "assert c.get(1) == 1\n"
+                "c.put(3, 3)\n"
+                "assert c.get(2) == -1\n"
+                "assert c.get(3) == 3\n"
+                "assert c.get(1) == 1\n"
+                "c = solution.LRUCache(2)\n"
+                "c.put(1, 1)\n"
+                "c.put(1, 10)\n"
+                "assert c.get(1) == 10\n"
+                "c.put(2, 2)\n"
+                "c.put(3, 3)\n"
+                "assert c.get(1) == -1\n"
+                "assert c.get(2) == 2\n"
+                "c = solution.LRUCache(0)\n"
+                "c.put(1, 1)\n"
+                "assert c.get(1) == -1\n"
+                "c = solution.LRUCache(1)\n"
+                "c.put(1, 1)\n"
+                "c.put(2, 2)\n"
+                "assert c.get(1) == -1\n"
+                "assert c.get(2) == 2\n"
+            ),
+            max_tokens=1200,
+        ),
         _needle_task(
             "needle-24k",
             settings,
@@ -498,6 +723,7 @@ def build_tasks(settings) -> tuple[Task, ...]:
             code="CUARZO-7390",
             depth=0.62,
         ),
+        _multi_needle_task("needle-dos", settings),
         Task(
             id="abstain-telefono",
             category="abstencion",
