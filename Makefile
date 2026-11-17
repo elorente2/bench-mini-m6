@@ -47,7 +47,7 @@ run-mirai:
 	$(PYTHON) -m bench.cli run mirai
 
 run-ollama:
-	$(PYTHON) -m bench.cli run-all --engines ollama-q3kxl,ollama-default --report
+	$(PYTHON) -m bench.cli run-all --engines ollama --report
 
 run-all:
 	$(PYTHON) -m bench.cli run-all --report

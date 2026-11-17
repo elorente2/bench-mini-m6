@@ -9,12 +9,7 @@ November 2026 result set.
 |---|---|---:|---|
 | `splash` | Splash 1.5.0 | 8000 | `splash serve --model unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL --port 8000` |
 | `mirai` | Mirai/uzu 0.6.17 | 8000 | `mirai server --model qwen3.8:27b --port 8000` |
-| `ollama-q3kxl` | Ollama 0.40.14 | 11434 | `ollama serve` + imported GGUF |
-| `ollama-default` | Ollama 0.40.14 | 11434 | `ollama serve` + native tag |
-| `omlx` | oMLX 0.7.3 | 8000 | `omlx serve --port 8000 --headless` |
-
-`omlx` is configured but has **no committed result yet**. Do not quote numbers
-for it until a file exists in `results/`.
+| `ollama` | Ollama 0.40.14 | 11434 | `ollama serve` + `qwen3.5-9b-q4` |
 
 ## Splash 1.5.0
 
@@ -99,15 +94,11 @@ ollama list
 ollama ps
 ```
 
-The two labels are different in practice:
-
-| Label | Tag | Weights | Runner | Context |
-|---|---|---|---|---|
-| `ollama-q3kxl` | `qwen3.8-27b-q3kxl` | Q3_K_XL GGUF; Ollama reports Q3_K_L | llama.cpp (`llama-server`) | 32768 |
-| `ollama-default` | `qwen3.8:27b` | nvfp4, 27.8B | MLX (`ollama runner`) | 32768 |
-
-The native tag advertises vision, tools and thinking. Thinking defaults to
-`medium`; see the reasoning note below.
+The engine label is `ollama` and it points at `qwen3.5-9b-q4`, the 9B that fits
+next to Teams and a cloud desktop. Pass `--model` to measure another tag, and
+keep `num_ctx` in mind: the tag decides the window, and 32K is what the 9B uses
+here, so the 65K needle cannot run. Ollama honours `reasoning_effort` for
+thinking models.
 
 The OpenAI-compatible endpoint is `http://127.0.0.1:11434/v1`.
 
@@ -167,7 +158,7 @@ The harness can stop an Ollama process it started itself, but it refuses to
 force-kill a service it does not own unless you pass `--force`:
 
 ```bash
-./scripts/engine.sh stop ollama-default --force
+./scripts/engine.sh stop ollama --force
 ```
 
 Before a Splash or Mirai pass, confirm no Ollama model is resident:
@@ -178,143 +169,30 @@ ollama ps
 ollama stop <model>
 ```
 
-## oMLX 0.7.3
+## Removed contenders
 
-oMLX is an MLX inference server with continuous batching and a two-tier KV
-cache (RAM plus SSD). It is the only contender that runs MLX safetensors
-natively instead of GGUF, so it enters the comparison as a **speed and memory**
-contender with its own weights, exactly like Mirai does.
+Rule 9 of `AGENTS.md` deletes models that lose; the report has to say why, so
+this is the record. Disk went from 112 GiB to 163 GiB free on 2026-11-17.
 
-Install the CLI so the server is owned by the harness. The macOS app manages
-its own server, which the harness cannot stop deterministically.
+| Removed | Size | Why |
+|---|---:|---|
+| `omlx` + `Qwen3.8-27B-4bit` | 15 GB | 9.2 tok/s short decode, six times slower than Splash or Mirai, and no accuracy gain at revision 5. Its only edge was a 262,144-token window, which Mirai matches (256K in its model config). |
+| `ollama-q3kxl` + `qwen3.8-27b-q3kxl` | 13 GB | 11.0 tok/s and a 32K window; the same quant on Splash is five times faster. |
+| `ollama-default` + `qwen3.8:27b` | 18 GB | 30.6 tok/s and 32K; Splash and Mirai are faster with a bigger window. |
+| `qwen2.5-coder:7b` | 4.7 GB | 7/18 on revision 5 (39 %). The 9B scores 14/18 with 0.6 GB more wired memory. |
+| Splash-side 9B GGUF | 6.4 GB | Splash 1.5.0 cannot load the Qwen3.5 architecture; Ollama keeps its own copy of the blobs, so the source file was a duplicate. |
 
-```bash
-brew tap jundot/omlx https://github.com/jundot/omlx
-brew install jundot/omlx/omlx --with-custom-kernel   # needs full Xcode
-omlx --version
-omlx serve --port 8000 --headless
-```
-
-Models are discovered from subdirectories of `--model-dir` (default
-`~/.omlx/models`). The served id is the directory name, so the configured id
-`Qwen3.8-27B-4bit` must match a directory with that exact name:
-
-```bash
-hf download mlx-community/Qwen3.8-27B-4bit \
-  --local-dir ~/.omlx/models/Qwen3.8-27B-4bit
-```
-
-```
-~/.omlx/models/Qwen3.8-27B-4bit/{config.json,*.safetensors,tokenizer*}
-```
-
-That checkpoint is a 4-bit affine (group 64) build, 16.1 GB in three shards,
-with no MTP draft — Splash and Mirai both run a draft or speculator, so decode
-for oMLX starts from a different baseline. Its `model_type` is `qwen3_5`, which
-means the `qwen35_*` kernel patches are the ones that apply to it.
-
-- Context: oMLX reports the model's real context window through `/v1/models`,
-  so the result records `context_source: "api"` rather than a config value.
-- Weights: 16.1 GB of safetensors, confirmed with `du -sh` on the downloaded
-  directory before the result is committed. Do not compare this run against
-  Q3_K_XL as a quality result (fairness rule 15).
-- Reasoning: **use `chat_template_kwargs`.** oMLX forwards `reasoning_effort`
-  into the model chat template and its compatibility layer can downgrade
-  `none` to a lower level that still emits `reasoning_content`. The configured
-  engine therefore sends `chat_template_kwargs = { enable_thinking = false }`,
-  and the client never strips that field on rejection: if oMLX refuses it the
-  pass fails instead of silently benchmarking a thinking model.
-- Gate: every run in the result must report `reasoning_chunks: 0`. A run with
-  reasoning tokens is invalid under fairness rule 6, not a slow outlier.
-- Startup flags that change the measurement (`--memory-guard`,
-  `--memory-guard-gb`, `--hot-cache-max-size`, `--paged-ssd-cache-dir`,
-  `--max-concurrent-requests`) must be recorded in the result notes if used.
-  The defaults are the comparison.
-- Cache case: the SSD tier is off unless `--paged-ssd-cache-dir` is set. Leave
-  it off for the first pass; a pass with the SSD tier on is a different
-  contender and needs its own label and result file.
-
-### Native kernels: use the official wheel
-
-This machine has no full Xcode (`xcrun --find metal` fails), so
-`brew install jundot/omlx/omlx --with-custom-kernel` cannot build the native
-kernels here. That is not a footnote: the 4-bit checkpoint above reports
-`model_type: qwen3_5`, and the patches that touch native kernels for that
-architecture are `qwen35_fa256_attention`, `qwen35_gdn_chunked`,
-`qwen35_q4_mlp`, `qwen35_oq_a8` and `qwen35_verify_qmm`. Each one checks
-`has_symbol(...)` and silently falls back to stock MLX when the build is
-missing, which upstream describes as "much slower and more memory" — exactly
-the prefill and long-context decode cases this repository measures.
-
-The release publishes wheels with the kernels **already compiled**:
-
-```bash
-python3.11 -m venv ~/.venvs/omlx
-~/.venvs/omlx/bin/pip install \
-  https://github.com/jundot/omlx/releases/download/v0.7.3/omlx-0.7.3-cp311-cp311-macosx_15_0_universal2.whl
-~/.venvs/omlx/bin/python -c "from omlx.custom_kernels import native_kernel_status; print(native_kernel_status())"
-```
-
-All four packages must report `available: true` (`attention`, `lowbit`,
-`quant_matmul`, `sparse_index`). If any is false, the pass is the generic MLX
-path: record that in the result notes and do not compare it to Splash as if the
-kernels were present.
-
-The Homebrew formula installs **without** kernels and is only useful as an `hf`
-CLI. Point `~/.local/bin/omlx` at the venv that has the wheel, so `PATH`
-resolves to the kernel build:
-
-```bash
-ln -sf ~/.venvs/omlx/bin/omlx ~/.local/bin/omlx
-omlx --version
-```
-
-**Do not `brew uninstall omlx` while the venv is your only oMLX.** Homebrew
-installed `python@3.11` as a dependency of the formula, so removing the formula
-removes the interpreter the venv points at (`~/.venvs/omlx/bin/python3.11` is a
-symlink into `/opt/homebrew/opt/python@3.11`) and every venv binary dies with
-`bad interpreter`. The venv stays broken until `brew install python@3.11`
-restores the same interpreter; the packages in `site-packages` are untouched.
-If the Homebrew copy has to go, reinstall the interpreter in the same command
-and check `omlx --version` afterwards.
-
-**Disable the memory guard for a single-model benchmark.** `omlx serve` starts
-a process enforcer whose `balanced` tier ceilings the process at roughly 14.6 GB
-on a 32 GB machine, below the 16.1 GB of the 4-bit weights, so it evicts the
-model in the middle of a run. `config/engines.toml` starts oMLX with
-`--memory-guard off`; the harness already enforces one model-loaded engine at a
-time.
-
-**Clear the persisted prefix cache before a speed pass.** oMLX keeps its paged
-prefix cache on disk (`~/.omlx/cache`, 100 GB by default) and it **survives a
-restart**. If it already holds the suite's long prompt, the "cold prefill" case
-returns in 1.3 s and reports 13,847 tok/s. Run `rm -rf ~/.omlx/cache` before
-starting the engine for a pass. The report now refuses to use the prefill
-numbers when the cached turn was not clearly faster, because the pair proves the
-cold start together.
-
-**oMLX has no speculative decoding.** Decode is bandwidth bound at ~9 tok/s for
-the 27B 4-bit: every token reads the weights again. Splash and Mirai generate
-6–8 tokens per pass with a draft model, which is the whole 6× gap. Raising the
-in-RAM hot cache (`--hot-cache-max-size 4GB`) changed nothing measurable, so the
-engine runs stock apart from the memory guard.
-
-### Do not benchmark a GGUF through oMLX
-
-oMLX lists `.gguf` files but runs them on Splash's engine as an external
-process ([docs/Splash.md](https://github.com/jundot/omlx/blob/main/docs/Splash.md)).
-A pass that reports a `.gguf` model id measured Splash with a different HTTP
-layer, not oMLX. Keep the GGUF out of `--model-dir`, or label the result as a
-Splash run.
+The result files stay: they are history, and the reports still show their columns.
+What disappears is the ability to re-run them on this machine without downloading
+again.
 
 ## One engine at a time
 
 | Measuring | Must be stopped |
 |---|---|
-| `splash` | Mirai, oMLX, any loaded Ollama model |
-| `mirai` | Splash, oMLX, any loaded Ollama model |
-| `omlx` | Splash, Mirai, any loaded Ollama model |
-| `ollama-*` | Splash, Mirai, oMLX |
+| `splash` | Mirai, any loaded Ollama model |
+| `mirai` | Splash, any loaded Ollama model |
+| `ollama` | Splash, Mirai |
 
 The harness checks process patterns, the port listener and (for Splash/Mirai)
 `ollama ps`. See `docs/fairness-rules.md`.

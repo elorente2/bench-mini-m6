@@ -110,28 +110,22 @@ manually and the harness has no PID file, stop it yourself or use:
 
 ## 6. Ollama passes
 
-Keep Ollama running and measure both labels:
+Keep Ollama running and measure the 9B:
 
 ```bash
-./scripts/engine.sh start ollama-q3kxl
-./scripts/run-pass.sh ollama-q3kxl
-./scripts/run-pass.sh ollama-default
+./scripts/engine.sh start ollama
+./scripts/run-pass.sh ollama
 ```
 
-The first `start` launches `ollama serve`; the second label reuses it. Stop
-Splash and Mirai first. Unload the previous Ollama model between labels so only
-one 27B model is resident at a time:
+`start` launches `ollama serve` if it is not already up. Stop Splash and Mirai
+first, and unload any other Ollama model so only one is resident at a time:
 
 ```bash
-./scripts/engine.sh start ollama-q3kxl
-./scripts/run-pass.sh ollama-q3kxl
-ollama stop qwen3.8-27b-q3kxl
-./scripts/run-pass.sh ollama-default
+ollama stop gemma4:26b-mlx
 ```
 
-Both Ollama labels use a 32K context and `reasoning_effort: none`. The native
-tag's OpenAI endpoint ignores `think: false`; `reasoning_effort: none` is what
-actually disables thinking.
+The Ollama engine uses a 32K context. Its OpenAI endpoint ignores
+`think: false`; `reasoning_effort: none` is what actually disables thinking.
 
 If a native tag is missing, the pass fails with a clear "model not found"
 message. Pull the tag or change `config/engines.toml`; do not silently compare a
@@ -157,7 +151,7 @@ make run-all
 ```
 
 `run-all` stops non-persistent engines for a clean load, measures them in order
-(`splash`, `mirai`, `ollama-q3kxl`, `ollama-default`), leaves Ollama running and
+(`splash`, `mirai`, `ollama`), leaves Ollama running and
 writes `reports/latest.md`. Use `--continue-on-error` to measure what is
 installed when one model is missing.
 

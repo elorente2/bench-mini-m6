@@ -111,8 +111,7 @@ detailed analysis in [`docs/results/2026-11-m6.md`](docs/results/2026-11-m6.md).
 |---|---|---|---:|---|
 | `splash` | Splash 1.5.0 | `unsloth/Qwen3.8-27B-GGUF:UD-Q3_K_XL` (13.1 GB) + DFlash2 draft (3.8 GB) | 8000 | `reasoning_effort: none` |
 | `mirai` | Mirai/uzu 0.6.17 | `alibaba:qwen3.8:27b:mirai:mirai-m:4` (14.5 GB) + speculator (1.1 GB) | 8000 | `reasoning_effort: disabled` |
-| `ollama-q3kxl` | Ollama 0.40.14 | same Q3_K_XL GGUF imported with a 32K context | 11434 | `reasoning_effort: none` |
-| `ollama-default` | Ollama 0.40.14 | native `qwen3.8:27b` tag (nvfp4), 32K context | 11434 | `reasoning_effort: none` |
+| `ollama` | Ollama 0.40.14 | `qwen3.5-9b-q4` (6.0 GB), 32K context | 11434 | `reasoning_effort: none` |
 
 ## Quick start
 

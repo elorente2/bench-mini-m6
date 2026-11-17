@@ -26,35 +26,6 @@ quantization = "4-bit"
 weights_gb = 14.5
 draft = "Mirai speculator (~1.1 GB)"
 
-[models.qwen3.8-27b.variants.ollama-q3kxl]
-engine = "ollama-q3kxl"
-id = "qwen3.8-27b-q3kxl"
-format = "GGUF imported into Ollama"
-quantization = "Q3_K_XL (~3-bit; Ollama reports Q3_K_L)"
-weights_gb = 13.1
-context_tokens = 32768
-
-[models.qwen3.8-27b.variants.ollama-default]
-engine = "ollama-default"
-id = "qwen3.8:27b"
-format = "Ollama native"
-quantization = "nvfp4"
-weights_gb = 18.0
-context_tokens = 32768
-
-# Configured but not measured yet: do not quote these numbers in a result until
-# a file exists in results/. The model id is the directory name oMLX serves.
-[models.qwen3.8-27b.variants.omlx]
-engine = "omlx"
-id = "Qwen3.8-27B-4bit"
-source = "mlx-community/Qwen3.8-27B-4bit"
-format = "MLX safetensors"
-quantization = "4-bit affine (group 64)"
-weights_gb = 16.1
-notes = "No MTP draft or speculator, unlike Splash and Mirai. Loads through mlx-vlm's qwen3_5 architecture."
-
-# Second size class: the point is to find a model that can stay loaded while
-# Teams and a cloud desktop are open, not to match the 27B on hard items.
 [models.qwen3.5-9b]
 name = "Qwen3.5-9B"
 family = "qwen3.5"
@@ -62,7 +33,7 @@ parameters = "9B"
 notes = "Text and vision. The mmproj projector enables images and PDFs on Splash."
 
 [models.qwen3.5-9b.variants.ollama]
-engine = "ollama-default"
+engine = "ollama"
 id = "qwen3.5-9b-q4"
 source = "unsloth/Qwen3.5-9B-GGUF (imported locally)"
 format = "GGUF (Ollama)"
@@ -75,16 +46,3 @@ notes = "Not loadable on Splash 1.5.0: it only supports Qwen3.8-27B, Qwen3.6-35B
 # The light contender that already fits next to a video call and a cloud
 # desktop. Different family on purpose: it is the "what does a small model
 # actually get wrong" baseline, not a quantization of the 27B.
-[models.qwen2.5-coder-7b]
-name = "Qwen2.5-Coder-7B"
-family = "qwen2.5"
-parameters = "7.6B"
-notes = "Ollama tag already on disk. 32K context, so the 65K needle cannot run."
-
-[models.qwen2.5-coder-7b.variants.ollama]
-engine = "ollama-default"
-id = "qwen2.5-coder:7b"
-format = "GGUF (Ollama)"
-quantization = "Q4_K_M"
-weights_gb = 4.7
-context_tokens = 32768

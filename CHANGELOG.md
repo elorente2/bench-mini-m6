@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Deleted the models this machine no longer needs, 51 GB in total, and left
+  the record in `docs/engines.md`: oMLX 4-bit (15 GB, 9.2 tok/s and its 262K
+  window is matched by Mirai), the two Ollama 27B tags (31 GB, 11-30 tok/s
+  with 32K), the 7B coder (4.7 GB, 39 % at revision 5) and the duplicate
+  9B GGUF that Splash cannot load (6.4 GB). The `omlx` and `ollama-q3kxl`
+  engine labels are gone with them; `ollama` now points at `qwen3.5-9b-q4`.
+  Result files stay as history.
+
 - Published the repository. Results no longer record the machine hostname
   (`bench/metrics.py`), and the 39 files that had it store `redacted` instead;
   nothing else in those files changed. Reports, docs, comments and commit

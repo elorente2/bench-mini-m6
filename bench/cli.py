@@ -275,7 +275,7 @@ def build_parser() -> argparse.ArgumentParser:
     run_all = sub.add_parser("run-all", help="start, measure and stop each engine")
     run_all.add_argument(
         "--engines",
-        default="splash,mirai,ollama-q3kxl,ollama-default",
+        default="splash,mirai,ollama",
         help="comma-separated labels, in order",
     )
     run_all.add_argument("--start-timeout", type=int, default=600)

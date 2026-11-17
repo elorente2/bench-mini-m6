@@ -15,7 +15,7 @@ quantization = "Q3_K_XL (~3-bit)"
 context_tokens = 217081
 reasoning_effort = "none"
 proc_pattern = 'splash serve-native|server\.server'
-conflicts = ['(^|/)mirai (--model|server)', 'omlx serve']
+conflicts = ['(^|/)mirai (--model|server)']
 start = [
   "splash",
   "serve",
@@ -45,69 +45,19 @@ version_cmd = ["mirai", "--version"]
 persistent = false
 notes = "Text only. Ships its own speculator. Model config max_sequence_length is 262,144 (256K, hybrid DeltaNet+attention); the API does not report it. OpenCode client context is set to 131,072 (128K)."
 
-[engines.ollama-q3kxl]
-name = "Ollama (imported Q3_K_XL)"
+[engines.ollama]
+name = "Ollama"
 base_url = "http://127.0.0.1:11434/v1"
 port = 11434
-model = "qwen3.8-27b-q3kxl"
-api_model = "qwen3.8-27b-q3kxl"
-quantization = "Q3_K_XL (~3-bit; Ollama reports Q3_K_L)"
+model = "qwen3.5-9b-q4"
+api_model = "qwen3.5-9b-q4"
+quantization = "UD-Q4_K_XL (~4-bit)"
 context_tokens = 32768
 reasoning_effort = "none"
 proc_pattern = '(^|/)ollama serve|ollama runner|llama-server|ollama_llama_server'
-conflicts = ['splash serve-native|server\.server', '(^|/)mirai (--model|server)', 'omlx serve']
-start = ["ollama", "serve"]
-version_cmd = ["ollama", "--version"]
-persistent = true
-notes = "Same GGUF quant as Splash, imported with scripts/import-ollama.sh; thinking disabled with reasoning_effort: none."
-
-[engines.ollama-default]
-name = "Ollama (native tag)"
-base_url = "http://127.0.0.1:11434/v1"
-port = 11434
-model = "qwen3.8:27b"
-api_model = "qwen3.8:27b"
-quantization = "Ollama native (nvfp4)"
-context_tokens = 32768
-reasoning_effort = "none"
-proc_pattern = '(^|/)ollama serve|ollama runner|llama-server|ollama_llama_server'
-conflicts = ['splash serve-native|server\.server', '(^|/)mirai (--model|server)', 'omlx serve']
-start = ["ollama", "serve"]
-version_cmd = ["ollama", "--version"]
-persistent = true
-notes = "Out-of-the-box native tag; 32K context and thinking disabled with reasoning_effort: none."
-
-[engines.omlx]
-name = "oMLX"
-base_url = "http://127.0.0.1:8000/v1"
-port = 8000
-model = "Qwen3.8-27B-4bit"
-api_model = "Qwen3.8-27B-4bit"
-quantization = "4-bit MLX"
-reasoning_effort = "none"
-proc_pattern = 'omlx-server'
 conflicts = ['splash serve-native|server\.server', '(^|/)mirai (--model|server)']
-# oMLX forwards reasoning_effort into the model chat template and may downgrade
-# "none" to a lower level that still thinks, so thinking is disabled explicitly.
-chat_template_kwargs = { enable_thinking = false }
-# --memory-guard off: the balanced guard ceilings the process at ~14.6 GB,
-# below the 16.1 GB of weights, so it would evict the model mid-run. One model
-# at a time is already enforced by the harness.
-#
-# Everything else is stock. In particular the in-RAM hot cache stays off
-# (--hot-cache-max-size default 0): a 4 GB hot cache made no measurable
-# difference, and oMLX has no speculative decoding, so decode is bandwidth
-# bound at ~9.5 tok/s. Clear ~/.omlx/cache before a pass: the persisted prefix
-# cache survives a restart and turns the cold prefill case into a fake hit.
-start = [
-  "omlx",
-  "serve",
-  "--port",
-  "8000",
-  "--headless",
-  "--memory-guard",
-  "off",
-]
-version_cmd = ["omlx", "--version"]
-persistent = false
-notes = "MLX server on MLX weights, not the Q3_K_XL GGUF. A .gguf in the model dir runs on Splash's engine through oMLX and is not an oMLX measurement."
+start = ["ollama", "serve"]
+version_cmd = ["ollama", "--version"]
+persistent = true
+notes = "The 9B that fits next to Teams and a cloud desktop. 32K context, thinking off by default; pass --model to measure another tag. Ollama honours reasoning_effort for thinking models."
+

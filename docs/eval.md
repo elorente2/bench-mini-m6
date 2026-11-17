@@ -144,18 +144,18 @@ a handoff check can reject the run.
 .venv/bin/python -m bench.cli eval splash --label qwen3.8-q3kxl-splash
 
 # Thinking off vs on for the same weights, as two separate runs.
-.venv/bin/python -m bench.cli eval omlx \
+.venv/bin/python -m bench.cli eval mirai \
   --label qwen3.8-4bit-thinkoff \
   --template-kwarg enable_thinking=false
-.venv/bin/python -m bench.cli eval omlx \
+.venv/bin/python -m bench.cli eval mirai \
   --label qwen3.8-4bit-thinkon \
   --template-kwarg enable_thinking=true
 
 # A subset while iterating on one category.
-.venv/bin/python -m bench.cli eval omlx --only codigo,json
+.venv/bin/python -m bench.cli eval mirai --only codigo,json
 
 # One item, to debug a grader.
-.venv/bin/python -m bench.cli eval omlx --item json-pedido
+.venv/bin/python -m bench.cli eval mirai --item json-pedido
 
 # Report and gates.
 make eval-report
@@ -199,7 +199,7 @@ suite slower without adding information.
 After a trial round:
 
 1. A model is removed from `config/models.toml`, its weights deleted from
-   `~/.omlx/models` (or the engine's store) and its engine label removed from
+   the engine's model store, and its engine label removed from
    `config/engines.toml` when it loses every category it was meant for and
    another kept model matches or beats it.
 2. An item is removed (and the revision bumped) when every run passes it for
@@ -256,8 +256,8 @@ Twenty items, eight runs, four weight sets. Every run passes the gates
 |---|---:|---|---|
 | Q3_K_XL · Splash (pre-V3.1) | 17/20 | nested JSON, design choice, IVA | off |
 | Q3_K_XL · Splash (pre-V3.1) | 19/20 | permission item, truncated at 8,892 tokens | on |
-| 4-bit MLX · oMLX | 17/20 | nested JSON, design choice, IVA | off |
-| 4-bit MLX · oMLX | 19/20 | permission item, truncated at 8,892 tokens | on |
+| 4-bit MLX · oMLX (removed) | 17/20 | nested JSON, design choice, IVA | off |
+| 4-bit MLX · oMLX (removed) | 19/20 | permission item, truncated at 8,892 tokens | on |
 | 4-bit M · Mirai/uzu | 18/20 | nested JSON, IVA | off |
 | 4-bit M · Mirai/uzu | **20/20** | none | on |
 | Q3_K_XL · Splash V3.1 | 18/20 | nested JSON, IVA | off |

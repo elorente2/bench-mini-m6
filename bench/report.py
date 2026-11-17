@@ -32,6 +32,7 @@ ENGINE_ORDER = {
     "ollama-default": 3,
     "omlx-4bit": 4,
     "omlx-4bit-hot4g": 5,
+    "ollama": 6,
 }
 
 SPEED_METRICS = tuple(metric for metric in METRICS if metric.group == "speed")
